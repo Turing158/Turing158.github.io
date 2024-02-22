@@ -45,7 +45,7 @@ tags:
 
 7. 下载好之后，在**Android Studio**的首页，点击**Plugins-右上角小齿轮-Install Plugin from Disk...**，然后找到**下载**的**压缩包**，点击它，然后点最下面的**ok**
 
-   ![image-20240221232327176](https://www.z4a.net/images/2024/02/22/image-20240221232327176.png)
+   ![image-20240221232327176](https://www.z4a.net/images/2024/02/22/image-20240221232324716.png)
 
 8. 最后，**重启Android Studio**就你看到**中文版的Android Studio**
 
