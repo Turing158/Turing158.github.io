@@ -258,8 +258,8 @@ toc:
 
 sidebar:
   # Sidebar Position, available value: left | right
-#  position: left
-  position: right
+  position: left
+#  position: right
 
   # Sidebar Display, available value:
   #  - post    expand on posts automatically. Default.
@@ -283,11 +283,11 @@ sidebar:
 
 
 # Blog rolls
-links_title: Links
+#links_title: Links
 #links_layout: block
 #links_layout: inline
-links:
-  Title: TuringICE
+#links:
+#  Title: TuringICE
 
 
 # ---------------------------------------------------------------
