@@ -29,7 +29,7 @@ springboot是java的一个框架，他将spring框架的初始化和搭建进行
 
 2. 选择**新建项目**，名称随意，主要是构建系统选择**Maven**，**JDK选择17***[因为要使用SpringBoot3需要JDK17的支持]*
 
-   ![image-20240130214707217](https://www.z4a.net/images/2024/02/22/image-20240130214707217.png)
+   ![image-20240130214707217](https://www.z4a.net/images/2024/02/22/image-20240130214717928.png)
 
 ## 配置Pom
 
