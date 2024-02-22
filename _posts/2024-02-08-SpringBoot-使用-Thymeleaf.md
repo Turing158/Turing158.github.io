@@ -7,7 +7,6 @@ categories:
 tags:
 ---
 
-[csdn]()
 
 # 介绍
 
@@ -86,6 +85,8 @@ tags:
 | th:src         | 设置img标签的图片路径           | `<img th:src="'./fold/'+${value}"/>`                |
 | th:action      | 替换表单的action属性            | `<form th:action="@{/login}">`                      |
 | th:with        | 可变量进行赋值运算              | `<div th:with="value = 1 + 2"></div>`               |
+
+
 
  ## 常用标签的用法
 
