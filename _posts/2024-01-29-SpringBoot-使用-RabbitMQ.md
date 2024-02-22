@@ -6,7 +6,7 @@
 
 > RabbitMQ是用Erlang实现的一个**高并发高可靠AMQP消息队列**服务器。支持消息的持久化、事务、拥塞控制、负载均衡等特性，主要是为了实现系统之间的双向解耦
 
-![概念图](https://www.z4a.net/images/2024/02/22/c65b0e005c026a9582234fd16da583ba.png)
+
 ### 优点
 
 > 解耦、异步提升效率、流量削峰[高并发]
@@ -324,7 +324,7 @@ public class Person1Sender {
 
    交换机的主要功能是**接收**消息并且**转发**到绑定的队列，不会储存消息
 
-   ![概念图](https://www.z4a.net/images/2024/02/22/概念图.png)
+   ![概念图](https://www.z4a.net/images/2024/02/22/c65b0e005c026a9582234fd16da583ba.png)
 
    交换机有**四种**类型
 
@@ -348,13 +348,10 @@ public class Person1Sender {
 
       OKOK，了解完概念，直接上demo来理解
 
-      ------
 
-      
-   
-      #### **Topic**
-      
-      1. 配置Topic类型交换机及所对应的队列
+
+#### Topic
+1. 配置Topic类型交换机及所对应的队列
       
       ```java
       //TopicRabbitMQConfig.java
@@ -429,9 +426,9 @@ public class Person1Sender {
           }
       ```
       
-      2. 添加Person5Sender.java
+2. 添加Person5Sender.java
       
-         这个**sender**可能有点不一样，特别是`rabbitTemplate.convertAndSend`
+   这个**sender**可能有点不一样，特别是`rabbitTemplate.convertAndSend`
       
          > 第一个值：交换机名字[**exchange**]
          >
@@ -439,38 +436,38 @@ public class Person1Sender {
          >
          > 第三个值：消息[**context**]
       
-         我这里设置了比较多的方法
+   我这里设置了比较多的方法
       
-      ```java
-         //Person5Sender.java
-         @Component
-         public class Person5Sender {
-             @Autowired
-             private AmqpTemplate rabbitTemplate;
+   ```java
+      //Person5Sender.java
+      @Component
+      public class Person5Sender {
+          @Autowired
+          private AmqpTemplate rabbitTemplate;
              
-             public void send1(){
-                 String context = "hello我是Person5,RoutingKey为topic.msg";
-                 this.rabbitTemplate.convertAndSend("exchange","topic.msg",context);
-             }
-             public void send2(){
-                 String context = "hello我是Person5,RoutingKey为topic.msgs";
-                 this.rabbitTemplate.convertAndSend("exchange","topic.msgs",context);
-             }
-             public void send3(){
-                 String context = "hello我是Person5,RoutingKey为topic.random";
-                 this.rabbitTemplate.convertAndSend("exchange","topic.random",context);
-             }
-             public void send4(){
-                 String context = "hello我是Person5,RoutingKey为topic.";
-                 this.rabbitTemplate.convertAndSend("exchange","topic",context);
-             }
-      ```
+          public void send1(){
+              String context = "hello我是Person5,RoutingKey为topic.msg";
+              this.rabbitTemplate.convertAndSend("exchange","topic.msg",context);
+          }
+          public void send2(){
+              String context = "hello我是Person5,RoutingKey为topic.msgs";
+              this.rabbitTemplate.convertAndSend("exchange","topic.msgs",context);
+          }
+          public void send3(){
+              String context = "hello我是Person5,RoutingKey为topic.random";
+              this.rabbitTemplate.convertAndSend("exchange","topic.random",context);
+          }
+          public void send4(){
+              String context = "hello我是Person5,RoutingKey为topic.";
+              this.rabbitTemplate.convertAndSend("exchange","topic",context);
+          }
+   ```
       
-      为了方便，我单独拎出来一个方法**send1()**来分析一波
+   为了方便，我单独拎出来一个方法**send1()**来分析一波
       
-      - 这个方法用于发送消息，**context**变量为消息
+   - 这个方法用于发送消息，**context**变量为消息
       
-      - **AmqpTemplate**的**convertAndSend**方法的三个值：
+   - **AmqpTemplate**的**convertAndSend**方法的三个值：
       
         > 第一个值：交换机名字[**exchange**]
         >
@@ -478,99 +475,99 @@ public class Person1Sender {
         >
         > 第三个值：消息[**context**]
       
-      - 这里主要是注意**路由键**
+   - 这里主要是注意**路由键**
       
-        这里的路由键会经过**Topic**类型的交换机[**exchange**]，然后，交换机会通过匹配你所填写的**路由键**，并将消息放在**匹配**到的队列中
+     这里的路由键会经过**Topic**类型的交换机[**exchange**]，然后，交换机会通过匹配你所填写的**路由键**，并将消息放在**匹配**到的队列中
       
-      ```java
-              public void send1(){
-                 String context = "hello我是Person5,RoutingKey为topic.msg";
-                 this.rabbitTemplate.convertAndSend("exchange","topic.msg",context);
-             }
-      ```
+   ```java
+           public void send1(){
+              String context = "hello我是Person5,RoutingKey为topic.msg";
+              this.rabbitTemplate.convertAndSend("exchange","topic.msg",context);
+          }
+   ```
       
-      3. 添加Receivers.java
+3. 添加Receivers.java
       
-         *这个类，我直接把接收者变成一个方法*
+   *这个类，我直接把接收者变成一个方法*
       
-         ```java
-         //Receivers.java
-         @Component
-         public class Receivers {
-             @RabbitListener(queues = "msg")
-             @RabbitHandler
-             public void person6(String msg){
-                 System.out.println("Person6接收到的信息:"+msg);
-             }
-             @RabbitListener(queues = "msgs")
-             @RabbitHandler
-             public void person7(String msg){
-                 System.out.println("Person7接收到的信息:"+msg);
-             }
-         }
-         ```
+   ```java
+   //Receivers.java
+   @Component
+   public class Receivers {
+       @RabbitListener(queues = "msg")
+       @RabbitHandler
+       public void person6(String msg){
+           System.out.println("Person6接收到的信息:"+msg);
+       }
+       @RabbitListener(queues = "msgs")
+       @RabbitHandler
+       public void person7(String msg){
+           System.out.println("Person7接收到的信息:"+msg);
+       }
+   }
+   ```
          
-         随便拎出来一个方法，分析一波
+   随便拎出来一个方法，分析一波
          
-         - **@RabbitListener**注解：用于**监听**该队列的消息，需要**搭配@RabbitHandler**一起使用，queues的值为配置时的队列名
-         - **@RabbitHandler**注解：用于**绑定**监听到该队列消息后的**方法**
-         - 方法的形参：方法的**形参**名字不一定要一样，但是要与监听到的消息的**类型一样**
+   - **@RabbitListener**注解：用于**监听**该队列的消息，需要**搭配@RabbitHandler**一起使用，queues的值为配置时的队列名
+   - **@RabbitHandler**注解：用于**绑定**监听到该队列消息后的**方法**
+   - 方法的形参：方法的**形参**名字不一定要一样，但是要与监听到的消息的**类型一样**
          
-         ```java
-             @RabbitListener(queues = "msg")
-             @RabbitHandler0
-             public void person6(String msg){
-                 System.out.println("Person6接收到的信息:"+msg);
-             }
-         ```
+   ```java
+       @RabbitListener(queues = "msg")
+       @RabbitHandler0
+       public void person6(String msg){
+           System.out.println("Person6接收到的信息:"+msg);
+       }
+   ```
          
-      4. 修改testController.java
+4. 修改testController.java
       
-         ```java
-         //testController.java
-         @Controller
-         public class testController {
-             @Autowired
-             Person5Sender person5Sender;
-             @RequestMapping("/")
-             @ResponseBody
-             public String test() throws InterruptedException {
-                 person5Sender.send1();
-                 Thread.sleep(1000);
-                 System.out.println("==================================");
-                 person5Sender.send2();
-                 Thread.sleep(1000);
-                 System.out.println("==================================");
-                 person5Sender.send3();
-                 Thread.sleep(1000);
-                 System.out.println("==================================");
-                 person5Sender.send4();
-                 return "test";
-             }
-         }
-         ```
+   ```java
+   //testController.java
+   @Controller
+   public class testController {
+       @Autowired
+       Person5Sender person5Sender;
+       @RequestMapping("/")
+       @ResponseBody
+       public String test() throws InterruptedException {
+           person5Sender.send1();
+           Thread.sleep(1000);
+           System.out.println("==================================");
+           person5Sender.send2();
+           Thread.sleep(1000);
+           System.out.println("==================================");
+           person5Sender.send3();
+           Thread.sleep(1000);
+           System.out.println("==================================");
+           person5Sender.send4();
+           return "test";
+       }
+   }
+   ```
       
-         调用**Person5Sender**的四个方法，并加点延迟区分一下，可得结果↓
+   调用**Person5Sender**的四个方法，并加点延迟区分一下，可得结果↓
       
-         ![image-20240129150721894](https://www.z4a.net/images/2024/02/22\image-20240129150721894.png)
+   ![image-20240129150721894](https://www.z4a.net/images/2024/02/22\image-20240129150721894.png)
       
-         其实者很明显了
+   其实者很明显了
          
-         1. 第一组：
+   1. 第一组：
          
-            路由键为**topic.msg**，那就看看符不符合通配符的匹配
+      路由键为**topic.msg**，那就看看符不符合通配符的匹配
          
-            第一个队列路由键的规则：**topic.msg**，也就是说，发送者的路由键也必须是**topic.msg**才能将消息发送到**msg队列**，所以，**msg队列**有消息被存入，触发了**Person6()**
+      第一个队列路由键的规则：**topic.msg**，也就是说，发送者的路由键也必须是**topic.msg**才能将消息发送到**msg队列**，所以，**msg队列**有消息被存入，触发了**Person6()**
          
-            第二个队列路由键的规则：**topic.#**，也就是说，发送者的路由键只要是**topic**字母开头，`.`后面无论有还是没有，都能将消息发送到**msgs队列**，从而触发**Person7()**
+      第二个队列路由键的规则：**topic.#**，也就是说，发送者的路由键只要是**topic**字母开头，`.`后面无论有还是没有，都能将消息发送到**msgs队列**，从而触发**Person7()**
          
-         2. 第二、三、四组：
+   2. 第二、三、四组：
          
-            路由键都要么是**topic.**后面加**一个**词或**多个**词的，要么是只有**topic**的，只能符合**topic.#**这个规则，从而触发**Person7()**
+      路由键都要么是**topic.**后面加**一个**词或**多个**词的，要么是只有**topic**的，只能符合**topic.#**这个规则，从而触发**Person7()**
          
-         **总结**：其实**Topic**类型也是挺好理解的，重点在于路由键规则的指定和匹配
+   **总结**：其实**Topic**类型也是挺好理解的，重点在于路由键规则的指定和匹配
       
-      ------
+   ------
       
       
       
@@ -584,9 +581,9 @@ public class Person1Sender {
       
       
       
-      #### **Fanout**
+#### **Fanout**
       
-      1. 同样的先配置**Fanout**的交换机和用于**测试的队列**，创建一个FanoutRabbitMQConfig.java
+1. 同样的先配置**Fanout**的交换机和用于**测试的队列**，创建一个FanoutRabbitMQConfig.java
       
          ```java
          //FanoutRabbitMQConfig.java
@@ -625,81 +622,81 @@ public class Person1Sender {
       
          这个应该都挺好懂得了吧，就是把**radio、tv、phone队列**都绑定到**FanoutExchange**上
       
-      2. 添加发送者，FanoutSender.java，分别给三个方法随便取了三个不同的**路由键**
+2. 添加发送者，FanoutSender.java，分别给三个方法随便取了三个不同的**路由键**
       
-         ```java
-         //FanoutSender.java
-         @Component
-         public class FanoutSender {
-             @Autowired
-             private AmqpTemplate rabbitTemplate;
-             public void send1(){
-                 String context = "我是FanoutSender,发送了send1,路由键为'abcdefg'";
-                 this.rabbitTemplate.convertAndSend("fanoutExchange","abcdefg", context);
-             }
-             public void send2(){
-                 String context = "我是FanoutSender,发送了send2,路由键为' '";
-                 this.rabbitTemplate.convertAndSend("fanoutExchange","", context);
-             }
-             public void send3(){
-                 String context = "我是FanoutSender,发送了send3,路由键为'fanout'";
-                 this.rabbitTemplate.convertAndSend("fanoutExchange","fanout", context);
-             }
-         }
-         ```
+   ```java
+   //FanoutSender.java
+   @Component
+   public class FanoutSender {
+       @Autowired
+       private AmqpTemplate rabbitTemplate;
+       public void send1(){
+           String context = "我是FanoutSender,发送了send1,路由键为'abcdefg'";
+           this.rabbitTemplate.convertAndSend("fanoutExchange","abcdefg", context);
+       }
+       public void send2(){
+           String context = "我是FanoutSender,发送了send2,路由键为' '";
+           this.rabbitTemplate.convertAndSend("fanoutExchange","", context);
+       }
+       public void send3(){
+           String context = "我是FanoutSender,发送了send3,路由键为'fanout'";
+           this.rabbitTemplate.convertAndSend("fanoutExchange","fanout", context);
+       }
+   }
+   ```
       
-      3. 添加接收者 FanoutReceiver.java，用于**监听**对应**队列**的消息
+3. 添加接收者 FanoutReceiver.java，用于**监听**对应**队列**的消息
       
-         ```java
-         //FanoutReceiver.java
-         @Component
-         public class FanoutReceiver {
-             @RabbitListener(queues = "radio")
-             @RabbitHandler
-             public void radio(String msg){
-                 System.out.println("监听radio："+msg);
-             }
-             @RabbitListener(queues = "phone")
-             @RabbitHandler
-             public void phone(String msg){
-                 System.out.println("监听phone："+msg);
-             }
-             @RabbitListener(queues = "tv")
-             @RabbitHandler
-             public void tv(String msg){
-                 System.out.println("监听tv："+msg);
-             }
-         }
-         ```
+   ```java
+   //FanoutReceiver.java
+   @Component
+   public class FanoutReceiver {
+       @RabbitListener(queues = "radio")
+       @RabbitHandler
+       public void radio(String msg){
+           System.out.println("监听radio："+msg);
+       }
+       @RabbitListener(queues = "phone")
+       @RabbitHandler
+       public void phone(String msg){
+           System.out.println("监听phone："+msg);
+       }
+       @RabbitListener(queues = "tv")
+       @RabbitHandler
+       public void tv(String msg){
+           System.out.println("监听tv："+msg);
+       }
+   }
+   ```
       
-      4. 修改测试控制类testController.java
+4. 修改测试控制类testController.java
       
-         ```java
-         //testController.java
-         @Controller
-         public class testController {
-             @Autowired
-             FanoutSender fanoutSender;
-             @RequestMapping("/")
-             @ResponseBody
-             public String test() throws InterruptedException {
-                 fanoutSender.send1();
-                 Thread.sleep(1000);
-                 System.out.println("==========================");
-                 fanoutSender.send2();
-                 Thread.sleep(1000);
-                 System.out.println("==========================");
-                 fanoutSender.send3();
-                 return "test";
-             }
-         }
-         ```
+   ```java
+   //testController.java
+   @Controller
+   public class testController {
+       @Autowired
+       FanoutSender fanoutSender;
+       @RequestMapping("/")
+       @ResponseBody
+       public String test() throws InterruptedException {
+           fanoutSender.send1();
+           Thread.sleep(1000);
+           System.out.println("==========================");
+           fanoutSender.send2();
+           Thread.sleep(1000);
+           System.out.println("==========================");
+           fanoutSender.send3();
+           return "test";
+       }
+   }
+   ```
       
-         查看效果
+   查看效果
       
-         ![image-20240129171749376](https://www.z4a.net/images/2024/02/22\image-20240129171749376.png)
+   ![image-20240129171749376](https://www.z4a.net/images/2024/02/22\image-20240129171749376.png)
       
-         **总结**：很明显了，这三个队列无论发送者是什么路由键，他都会将消息发送到三个队列中
+   **总结**：很明显了，这三个队列无论发送者是什么路由键，他都会将消息发送到三个队列中
 
 ### 参考文档：
 
