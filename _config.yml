@@ -630,10 +630,10 @@ pace: true
 #pace-theme-minimal
 # For example
 # pace_theme: pace-theme-center-simple
-pace_theme: pace-theme-minimal
+pace_theme: pace-theme-center-simple
 
 # Canvas-nest
-canvas_nest: false
+canvas_nest: true
 
 # three_waves
 three_waves: false
@@ -642,7 +642,7 @@ three_waves: false
 canvas_lines: false
 
 # canvas_sphere
-canvas_sphere: true
+canvas_sphere: false
 
 # Only fit scheme Pisces
 # Canvas-ribbon
