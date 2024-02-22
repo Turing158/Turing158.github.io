@@ -86,7 +86,7 @@ tags:
 | th:action      | 替换表单的action属性            | `<form th:action="@{/login}">`                      |
 | th:with        | 可变量进行赋值运算              | `<div th:with="value = 1 + 2"></div>`               |
 
-
+---
 
  ## 常用标签的用法
 
@@ -454,7 +454,11 @@ tags:
 
 ### th:switch | th:case
 
+
+
 > **th:switch | th:case**：**前者的值**就是通过**session**作为**变量**，**后者的值**就是判断**前者的值**是否等于**后者的值**，若是则显示，反之，若**子标签**的属性**th:case="\*"**，就是变量的值不等于其他子标签的值，就会显示属性**th:case="\*"**的**子标签**
+
+
 
 1. 使用**th:switch | th:case**需要有一个**div**或者其他的作为**载体**，并增加**th:switch**属性，里面的标签用**th:case**来判断
 
