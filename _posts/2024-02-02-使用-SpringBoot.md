@@ -1,7 +1,7 @@
 ---
 title: 使用-SpringBoot
 description: springboot是java的一个框架，他将spring框架的初始化和搭建进行了简化，让你不到一分钟能够使用Spring的内容，只需一些简单的配置
-date: 2024-2-7 21:52:00
+date: 2024-2-2 21:52:00
 categories:
  - SpringBoot
 tags:

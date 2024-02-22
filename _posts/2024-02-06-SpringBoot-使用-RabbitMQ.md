@@ -1,3 +1,11 @@
+---
+title: SpringBoot-使用-RabbitMQ
+description: RabbitMQ是用Erlang实现的一个高并发高可靠AMQP消息队列服务器。支持消息的持久化、事务、拥塞控制、负载均衡等特性，主要是为了实现系统之间的双向解耦
+date: 2024-2-6 16:45:12
+categories:
+ - SpringBoot
+tags:
+---
 # SpringBoot使用RabbitMQ
 
 
@@ -187,7 +195,7 @@ public class Person1Sender {
    }
    ```
    
-   效果：![image-20240127203952345](https://www.z4a.net/images/2024/02/22\image-20240127203952345.png)
+   效果：![image-20240127203952345](https://www.z4a.net/images/2024/02/22/image-20240127203952345.png)
    
    ------
    
@@ -248,7 +256,7 @@ public class Person1Sender {
 
    4. 运行之后，看下控制台
 
-   ![image-20240125220318175](https://www.z4a.net/images/2024/02/22\image-20240125220318175.png)
+   ![image-20240125220318175](https://www.z4a.net/images/2024/02/22/image-20240125220318175.png)
 
    突然发现，**person2**和**person3**接收的消息都是**一半一半**的，都是你一个我一个
 
@@ -294,7 +302,7 @@ public class Person1Sender {
    
    3. 重新启动运行下看控制台
    
-   ![image-20240125221409953](https://www.z4a.net/images/2024/02/22\image-20240125221409953.png)
+   ![image-20240125221409953](https://www.z4a.net/images/2024/02/22/image-20240125221409953.png)
    
    真**神奇，3接4的消息，2接1的消息，也是一半一半
    
@@ -549,7 +557,7 @@ public class Person1Sender {
       
    调用**Person5Sender**的四个方法，并加点延迟区分一下，可得结果↓
       
-   ![image-20240129150721894](https://www.z4a.net/images/2024/02/22\image-20240129150721894.png)
+   ![image-20240129150721894](https://www.z4a.net/images/2024/02/22/image-20240129150721894.png)
       
    其实者很明显了
          
@@ -694,7 +702,7 @@ public class Person1Sender {
       
    查看效果
       
-   ![image-20240129171749376](https://www.z4a.net/images/2024/02/22\image-20240129171749376.png)
+   ![image-20240129171749376](https://www.z4a.net/images/2024/02/22/image-20240129171749376.png)
       
    **总结**：很明显了，这三个队列无论发送者是什么路由键，他都会将消息发送到三个队列中
 
