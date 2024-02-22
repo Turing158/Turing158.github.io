@@ -6,7 +6,6 @@ categories:
  - SpringBoot
 tags:
 ---
-[TOC]
 
 [csdn](https://blog.csdn.net/weixin_46396315/article/details/135996056)
 
@@ -26,11 +25,11 @@ springboot是java的一个框架，他将spring框架的初始化和搭建进行
 
 1. 在IDEA里**文件** > **新建** > **项目**
 
-   ![image-20240130214504538](./使用SpringBoot.assets/image-20240130214504538.png)
+   ![image-20240130214504538](https://www.z4a.net/images/2024/02/22/image-20240130214504538.png)
 
 2. 选择**新建项目**，名称随意，主要是构建系统选择**Maven**，**JDK选择17***[因为要使用SpringBoot3需要JDK17的支持]*
 
-   ![image-20240130214707217](./使用SpringBoot.assets/image-20240130214707217.png)
+   ![image-20240130214707217](https://www.z4a.net/images/2024/02/22/image-20240130214707217.png)
 
 ## 配置Pom
 
@@ -42,7 +41,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 其他的就不需要怎么动
 
-![image-20240130231405249](./使用SpringBoot.assets/image-20240130231405249.png)
+![image-20240130231405249](https://www.z4a.net/images/2024/02/22/image-20240130231405249.png)
 
 1. 添加**Parent**
 
@@ -103,7 +102,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
    一般来说，启动了之后是不会有什么报错或者直接报错后停止的
    
-   ![image-20240201020341498](./使用SpringBoot.assets/image-20240201020341498.png)
+   ![image-20240201020341498](https://www.z4a.net/images/2024/02/22/image-20240201020341498.png)
 
 
 
@@ -173,7 +172,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 5. 在application.java启动类启动，并打开浏览器输入**localhost:8080**即可查看结果
 
-![image-20240207204059405](./使用SpringBoot.assets/image-20240207204059405.png)
+![image-20240207204059405](https://www.z4a.net/images/2024/02/22/image-20240207204059405.png)
 
 ## application
 
@@ -181,7 +180,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 我们先在**resources**文件下新建一个文件**application.properties**或**application.yml**，这个文件是用来设置Springboot的一些配置的，但是目前还没有用到，所以先搁置着
 
-![image-20240202162603439](./使用SpringBoot.assets/image-20240202162603439.png)
+![image-20240202162603439](https://www.z4a.net/images/2024/02/22/image-20240202162603439.png)
 
 # SpringBoot对于现在的使用方式
 
@@ -274,6 +273,6 @@ public String test3(){
 
 3. 启动测试
 
-   ![image-20240207204039342](./使用SpringBoot.assets/image-20240207204039342.png)
+   ![image-20240207204039342](https://www.z4a.net/images/2024/02/22/image-20240207204039342.png)
 
 Springboot的基本用法就这些了，如果还有什么补充，尽管提出
