@@ -283,11 +283,16 @@ sidebar:
 
 
 # Blog rolls
-links_title: Links
+links_title:
 #links_layout: block
 links_layout: inline
 links:
-  Title: TuringICE
+  Home: /
+  Archives: /archives/
+  categories: /categories/
+  archives: /archives/
+  tags: /tags/
+  about: /about/
 
 
 # ---------------------------------------------------------------
