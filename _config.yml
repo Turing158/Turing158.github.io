@@ -284,8 +284,8 @@ sidebar:
 
 # Blog rolls
 links_title:
-#links_layout: block
-links_layout: inline
+links_layout: block
+#links_layout: inline
 links:
   Home: /
   Archives: /archives/
@@ -387,7 +387,7 @@ baidu_analytics: 75c02ca41fa838f120587aa681fac527
 
 # Disqus
 disqus:
-  enable: true
+  enable: false
   shortname: turing158s-home
   count: true
   # hide comments (visitors need to click to load the comments)
@@ -421,7 +421,7 @@ wildfire:
 # </wildfire>
 
 # Hypercomments
-#hypercomments_id:
+hypercomments_id: 0137dd10-e577-4099-bc9d-2960f04f024c
 
 # Gentie productKey
 #gentie_productKey:
