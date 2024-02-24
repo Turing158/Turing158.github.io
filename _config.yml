@@ -134,8 +134,8 @@ menu:
 menu_icons:
   enable: true
   #KeyMapsToMenuItemKey: NameOfTheIconFromFontAwesome
-  home: home
-  about: user
+  home: coffee
+  about: vcard
   categories: th
   schedule: calendar
   tags: tags
