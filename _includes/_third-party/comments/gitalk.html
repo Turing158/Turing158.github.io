@@ -18,7 +18,8 @@
         id: '{{ page.url }}',
         labels: ['Gitalk'],
         perPage: 50,
-        distractionFreeMode: true
+        distractionFreeMode: true,
+        createIssueManually: true,
       });
       gitalk.render('gitalk-container');
 </script>
