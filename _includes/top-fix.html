@@ -58,7 +58,7 @@
         }
         else{
             window.removeEventListener('scroll',scrollFun);
-            top_fixDOC.style.display = 'none';
+            hideTopFixDOC();
         }
     }
     function scrollFun(){
@@ -75,10 +75,7 @@
         clearTimeout(timeOut);
     }
     function hideTopFixDOC(){
-        top_fixDOC.style.animation = 'show 0.2s ease-in reverse';
-        timeOut = setTimeout(function (){
-            top_fixDOC.style.display = 'none';
-        },200);
+        top_fixDOC.style.display = 'none';
     }
 </script>
 <style>
@@ -89,8 +86,9 @@
         width: 100vw;
         height: 55px;
         z-index: 999;
-        background-color: #f1f1f1ee;
+        background-color: #f1f1f1aa;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
         display: none;
     }
     .top-menu{
