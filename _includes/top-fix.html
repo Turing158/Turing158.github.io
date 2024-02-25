@@ -35,8 +35,21 @@
     </div>
 </div>
 <script>
-    var top_fixDOC = document.getElementById('top-fix');
-    window.addEventListener('scroll',function (){
+    let top_fixDOC = document.getElementById('top-fix');
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+        // 当窗口大小发生变化时，重新获取窗口的宽度和高度
+        windowWidth = window.innerWidth;
+        windowHeight = window.innerHeight;
+        if(windowWidth >= 768){
+            window.addEventListener('scroll',scrollFun);
+        }
+        else{
+            window.removeEventListener('scroll',scrollFun);
+        }
+    });
+    function scrollFun(){
         const scrollY = window.scrollY || window.pageYOffset;
         if (scrollY >= 400) {
             top_fixDOC.style.display = 'block'
@@ -45,7 +58,7 @@
             top_fixDOC.style.display = 'none'
             top_fixDOC.style.opacity = '0'
         }
-    });
+    }
 </script>
 <style>
     .top-fix{
