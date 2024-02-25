@@ -35,13 +35,14 @@
     </div>
 </div>
 <script>
-    $(window).on('scroll', function () {
-        var scrollTop = $(window).scrollTop();
-        var docHeight = $('#content').height();
-        var winHeight = $(window).height();
-        console.log('scrollTop'+scrollTop);
-        console.log('docHeight'+docHeight);
-        console.log('winHeight'+winHeight);
+    var top = document.querySelector('.top-fix');
+    window.addEventListener('scroll',function (){
+        const scrollY = window.scrollY || window.pageYOffset;
+        if (scrollY >= 500) {
+            top.style.display = 'none';
+        } else {
+            top.style.display = 'block';
+        }
     });
 </script>
 <style>
