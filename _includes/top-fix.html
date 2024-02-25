@@ -36,12 +36,22 @@
     </div>
 </div>
 <script>
-    let limitWidth = 768;
-    let limitHeight = 370;
-    let top_fixDOC = document.getElementById('top-fix');
+    const limitWidth = 768;
+    const limitHeight = 370;
+    const top_fixDOC = document.getElementById('top-fix');
+    const bodyEle = document.querySelector('body');
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
     let timeOut = null;
+    const observer = new MutationObserver(function(mutationsList) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                const computedStyle = window.getComputedStyle(bodyEle);
+                top_fixDOC.style.paddingRight = computedStyle.getPropertyValue('padding-right');
+            }
+        }
+    });
+    observer.observe(bodyEle, { attributes: true });
     checkWindowWidth();
     window.addEventListener('resize', function() {
         windowWidth = window.innerWidth;
@@ -55,10 +65,12 @@
                 showTopFixDOC();
             }
             window.addEventListener('scroll',scrollFun);
+            observer.observe(bodyEle, { attributes: true });
         }
         else{
             window.removeEventListener('scroll',scrollFun);
             hideTopFixDOC();
+            observer.disconnect();
         }
     }
     function scrollFun(){
@@ -77,6 +89,7 @@
     function hideTopFixDOC(){
         top_fixDOC.style.display = 'none';
     }
+
 </script>
 <style>
     #top-fix{
