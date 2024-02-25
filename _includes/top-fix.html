@@ -39,9 +39,9 @@
     window.addEventListener('scroll',function (){
         const scrollY = window.scrollY || window.pageYOffset;
         if (scrollY >= 500) {
-            top.classList.add('display_block')
+            top_fixDOC.style.display = 'block'
         } else {
-            top.classList.remove('display_none')
+            top_fixDOC.style.display = 'none'
         }
     });
 </script>
