@@ -57,7 +57,7 @@
     });
     function scrollFun(){
         const scrollY = window.scrollY || window.pageYOffset;
-        if (scrollY >= 400) {
+        if (scrollY >= 380) {
             showTopFixDOC()
         } else {
             hideTopFixDOC()
@@ -65,14 +65,14 @@
     }
     function showTopFixDOC(){
         top_fixDOC.style.display = 'block'
-        top_fixDOC.style.animation = 'show 0.3s ease-in'
+        top_fixDOC.style.animation = 'show 0.2s ease-in'
         clearTimeout(timeOut)
     }
     function hideTopFixDOC(){
-        top_fixDOC.style.animation = 'show 0.3s ease-in reverse'
+        top_fixDOC.style.animation = 'show 0.1s ease-in reverse'
         timeOut = setTimeout(function (){
             top_fixDOC.style.display = 'none'
-        },300)
+        },100)
     }
 </script>
 <style>
