@@ -16,7 +16,7 @@
             </li>
             {% endfor %}
 
-            {% if hasSearch %}
+
             <li class="menu-item menu-item-search">
                 {% if site.swiftype_key %}
                 <a href="javascript:;" class="st-search-show-outputs">
@@ -28,8 +28,9 @@
                         {% endif %}
                         {{ __.menu.search }}
                     </a>
+                </a>
             </li>
-            {% endif %}
+
         </ul>
         {% endif %}
     </div>
@@ -39,7 +40,6 @@
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
     window.addEventListener('resize', function() {
-        // 当窗口大小发生变化时，重新获取窗口的宽度和高度
         windowWidth = window.innerWidth;
         windowHeight = window.innerHeight;
         if(windowWidth >= 768){
@@ -47,6 +47,8 @@
         }
         else{
             window.removeEventListener('scroll',scrollFun);
+            top_fixDOC.style.display = 'none'
+            top_fixDOC.style.opacity = '0'
         }
     });
     function scrollFun(){
@@ -68,7 +70,7 @@
         width: 100vw;
         height: 55px;
         z-index: 999;
-        background-color: #f1f1f1cc;
+        background-color: #f1f1f1ee;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         transition: all 0.5s;
         display: none;
