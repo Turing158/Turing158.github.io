@@ -38,10 +38,12 @@
     var top_fixDOC = document.getElementById('top-fix');
     window.addEventListener('scroll',function (){
         const scrollY = window.scrollY || window.pageYOffset;
-        if (scrollY >= 500) {
+        if (scrollY >= 450) {
             top_fixDOC.style.display = 'block'
+            top_fixDOC.style.opacity = '1'
         } else {
             top_fixDOC.style.display = 'none'
+            top_fixDOC.style.opacity = '0'
         }
     });
 </script>
@@ -55,12 +57,9 @@
         z-index: 999;
         background-color: #f1f1f1;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .display_block{
-        display: block;
-    }
-    .display_none{
+        transition: all 0.5s;
         display: none;
+        opacity: 0;
     }
     .top-menu{
         position: relative;
