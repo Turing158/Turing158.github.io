@@ -1,37 +1,39 @@
 <div class="top-fix">
-    {% if site.menu %}
-    <ul id="menu" class="menu">
-        {% for name_path in site.menu %}
-        {% assign name = name_path[0] %}
-        {% assign path = name_path[1] %}
-        {% assign itemName = name | downcase %}
-        <li class="menu-item menu-item-{{ itemName }}">
-            <a href="{{ path | relative_url }}" rel="section">
-                {% if site.menu_icons.enable %}
-                <i class="menu-item-icon fa fa-fw fa-{{site.menu_icons[itemName] | default: 'question-circle' | downcase }}"></i> <br />
-                {% endif %}
-                {{ __.menu[name] }}
-            </a>
-        </li>
-        {% endfor %}
-
-        {% if hasSearch %}
-        <li class="menu-item menu-item-search">
-            {% if site.swiftype_key %}
-            <a href="javascript:;" class="st-search-show-outputs">
-                {% elsif site.local_search.enable or site.algolia_search.enable %}
-                <a href="javascript:;" class="popup-trigger">
-                    {% endif %}
+    <div class="top-menu">
+        {% if site.menu %}
+        <ul id="menu" class="menu">
+            {% for name_path in site.menu %}
+            {% assign name = name_path[0] %}
+            {% assign path = name_path[1] %}
+            {% assign itemName = name | downcase %}
+            <li class="menu-item menu-item-{{ itemName }}">
+                <a href="{{ path | relative_url }}" rel="section">
                     {% if site.menu_icons.enable %}
-                    <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+                    <i class="menu-item-icon fa fa-fw fa-{{site.menu_icons[itemName] | default: 'question-circle' | downcase }}"></i> <br />
                     {% endif %}
-                    {{ __.menu.search }}
+                    {{ __.menu[name] }}
                 </a>
-            </a>
-        </li>
+            </li>
+            {% endfor %}
+
+            {% if hasSearch %}
+            <li class="menu-item menu-item-search">
+                {% if site.swiftype_key %}
+                <a href="javascript:;" class="st-search-show-outputs">
+                    {% elsif site.local_search.enable or site.algolia_search.enable %}
+                    <a href="javascript:;" class="popup-trigger">
+                        {% endif %}
+                        {% if site.menu_icons.enable %}
+                        <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+                        {% endif %}
+                        {{ __.menu.search }}
+                    </a>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
         {% endif %}
-    </ul>
-    {% endif %}
+    </div>
 </div>
 <style>
     .top-fix{
@@ -43,5 +45,9 @@
         z-index: 999;
         background-color: #fff;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .top-menu{
+        position: relative;
+        top: 20px;
     }
 </style>
