@@ -34,6 +34,16 @@
         {% endif %}
     </div>
 </div>
+<script>
+    $(window).on('scroll', function () {
+        var scrollTop = $(window).scrollTop();
+        var docHeight = $('#content').height();
+        var winHeight = $(window).height();
+        console.log('scrollTop'+scrollTop);
+        console.log('docHeight'+docHeight);
+        console.log('winHeight'+winHeight);
+    });
+</script>
 <style>
     .top-fix{
         position: fixed;
