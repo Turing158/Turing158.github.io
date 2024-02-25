@@ -1,4 +1,4 @@
-<div id="top-fix">
+<div class="top-fix">
     <div class="top-menu">
         {% if site.menu %}
         <ul id="menu" class="menu">
@@ -38,7 +38,8 @@
 <script>
     const limitWidth = 768;
     const limitHeight = 370;
-    const top_fixDOC = document.getElementById('top-fix');
+    const top_fixDOC = document.querySelector('.top-fix');
+    const top_fixTop_menu = document.querySelector('.top-menu');
     const bodyEle = document.querySelector('body');
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
@@ -47,7 +48,7 @@
         for (let mutation of mutationsList) {
             if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
                 const computedStyle = window.getComputedStyle(bodyEle);
-                top_fixDOC.style.paddingRight = computedStyle.getPropertyValue('padding-right');
+                top_fixTop_menu.style.paddingRight = computedStyle.getPropertyValue('padding-right');
             }
         }
     });
@@ -92,7 +93,7 @@
 
 </script>
 <style>
-    #top-fix{
+    .top-fix{
         position: fixed;
         top: 0;
         left: 0;
