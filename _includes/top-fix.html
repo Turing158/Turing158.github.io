@@ -39,31 +39,40 @@
     let top_fixDOC = document.getElementById('top-fix');
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
+    let timeOut = null;
     window.addEventListener('resize', function() {
         windowWidth = window.innerWidth;
         windowHeight = window.innerHeight;
         if(windowWidth >= 768){
             let nowScrollY = window.scrollY || window.pageYOffset;
             if(nowScrollY >= 400){
-                top_fixDOC.style.display = 'block'
-                top_fixDOC.style.opacity = '1'
+                showTopFixDOC()
             }
             window.addEventListener('scroll',scrollFun);
         }
         else{
             window.removeEventListener('scroll',scrollFun);
             top_fixDOC.style.display = 'none'
-            top_fixDOC.style.opacity = '0'
         }
     });
     function scrollFun(){
         const scrollY = window.scrollY || window.pageYOffset;
         if (scrollY >= 400) {
-            top_fixDOC.style.display = 'block'
-            top_fixDOC.style.animation = 'show 0.5s ease-in'
+            showTopFixDOC()
         } else {
-            top_fixDOC.style.display = 'none'
+            hideTopFixDOC()
         }
+    }
+    function showTopFixDOC(){
+        top_fixDOC.style.display = 'block'
+        top_fixDOC.style.animation = 'show 0.3s ease-in'
+        clearTimeout(timeOut)
+    }
+    function hideTopFixDOC(){
+        top_fixDOC.style.animation = 'show 0.3s ease-in reverse'
+        timeOut = setTimeout(function (){
+            top_fixDOC.style.display = 'none'
+        },300)
     }
 </script>
 <style>
