@@ -39,9 +39,9 @@
     window.addEventListener('scroll',function (){
         const scrollY = window.scrollY || window.pageYOffset;
         if (scrollY >= 500) {
-            top.style.display = 'none';
+            top.classList.add('display_block')
         } else {
-            top.style.display = 'block';
+            top.classList.remove('display_none')
         }
     });
 </script>
@@ -55,6 +55,12 @@
         z-index: 999;
         background-color: #f1f1f1;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .display_block{
+        display: block;
+    }
+    .display_none{
+        display: none;
     }
     .top-menu{
         position: relative;
