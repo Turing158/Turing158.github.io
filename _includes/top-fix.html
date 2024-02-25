@@ -36,6 +36,8 @@
     </div>
 </div>
 <script>
+    let limitWidth = 768;
+    let limitHeight = 370;
     let top_fixDOC = document.getElementById('top-fix');
     let windowWidth = window.innerWidth;
     let windowHeight = window.innerHeight;
@@ -47,9 +49,9 @@
         checkWindowWidth();
     });
     function checkWindowWidth(){
-        if(windowWidth >= 768){
+        if(windowWidth >= limitWidth){
             let nowScrollY = window.scrollY || window.pageYOffset;
-            if(nowScrollY >= 380){
+            if(nowScrollY >= limitHeight){
                 showTopFixDOC();
             }
             window.addEventListener('scroll',scrollFun);
@@ -61,7 +63,7 @@
     }
     function scrollFun(){
         const scrollY = window.scrollY || window.pageYOffset;
-        if (scrollY >= 380) {
+        if (scrollY >= limitHeight) {
             showTopFixDOC();
         } else {
             hideTopFixDOC();
