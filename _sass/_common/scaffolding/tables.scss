@@ -11,10 +11,12 @@ table {
 table>tbody>tr {
   & { background-color: #f1f1f1}
   &:nth-of-type(odd) { background-color: $table-row-odd-bg-color; }
-  &:nth-child(0) { background-color: #ddd}
   &:hover { background-color: $table-row-hover-bg-color; }
 }
-
+table>thead>tr {
+  background-color: #131313;
+  color: #f1f1f1;
+}
 caption, th, td {
   padding: $table-cell-padding;
   text-align: $table-content-alignment;
