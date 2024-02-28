@@ -9,7 +9,9 @@ table {
   word-wrap: break-all;
 }
 table>tbody>tr {
+  & { background-color: #f1f1f1}
   &:nth-of-type(odd) { background-color: $table-row-odd-bg-color; }
+  &:nth-child(0) { background-color: #ddd}
   &:hover { background-color: $table-row-hover-bg-color; }
 }
 
