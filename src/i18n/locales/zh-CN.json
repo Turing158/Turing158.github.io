@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "home": "主页",
+    "articles": "文章",
+    "projects": "项目",
+    "tools": "工具",
+    "about": "关于",
+    "commits": "提交"
+  },
+  "home": {
+    "recentCommits": "最新提交",
+    "recentArticles": "最新文章",
+    "viewAll": "查看全部",
+    "noCommits": "暂无提交记录",
+    "noArticles": "暂无文章"
+  },
+  "articles": {
+    "title": "文章",
+    "readMore": "阅读全文",
+    "noArticles": "暂无文章",
+    "publishedAt": "发布于",
+    "back": "返回",
+    "tagReset": "重置",
+    "noMatch": "没有匹配的文章",
+    "prev": "上一页",
+    "next": "下一页",
+    "perPage": "每页显示"
+  },
+  "projects": {
+    "title": "项目",
+    "noProjects": "暂无项目",
+    "visit": "前往",
+    "commits": "提交",
+    "issues": "议题",
+    "categoryDeveloping": "开发中",
+    "categoryCompleted": "已完成",
+    "categoryBlog": "博客和主页",
+    "categoryTutorial": "教程项目",
+    "categoryShelved": "晾在一边"
+  },
+  "pageCommits": {
+    "title": "提交记录",
+    "visitProject": "前往项目",
+    "visitCommits": "前往提交",
+    "committedAt": "提交于",
+    "visit": "前往",
+    "loading": "加载中...",
+    "loadFailed": "加载失败",
+    "retry": "重试",
+    "noCommits": "暂无提交记录",
+    "repoPlaceholder": "输入仓库名",
+    "search": "查询",
+    "expand": "展开",
+    "collapse": "收起"
+  },
+  "about": {
+    "title": "关于",
+    "bio": "Java / C# 开发者，热爱开源和技术分享。",
+    "skills": "技能栈",
+    "skillsBackend": "后端开发",
+    "skillsFrontend": "前端开发",
+    "skillsTools": "工具与其他",
+    "timeline": "时间线",
+    "timelineLatestBadge": "最新",
+    "timelineItem1Title": "按兴趣学习开发和实习",
+    "timelineItem1Desc": "根据兴趣（Minecraft）来开发各种软件和系统，这期间实践了Flutter、Qt、WPF等各种框架，学习了dart、c++、c#、go等各种语言的学习",
+    "timelineItem2Title": "系统性学习和开发系统",
+    "timelineItem2Desc": "开始系统性的学习Java的Spring系列框架、JavaFx框架，开发网页系统和桌面软件",
+    "timelineItem3Title": "接触Gradle构建和C++",
+    "timelineItem3Desc": "开始探索模组如何通过MDK制作，以及加入编程社团学习C++基础知识",
+    "timelineItem4Title": "接触代码和制作服务器插件",
+    "timelineItem4Desc": "从开始的改改配置文件实现效果到自己上手实操Java代码",
+    "timelineItem5Title": "启蒙老师",
+    "timelineItem5Desc": "接触Minecraft，让我开始喜欢上了这个开放大世界，也让我对代码有了兴趣",
+    "contact": "联系方式",
+    "email": "电子邮箱"
+  },
+  "theme": {
+    "forest": "森林",
+    "ocean": "海洋",
+    "sunset": "日落"
+  },
+  "tools": {
+    "title": "工具集",
+    "description": "常用在线工具，开箱即用。",
+    "copied": "已复制!",
+    "jsonFormatter": {
+      "inputLabel": "输入 JSON",
+      "placeholder": "在此粘贴 JSON...",
+      "format": "格式化",
+      "minify": "压缩",
+      "copy": "复制",
+      "clear": "清空",
+      "outputLabel": "输出结果",
+      "empty": "请输入 JSON 内容",
+      "invalid": "JSON 格式有误",
+      "nothingToCopy": "没有可复制的内容"
+    },
+    "base64": {
+      "inputLabel": "输入文本",
+      "placeholder": "输入要编解码的文本...",
+      "encode": "编码",
+      "decode": "解码",
+      "swap": "互换",
+      "copy": "复制",
+      "clear": "清空",
+      "outputLabel": "输出结果"
+    },
+    "regex": {
+      "patternLabel": "正则表达式",
+      "patternPlaceholder": "输入正则表达式...",
+      "flagsLabel": "标志",
+      "testLabel": "测试文本",
+      "testPlaceholder": "输入测试文本...",
+      "test": "测试",
+      "clear": "清空",
+      "resultLabel": "匹配结果",
+      "noMatch": "无匹配结果"
+    },
+    "color": {
+      "placeholder": "#000000"
+    },
+    "timestamp": {
+      "current": "当前时间戳",
+      "inputLabel": "输入时间戳或日期",
+      "placeholder": "Unix 时间戳或日期字符串...",
+      "toDate": "转为日期",
+      "toTimestamp": "转为时间戳",
+      "copyTimestamp": "复制时间戳",
+      "copyDate": "复制日期",
+      "clear": "清空",
+      "outputLabel": "输出结果",
+      "invalidTimestamp": "无效的时间戳",
+      "invalidDate": "无效的日期格式"
+    },
+    "textCounter": {
+      "inputLabel": "输入文本",
+      "placeholder": "在此输入或粘贴文本...",
+      "chars": "字符数",
+      "charsNoSpace": "不含空格",
+      "words": "单词数",
+      "lines": "行数",
+      "paragraphs": "段落数",
+      "bytes": "字节数"
+    }
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "加载失败",
+    "switchLang": "English",
+    "collapse": "收起",
+    "expand": "展开菜单"
+  },
+  "comments": {
+    "title": "评论"
+  }
+}

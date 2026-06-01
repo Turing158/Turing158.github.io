@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(npm view *)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node *)",
+      "Bash(curl -s \"https://api.github.com/repos/Turing158/starfall-springboot-web\")",
+      "WebFetch(domain:api.github.com)",
+      "Bash(curl -s https://api.github.com/repos/Turing158/starfall-springboot-web)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'name: {d.get\\(\\\\\"name\\\\\"\\)}'\\); print\\(f'description: {d.get\\(\\\\\"description\\\\\"\\)}'\\)\")",
+      "Bash(curl -s *)",
+      "Bash(dir distassetshello-world* *)",
+      "Bash(npx vite *)",
+      "Bash(xxd \"E:\\\\project\\\\personal\\\\src\\\\views\\\\HomeView.vue\")",
+      "Bash(xxd)",
+      "WebFetch(domain:date.nager.at)",
+      "Bash(xxd \"E:\\\\project\\\\personal\\\\src\\\\plugins\\\\articles-plugin.ts\")",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_evaluate",
+      "Bash(pkill -f \"vite\")",
+      "Bash(xxd \"E:\\\\project\\\\personal\\\\src\\\\layouts\\\\MainLayout.vue\")",
+      "Bash(python3 *)",
+      "Bash(dir *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d.get\\('main',''\\)\\); print\\(d.get\\('module',''\\)\\); print\\(json.dumps\\(list\\(d.get\\('exports',{}\\).get\\('.',''\\).keys\\(\\)\\) if isinstance\\(d.get\\('exports',{}\\).get\\('.',{}\\), dict\\) else d.get\\('exports',{}\\), indent=2\\)\\)\")",
+      "Bash(npx vue-tsc *)",
+      "WebFetch(domain:github.com)",
+      "Bash(find E:\\\\project\\\\personal *)",
+      "Bash(git -C /e/project/personal status)",
+      "Bash(xxd \"E:\\\\project\\\\personal\\\\src\\\\views\\\\ToolsView.vue\")",
+      "mcp__ide__getDiagnostics",
+      "Bash(grep -oP '#[0-9a-fA-F]{3,8}|rgba?\\\\\\([^\\)]+\\\\\\)' \"E:\\\\project\\\\personal\\\\node_modules\\\\animal-island-vue\\\\dist/index.css\")",
+      "Bash(jobs -l)",
+      "Bash(python *)"
+    ]
+  }
+}

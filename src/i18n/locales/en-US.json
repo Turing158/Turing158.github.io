@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "home": "Home",
+    "articles": "Articles",
+    "projects": "Projects",
+    "tools": "Tools",
+    "about": "About",
+    "commits": "Commits"
+  },
+  "home": {
+    "recentCommits": "Recent Commits",
+    "recentArticles": "Recent Articles",
+    "viewAll": "View All",
+    "noCommits": "No commits yet",
+    "noArticles": "No articles yet"
+  },
+  "articles": {
+    "title": "Articles",
+    "readMore": "Read More",
+    "noArticles": "No articles yet",
+    "publishedAt": "Published at",
+    "back": "Back",
+    "tagReset": "Reset",
+    "noMatch": "No matching articles",
+    "prev": "Previous",
+    "next": "Next",
+    "perPage": "Per page"
+  },
+  "projects": {
+    "title": "Projects",
+    "noProjects": "No projects yet",
+    "categoryDeveloping": "Developing",
+    "categoryCompleted": "Completed",
+    "categoryBlog": "Blog & Homepage",
+    "categoryTutorial": "Tutorials",
+    "categoryShelved": "Shelved",
+    "visit": "Visit",
+    "commits": "commits",
+    "issues": "issues"
+  },
+  "pageCommits": {
+    "title": "Commit History",
+    "visitProject": "Visit Project",
+    "visitCommits": "View Commits",
+    "committedAt": "committed on",
+    "visit": "Visit",
+    "loading": "Loading...",
+    "loadFailed": "Failed to load",
+    "retry": "Retry",
+    "noCommits": "No commits yet",
+    "repoPlaceholder": "Enter repo name",
+    "search": "Search",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "about": {
+    "title": "About",
+    "bio": "Java / C# developer, passionate about open source and tech sharing.",
+    "skills": "Tech Stack",
+    "skillsBackend": "Backend",
+    "skillsFrontend": "Frontend",
+    "skillsTools": "Tools & Others",
+    "timeline": "Timeline",
+    "timelineLatestBadge": "Latest",
+    "timelineItem1Title": "Learning & Interning by Interest",
+    "timelineItem1Desc": "Developed various software and systems based on personal interest (Minecraft). Practiced frameworks like Flutter, Qt, WPF, and learned languages including Dart, C++, C#, and Go.",
+    "timelineItem2Title": "Systematic Learning & Development",
+    "timelineItem2Desc": "Began systematically learning Java Spring ecosystem and JavaFX framework, developing web systems and desktop applications.",
+    "timelineItem3Title": "Exploring Gradle & C++",
+    "timelineItem3Desc": "Started exploring how to create mods with MDK, and joined a programming club to learn C++ fundamentals.",
+    "timelineItem4Title": "First Touch with Code & Server Plugins",
+    "timelineItem4Desc": "From tweaking config files to getting hands-on with Java code for server plugins.",
+    "timelineItem5Title": "The Enlightenment",
+    "timelineItem5Desc": "Discovered Minecraft, which sparked a love for this open world and ignited an interest in programming.",
+    "contact": "Contact",
+    "email": "Email"
+  },
+  "theme": {
+    "forest": "Forest",
+    "ocean": "Ocean",
+    "sunset": "Sunset"
+  },
+  "tools": {
+    "title": "Tools",
+    "description": "Common online tools, ready to use.",
+    "copied": "Copied!",
+    "jsonFormatter": {
+      "inputLabel": "Input JSON",
+      "placeholder": "Paste JSON here...",
+      "format": "Format",
+      "minify": "Minify",
+      "copy": "Copy",
+      "clear": "Clear",
+      "outputLabel": "Output",
+      "empty": "Please enter JSON content",
+      "invalid": "Invalid JSON format",
+      "nothingToCopy": "Nothing to copy"
+    },
+    "base64": {
+      "inputLabel": "Input Text",
+      "placeholder": "Enter text to encode/decode...",
+      "encode": "Encode",
+      "decode": "Decode",
+      "swap": "Swap",
+      "copy": "Copy",
+      "clear": "Clear",
+      "outputLabel": "Output"
+    },
+    "regex": {
+      "patternLabel": "Regular Expression",
+      "patternPlaceholder": "Enter regex pattern...",
+      "flagsLabel": "Flags",
+      "testLabel": "Test String",
+      "testPlaceholder": "Enter test string...",
+      "test": "Test",
+      "clear": "Clear",
+      "resultLabel": "Matches",
+      "noMatch": "No matches found"
+    },
+    "color": {
+      "placeholder": "#000000"
+    },
+    "timestamp": {
+      "current": "Current Timestamp",
+      "inputLabel": "Input Timestamp or Date",
+      "placeholder": "Unix timestamp or date string...",
+      "toDate": "To Date",
+      "toTimestamp": "To Timestamp",
+      "copyTimestamp": "Copy Timestamp",
+      "copyDate": "Copy Date",
+      "clear": "Clear",
+      "outputLabel": "Output",
+      "invalidTimestamp": "Invalid timestamp",
+      "invalidDate": "Invalid date format"
+    },
+    "textCounter": {
+      "inputLabel": "Input Text",
+      "placeholder": "Enter or paste text...",
+      "chars": "Characters",
+      "charsNoSpace": "No Spaces",
+      "words": "Words",
+      "lines": "Lines",
+      "paragraphs": "Paragraphs",
+      "bytes": "Bytes"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Load failed",
+    "switchLang": "中文",
+    "collapse": "Collapse",
+    "expand": "Open menu"
+  },
+  "comments": {
+    "title": "Comments"
+  }
+}

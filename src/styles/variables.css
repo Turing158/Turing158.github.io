@@ -1,0 +1,52 @@
+:root {
+  /* Forest theme (default) */
+  --bg-primary: #f5f0e8;
+  --bg-secondary: #e8e0d0;
+  --bg-sidebar: #2d4a3e;
+  --bg-card: #ffffff;
+  --text-primary: #2c2c2c;
+  --text-secondary: #666666;
+  --text-sidebar: #e8e0d0;
+  --text-sidebar-active: #a8d5a2;
+  --accent: #4a7c59;
+  --accent-hover: #5a9c69;
+  --border: #d4c9b8;
+  --shadow: rgba(45, 74, 62, 0.1);
+  --code-bg: #e6ddd0;
+  --toc-active: #4a7c59;
+  --sidebar-width: 240px;
+}
+
+[data-theme="ocean"] {
+  --bg-primary: #f0f4f8;
+  --bg-secondary: #dce6f0;
+  --bg-sidebar: #1a3a5c;
+  --bg-card: #ffffff;
+  --text-primary: #1a2d44;
+  --text-secondary: #4a6a8a;
+  --text-sidebar: #c8d8e8;
+  --text-sidebar-active: #7ec8e3;
+  --accent: #2a6f97;
+  --accent-hover: #3a8fb7;
+  --border: #b8cce0;
+  --shadow: rgba(26, 58, 92, 0.1);
+  --code-bg: #e8eef4;
+  --toc-active: #2a6f97;
+}
+
+[data-theme="sunset"] {
+  --bg-primary: #fdf2f0;
+  --bg-secondary: #f5ddd8;
+  --bg-sidebar: #6b2d3e;
+  --bg-card: #ffffff;
+  --text-primary: #3d1a1a;
+  --text-secondary: #7a4a4a;
+  --text-sidebar: #f0d8d8;
+  --text-sidebar-active: #f4a89a;
+  --accent: #c05533;
+  --accent-hover: #e06543;
+  --border: #e8c8b8;
+  --shadow: rgba(107, 45, 62, 0.1);
+  --code-bg: #f5e8e0;
+  --toc-active: #c05533;
+}

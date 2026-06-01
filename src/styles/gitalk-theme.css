@@ -1,0 +1,896 @@
+/**
+ * Gitalk 评论系统主题化样式
+ *
+ * 完全覆盖 Gitalk 内置样式（不引入 gitalk/dist/gitalk.css），
+ * 使评论系统视觉上与博客的 animal-island-vue 组件保持一致，
+ * 并支持 forest / ocean / sunset 三套主题自动切换。
+ *
+ * 设计参考：
+ * - 输入框 → BlogInput 组件风格（圆角边框 + focus 光晕）
+ * - 按钮 → animal-island-vue Button 风格（立体阴影 + 按下效果）
+ * - 评论卡片 → 与博客卡片风格统一
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+ * 1. 根容器 & 全局重置
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container {
+  font-family: 'Nunito', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  font-size: 15px;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.gt-container * {
+  box-sizing: border-box;
+}
+
+/* 链接颜色跟随主题 */
+.gt-container a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.gt-container a:hover {
+  color: var(--accent-hover);
+  text-decoration: none;
+}
+
+/* 隐藏 Gitalk 默认的"回到顶部"等辅助元素 */
+.gt-container .hide {
+  display: none !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 2. 头部区域 — 评论数量 & 用户信息
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-meta {
+  margin: 0 0 1.25em;
+  padding: 0 0 1em;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95em;
+  position: relative;
+  z-index: 10;
+}
+
+.gt-container .gt-meta::before,
+.gt-container .gt-meta::after {
+  display: none;
+}
+
+/* 评论数量 */
+.gt-container .gt-counts {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+.gt-container .gt-counts .gt-link-counts {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* 用户信息区 */
+.gt-container .gt-user {
+  float: right;
+  margin: 0;
+  font-size: 0.85em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gt-container .gt-user-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.gt-container .gt-user-inner:hover {
+  color: var(--accent);
+}
+
+.gt-container .gt-user-pic {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.gt-container .gt-user-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+/* 用户下拉菜单 */
+.gt-container .gt-popup {
+  position: absolute;
+  right: 0;
+  top: 2em;
+  background: var(--bg-card);
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5em 0;
+  font-size: 0.85em;
+  letter-spacing: 0;
+  box-shadow: 0 8px 24px var(--shadow);
+  z-index: 100;
+  animation: gt-fade-in 0.2s ease;
+}
+
+.gt-container .gt-popup .gt-action {
+  cursor: pointer;
+  display: block;
+  margin: 0;
+  padding: 0.5em 1.25em;
+  position: relative;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.gt-container .gt-popup .gt-action:hover {
+  background: var(--bg-secondary);
+  color: var(--accent);
+}
+
+.gt-container .gt-popup .gt-action.is--active {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.gt-container .gt-popup .gt-action.is--active::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  position: absolute;
+  left: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* 下拉菜单各操作项 */
+.gt-container .gt-popup .gt-action-text {
+  color: var(--text-secondary);
+  font-size: 0.85em;
+  padding: 0.25em 1.25em;
+  cursor: default;
+}
+
+.gt-container .gt-popup .gt-action-login,
+.gt-container .gt-popup .gt-action-logout {
+  font-weight: 600;
+}
+
+.gt-container .gt-popup .gt-action-sortasc,
+.gt-container .gt-popup .gt-action-sortdesc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 排序箭头图标 */
+.gt-container .gt-ico-arrdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.85em;
+  height: 0.85em;
+}
+
+.gt-container .gt-ico-arrdown svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 3. 输入区域 — BlogInput 风格
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-header {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.gt-container .gt-header-comment {
+  flex: 1;
+  margin-left: 1em;
+}
+
+@media (max-width: 479px) {
+  .gt-container .gt-header-comment {
+    margin-left: 0.75em;
+  }
+}
+
+/* 输入框 — 完全复刻 BlogInput 视觉 */
+.gt-container .gt-header-textarea {
+  padding: 12px 16px;
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  max-height: 240px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 0.9rem;
+  font-family: 'Nunito', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  word-wrap: break-word;
+  resize: vertical;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.gt-container .gt-header-textarea::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.gt-container .gt-header-textarea:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+}
+
+.gt-container .gt-header-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* 预览区域 */
+.gt-container .gt-header-preview {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 4. 按钮 — animal-island-vue 风格
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-header-controls {
+  position: relative;
+  margin: 0.75em 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.gt-container .gt-header-controls::before,
+.gt-container .gt-header-controls::after {
+  display: none;
+}
+
+/* Markdown 提示链接 */
+.gt-container .gt-header-controls-tip {
+  font-size: 0.8rem;
+  color: var(--accent);
+  text-decoration: none;
+  vertical-align: baseline;
+  margin-right: auto;
+  opacity: 0.8;
+  transition: opacity 0.25s ease;
+}
+
+.gt-container .gt-header-controls-tip:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+@media (max-width: 479px) {
+  .gt-container .gt-header-controls-tip {
+    display: none;
+  }
+}
+
+/* 基础按钮样式重置 */
+.gt-container .gt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  transition: all 0.25s ease;
+  font-family: 'Nunito', 'Noto Sans SC', sans-serif;
+}
+
+/* Primary 按钮 — 发布 / 登录 */
+.gt-container .gt-btn-public,
+.gt-container .gt-btn-login {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 70%, #000);
+}
+
+.gt-container .gt-btn-public:hover:not(:disabled),
+.gt-container .gt-btn-login:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--accent) 70%, #000);
+  transform: translateY(-1px);
+}
+
+.gt-container .gt-btn-public:active:not(:disabled),
+.gt-container .gt-btn-login:active:not(:disabled) {
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 70%, #000);
+  transform: translateY(3px);
+}
+
+/* Default 按钮 — 预览 */
+.gt-container .gt-btn-preview {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  box-shadow: 0 3px 0 var(--border);
+}
+
+.gt-container .gt-btn-preview:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-card);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--accent) 50%, var(--border));
+  transform: translateY(-1px);
+}
+
+.gt-container .gt-btn-preview:active:not(:disabled) {
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--accent) 50%, var(--border));
+  transform: translateY(2px);
+}
+
+/* 按钮禁用状态 */
+.gt-container .gt-btn.is--disable,
+.gt-container .gt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 按钮加载 spinner */
+.gt-container .gt-btn-loading {
+  position: relative;
+  margin-left: 0.5em;
+  display: inline-block;
+  width: 0.75em;
+  height: 1em;
+  vertical-align: top;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 5. 头像
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-avatar {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 479px) {
+  .gt-container .gt-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.gt-container .gt-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  transition: transform 0.3s ease, border-color 0.25s ease;
+}
+
+.gt-container .gt-avatar img:hover {
+  transform: scale(1.08);
+  border-color: var(--accent);
+}
+
+/* GitHub 小头像（头部用户区） */
+.gt-container .gt-avatar-github {
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+@media (max-width: 479px) {
+  .gt-container .gt-avatar-github {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 6. 评论列表
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-comments {
+  padding-top: 0.5em;
+}
+
+.gt-container .gt-comments-null {
+  text-align: center;
+  padding: 2em 0;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+.gt-container .gt-comments-controls {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+/* 单条评论 */
+.gt-container .gt-comment {
+  position: relative;
+  padding: 0.75em 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 评论内容卡片 */
+.gt-container .gt-comment-content {
+  flex: 1;
+  margin-left: 1em;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: auto;
+  transition: all 0.3s ease;
+}
+
+.gt-container .gt-comment-content:hover {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
+  box-shadow: 0 4px 16px var(--shadow);
+}
+
+@media (max-width: 479px) {
+  .gt-container .gt-comment-content {
+    margin-left: 0.75em;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+}
+
+/* 管理员评论 — 左侧 accent 竖线 */
+.gt-container .gt-comment-admin .gt-comment-content {
+  border-left: 3px solid var(--accent);
+}
+
+/* 评论头部 — 用户名 & 日期 */
+.gt-container .gt-comment-header {
+  margin-bottom: 0.5em;
+  font-size: 0.85em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gt-container .gt-comment-block-1,
+.gt-container .gt-comment-block-2 {
+  display: none;
+}
+
+.gt-container .gt-comment-username {
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95em;
+}
+
+.gt-container .gt-comment-username:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.gt-container .gt-comment-text {
+  margin-left: 0;
+  color: var(--text-secondary);
+  font-size: 0.85em;
+}
+
+.gt-container .gt-comment-date {
+  margin-left: 0;
+  color: var(--text-secondary);
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+/* 评论正文 */
+.gt-container .gt-comment-body {
+  color: var(--text-primary) !important;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+/* 评论正文中的 markdown 样式适配 */
+.gt-container .gt-comment-body .markdown-body {
+  background: transparent !important;
+  color: var(--text-primary) !important;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.gt-container .gt-comment-body .markdown-body p {
+  margin-bottom: 0.5em;
+}
+
+.gt-container .gt-comment-body .markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.gt-container .gt-comment-body .markdown-body pre {
+  background: var(--code-bg) !important;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.gt-container .gt-comment-body .markdown-body code {
+  background: var(--code-bg) !important;
+  color: var(--text-primary);
+}
+
+.gt-container .gt-comment-body .markdown-body blockquote {
+  border-left-color: var(--accent) !important;
+  color: var(--text-secondary);
+}
+
+/* 评论操作按钮 — like / edit / reply */
+.gt-container .gt-comment-like,
+.gt-container .gt-comment-edit,
+.gt-container .gt-comment-reply {
+  position: absolute;
+  height: 1.5em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease, color 0.25s ease, transform 0.2s ease;
+}
+
+.gt-container .gt-comment:hover .gt-comment-like,
+.gt-container .gt-comment:hover .gt-comment-edit,
+.gt-container .gt-comment:hover .gt-comment-reply {
+  opacity: 1;
+}
+
+.gt-container .gt-comment-like:hover,
+.gt-container .gt-comment-edit:hover,
+.gt-container .gt-comment-reply:hover {
+  cursor: pointer;
+  color: var(--accent);
+  transform: scale(1.15);
+}
+
+.gt-container .gt-comment-like {
+  top: 14px;
+  right: 5em;
+}
+
+.gt-container .gt-comment-edit {
+  top: 14px;
+  right: 3em;
+}
+
+.gt-container .gt-comment-reply {
+  top: 14px;
+  right: 1em;
+}
+
+/* 操作按钮图标颜色 */
+.gt-container .gt-comment-like .gt-svg svg,
+.gt-container .gt-comment-edit .gt-svg svg,
+.gt-container .gt-comment-reply .gt-svg svg {
+  fill: var(--text-secondary);
+  transition: fill 0.25s ease;
+}
+
+.gt-container .gt-comment-like:hover .gt-svg svg,
+.gt-container .gt-comment-edit:hover .gt-svg svg,
+.gt-container .gt-comment-reply:hover .gt-svg svg {
+  fill: var(--accent);
+}
+
+/* like 按钮激活状态 */
+.gt-container .gt-comment-like.is--active .gt-svg svg {
+  fill: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 7. 错误 & 加载状态
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-error {
+  text-align: center;
+  margin: 0.75em 0;
+  color: var(--animal-error-color, #e05a5a);
+  font-size: 0.9em;
+  padding: 0.75em 1em;
+  background: color-mix(in srgb, var(--animal-error-color, #e05a5a) 8%, transparent);
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--animal-error-color, #e05a5a) 20%, transparent);
+}
+
+.gt-container .gt-initing {
+  padding: 2em 0;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.gt-container .gt-initing-text {
+  margin: 0.75em auto;
+  font-size: 0.9em;
+  color: var(--text-secondary);
+}
+
+.gt-container .gt-no-init {
+  padding: 2em 0;
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.9em;
+}
+
+/* 加载旋转动画 */
+.gt-container .gt-spinner::before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 3px;
+  width: 0.75em;
+  height: 0.75em;
+  margin-top: -0.1875em;
+  margin-left: -0.375em;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: gt-kf-rotate 0.6s linear infinite;
+}
+
+.gt-container .gt-loader {
+  position: relative;
+  border: 2px solid var(--border);
+  animation: gt-kf-rotate 1.2s linear infinite;
+  display: inline-block;
+  font-style: normal;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  border-radius: 50%;
+}
+
+.gt-container .gt-loader::before {
+  content: '';
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 50%;
+  margin-top: -0.125em;
+  margin-left: -0.125em;
+  width: 0.25em;
+  height: 0.25em;
+  background-color: var(--accent);
+  border-radius: 50%;
+}
+
+@keyframes gt-kf-rotate {
+  0% {
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 8. 聚焦遮罩（评论输入时背景变暗）
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container::after {
+  content: '';
+  position: fixed;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  top: 0;
+  opacity: 0;
+}
+
+.gt-container.gt-input-focused {
+  position: relative;
+}
+
+.gt-container.gt-input-focused::after {
+  content: '';
+  position: fixed;
+  bottom: 0%;
+  left: 0;
+  right: 0;
+  top: 0;
+  background: #000;
+  opacity: 0.5;
+  transition: opacity 0.3s, bottom 0s;
+  z-index: 9999;
+}
+
+.gt-container.gt-input-focused .gt-header-comment {
+  z-index: 10000;
+  position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 9. 链接 & 版权
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-link {
+  border-bottom: 1px dotted var(--accent);
+}
+
+.gt-container .gt-link-counts,
+.gt-container .gt-link-project {
+  text-decoration: none;
+}
+
+.gt-container .gt-copyright {
+  margin: 1.5em 0 0.5em;
+  border-top: 1px solid var(--border);
+  padding-top: 0.75em;
+  font-size: 0.75em;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 10. SVG 图标颜色
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-svg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  vertical-align: middle;
+}
+
+.gt-container .gt-svg svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.gt-container .gt-ico {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gt-container .gt-ico-text {
+  margin-left: 0.25em;
+}
+
+.gt-container .gt-ico-github {
+  width: 100%;
+  height: 100%;
+}
+
+.gt-container .gt-ico-github .gt-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gt-container .gt-ico-github svg {
+  fill: inherit;
+}
+
+/* 用户下拉箭头 */
+.gt-container .gt-user .gt-ico svg {
+  fill: currentColor;
+}
+
+.gt-container .gt-user .is--poping .gt-ico svg {
+  fill: var(--accent);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 11. 版本号
+ * ═══════════════════════════════════════════════════════════════ */
+.gt-container .gt-version {
+  color: var(--text-secondary);
+  opacity: 0.5;
+  margin-left: 0.25em;
+  font-size: 0.8em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 12. 响应式适配
+ * ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 479px) {
+  .gt-container .gt-header-controls {
+    margin: 0.5em 0 0;
+    flex-wrap: wrap;
+  }
+
+  .gt-container .gt-header-controls .gt-btn {
+    float: none;
+    flex: 1;
+    margin: 0;
+  }
+
+  .gt-container .gt-btn {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
+
+  .gt-container .gt-comment-like,
+  .gt-container .gt-comment-edit,
+  .gt-container .gt-comment-reply {
+    opacity: 0.6;
+  }
+
+  .gt-container .gt-comment-like {
+    right: 4.5em;
+  }
+
+  .gt-container .gt-comment-edit {
+    right: 2.5em;
+  }
+
+  .gt-container .gt-comment-reply {
+    right: 0.5em;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 13. 动画
+ * ═══════════════════════════════════════════════════════════════ */
+@keyframes gt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 新评论淡入 */
+.gt-container .gt-comment {
+  animation: gt-fade-in 0.35s ease;
+}
+
+/* Reduced motion 支持 */
+@media (prefers-reduced-motion: reduce) {
+  .gt-container .gt-comment,
+  .gt-container .gt-popup {
+    animation: none;
+  }
+
+  .gt-container *,
+  .gt-container *::before,
+  .gt-container *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

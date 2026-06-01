@@ -1,0 +1,225 @@
+/**
+ * animal-island-vue 主题适配
+ *
+ * 将 animal-island-vue 组件库的 --animal-* CSS 变量
+ * 映射到项目自身的主题变量 --*，使其随主题切换而变化。
+ *
+ * 注意：此文件必须在 'animal-island-vue/style' 导入之后使用，
+ * 通过 :root 选择器覆盖库中定义的默认值。
+ */
+
+/* ── Forest 主题（默认） ─────────────────────────────────── */
+:root,
+[data-theme="forest"] {
+  /* Primary → accent */
+  --animal-primary-color: var(--accent);
+  --animal-primary-color-hover: var(--accent-hover);
+  --animal-primary-color-active: var(--accent-hover);
+  --animal-primary-color-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+
+  /* Success → 基于 accent 的绿色调 */
+  --animal-success-color: #6fba2c;
+  --animal-success-color-hover: #85cc45;
+  --animal-success-color-active: #5a9e1e;
+
+  /* Warning */
+  --animal-warning-color: #f5c31c;
+  --animal-warning-color-hover: #f7d04a;
+  --animal-warning-color-active: #dba90e;
+
+  /* Error */
+  --animal-error-color: #e05a5a;
+  --animal-error-color-hover: #e87878;
+  --animal-error-color-active: #c94444;
+
+  /* Text */
+  --animal-text-color: var(--text-primary);
+  --animal-text-color-secondary: var(--text-secondary);
+  --animal-text-color-disabled: var(--border);
+
+  /* Border */
+  --animal-border-color: var(--border);
+  --animal-border-color-hover: var(--text-secondary);
+  --animal-border-color-light: var(--border);
+
+  /* Background */
+  --animal-bg-color: var(--bg-card);
+  --animal-bg-color-secondary: var(--bg-secondary);
+  --animal-bg-color-disabled: var(--bg-secondary);
+  --animal-bg-color-input: var(--bg-card);
+
+  /* Shadow */
+  --animal-shadow-color-light: var(--shadow);
+  --animal-shadow-warm: var(--border);
+  --animal-shadow-soft: var(--border);
+  --animal-shadow-soft-hover: var(--text-secondary);
+  --animal-shadow-soft-strong: var(--text-secondary);
+}
+
+/* ── Ocean 主题 ──────────────────────────────────────────── */
+[data-theme="ocean"] {
+  --animal-primary-color: var(--accent);
+  --animal-primary-color-hover: var(--accent-hover);
+  --animal-primary-color-active: var(--accent-hover);
+  --animal-primary-color-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+
+  --animal-success-color: #6fba2c;
+  --animal-success-color-hover: #85cc45;
+  --animal-success-color-active: #5a9e1e;
+
+  --animal-warning-color: #f5c31c;
+  --animal-warning-color-hover: #f7d04a;
+  --animal-warning-color-active: #dba90e;
+
+  --animal-error-color: #e05a5a;
+  --animal-error-color-hover: #e87878;
+  --animal-error-color-active: #c94444;
+
+  --animal-text-color: var(--text-primary);
+  --animal-text-color-secondary: var(--text-secondary);
+  --animal-text-color-disabled: var(--border);
+
+  --animal-border-color: var(--border);
+  --animal-border-color-hover: var(--text-secondary);
+  --animal-border-color-light: var(--border);
+
+  --animal-bg-color: var(--bg-card);
+  --animal-bg-color-secondary: var(--bg-secondary);
+  --animal-bg-color-disabled: var(--bg-secondary);
+  --animal-bg-color-input: var(--bg-card);
+
+  --animal-shadow-color-light: var(--shadow);
+  --animal-shadow-warm: var(--border);
+  --animal-shadow-soft: var(--border);
+  --animal-shadow-soft-hover: var(--text-secondary);
+  --animal-shadow-soft-strong: var(--text-secondary);
+}
+
+/* ── Sunset 主题 ─────────────────────────────────────────── */
+[data-theme="sunset"] {
+  --animal-primary-color: var(--accent);
+  --animal-primary-color-hover: var(--accent-hover);
+  --animal-primary-color-active: var(--accent-hover);
+  --animal-primary-color-bg: color-mix(in srgb, var(--accent) 12%, transparent);
+
+  --animal-success-color: #6fba2c;
+  --animal-success-color-hover: #85cc45;
+  --animal-success-color-active: #5a9e1e;
+
+  --animal-warning-color: #f5c31c;
+  --animal-warning-color-hover: #f7d04a;
+  --animal-warning-color-active: #dba90e;
+
+  --animal-error-color: #e05a5a;
+  --animal-error-color-hover: #e87878;
+  --animal-error-color-active: #c94444;
+
+  --animal-text-color: var(--text-primary);
+  --animal-text-color-secondary: var(--text-secondary);
+  --animal-text-color-disabled: var(--border);
+
+  --animal-border-color: var(--border);
+  --animal-border-color-hover: var(--text-secondary);
+  --animal-border-color-light: var(--border);
+
+  --animal-bg-color: var(--bg-card);
+  --animal-bg-color-secondary: var(--bg-secondary);
+  --animal-bg-color-disabled: var(--bg-secondary);
+  --animal-bg-color-input: var(--bg-card);
+
+  --animal-shadow-color-light: var(--shadow);
+  --animal-shadow-warm: var(--border);
+  --animal-shadow-soft: var(--border);
+  --animal-shadow-soft-hover: var(--text-secondary);
+  --animal-shadow-soft-strong: var(--text-secondary);
+}
+
+/* ════════════════════════════════════════════════════════════
+ * Button 按钮主题化覆盖
+ *
+ * 组件库的 .animal-btn--primary / --default 使用了硬编码颜色
+ * (#794f27 / #f8f8f0 / #19c8b9 等)，不随主题变化。
+ * 这里用全局选择器 + !important 强制接管其配色，使其跟随主题。
+ *
+ * 用 :not() 排除 danger / ghost / loading 变体，
+ * 避免覆盖它们各自的危险红、透明背景与加载动画。
+ * 立体阴影底色用 color-mix 将 accent 调暗，保留动森按下效果。
+ * ════════════════════════════════════════════════════════════ */
+
+/* ── Primary：实心强调色按钮 ──────────────────────────────── */
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading) {
+  color: #fff !important;
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 5px color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading):hover:not(:disabled) {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  box-shadow: 0 6px color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading):active:not(:disabled) {
+  box-shadow: 0 1px color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+
+/* ── Default：浅底 + 主题边框，hover/active 跟随强调色 ─────── */
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading) {
+  color: var(--text-primary) !important;
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):hover:not(:disabled) {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 3px 10px var(--shadow) !important;
+}
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):active:not(:disabled) {
+  color: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+ * Checkbox 复选框主题化覆盖
+ *
+ * 组件库的 checkbox 在 checked / disabled / focus 状态下
+ * 使用了硬编码 hex 颜色，不随主题变化。
+ * 这里用全局选择器 + !important 强制接管其配色。
+ * ════════════════════════════════════════════════════════════ */
+
+/* ── 未选中状态：边框 + 背景 ──────────────────────────────── */
+.animal-checkbox__box[data-v-154fc45b] {
+  border-color: var(--border) !important;
+  background: var(--bg-card) !important;
+}
+
+/* ── 选中状态：强调色背景 + 边框 ──────────────────────────── */
+.animal-checkbox--checked:not(.animal-checkbox--disabled) .animal-checkbox__box[data-v-154fc45b] {
+  background: var(--accent) !important;
+  border-color: var(--accent-hover) !important;
+}
+
+/* ── 选中状态的 checkmark 图标保持白色 ───────────────────── */
+.animal-checkbox--checked:not(.animal-checkbox--disabled) .animal-checkbox__mark {
+  color: #fff !important;
+}
+
+/* ── 禁用状态：降低透明度 + 主题色边框 ───────────────────── */
+.animal-checkbox--disabled .animal-checkbox__box[data-v-154fc45b] {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── 禁用状态标签文字 ─────────────────────────────────────── */
+.animal-checkbox--disabled .animal-checkbox__label {
+  color: var(--text-secondary) !important;
+}
+
+/* ── 聚焦状态：使用强调色轮廓 ─────────────────────────────── */
+.animal-checkbox__box[data-v-154fc45b]:focus-visible {
+  outline-color: var(--accent) !important;
+}
+
+/* ── 标签文字颜色 ─────────────────────────────────────────── */
+.animal-checkbox__label {
+  color: var(--text-primary) !important;
+}
