@@ -119,13 +119,14 @@ import { useArticles } from '@/composables/useArticles'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useHolidays } from '@/composables/useHolidays'
+import { config } from '@/config'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()
 
-const blogName = 'Turing_ICE'
+const blogName = config.blog.title
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
-const hasGitHubConfig = !!(import.meta.env.VITE_GITHUB_OWNER && import.meta.env.VITE_GITHUB_REPO)
+const hasGitHubConfig = !!(config.github.owner && config.github.repo)
 
 // Clock — Time 组件自带定时器，无需手动管理
 const now = ref(new Date())

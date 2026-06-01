@@ -6,6 +6,10 @@ import { useAppStore } from '@/stores/app'
 import type { Article } from '@/types/article'
 import localArticles from '@/generated/_articles'
 import { developingProjects } from '@/data/projects'
+import { config } from '@/config'
+
+const GITHUB_OWNER = config.github.owner
+const GITHUB_REPO = config.github.repo
 
 const md = new MarkdownIt({
   html: true,
@@ -20,9 +24,6 @@ const md = new MarkdownIt({
     return ''
   },
 })
-
-const GITHUB_OWNER = import.meta.env.VITE_GITHUB_OWNER || ''
-const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || ''
 
 function loadLocalArticles(): Article[] {
   return localArticles as Article[]

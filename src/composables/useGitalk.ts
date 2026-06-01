@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import Gitalk from 'gitalk'
+import { config } from '@/config'
 
 export function useGitalk(containerId: string, slug: string, title: string) {
   const initialized = ref(false)
@@ -12,17 +13,17 @@ export function useGitalk(containerId: string, slug: string, title: string) {
     container.innerHTML = ''
 
     const gitalk = new Gitalk({
-      clientID: import.meta.env.VITE_GITALK_CLIENT_ID || '',
-      clientSecret: import.meta.env.VITE_GITALK_CLIENT_SECRET || '',
-      repo: import.meta.env.VITE_GITHUB_REPO || '',
-      owner: import.meta.env.VITE_GITHUB_OWNER || '',
-      admin: [import.meta.env.VITE_GITHUB_OWNER || ''],
+      clientID: config.gitalk.clientID,
+      clientSecret: config.gitalk.clientSecret,
+      repo: config.github.repo,
+      owner: config.github.owner,
+      admin: [config.github.owner],
       id: slug,
       title: title,
       body: title,
       distractionFreeMode: false,
       language: 'zh-CN',
-      proxy: 'https://proxy-gitalk-api.netlify.app/github_access_token',
+      proxy: config.gitalk.proxy,
     })
 
     gitalk.render(containerId)

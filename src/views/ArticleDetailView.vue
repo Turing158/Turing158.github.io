@@ -36,8 +36,9 @@ import { useI18n } from 'vue-i18n'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import Gitalk from 'gitalk'
-import '../styles/gitalk-theme.css';
+import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
+import { config } from '@/config'
 
 const route = useRoute()
 const router = useRouter()
@@ -80,17 +81,17 @@ const initGitalk = () => {
   container.innerHTML = ''
 
   const gitalk = new Gitalk({
-    clientID: import.meta.env.VITE_GITALK_CLIENT_ID || '',
-    clientSecret: import.meta.env.VITE_GITALK_CLIENT_SECRET || '',
-    repo: import.meta.env.VITE_GITHUB_REPO || '',
-    owner: import.meta.env.VITE_GITHUB_OWNER || '',
-    admin: [import.meta.env.VITE_GITHUB_OWNER || ''],
+    clientID: config.gitalk.clientID,
+    clientSecret: config.gitalk.clientSecret,
+    repo: config.github.repo,
+    owner: config.github.owner,
+    admin: [config.github.owner],
     id: slug.value,
     title: article.value?.title || slug.value,
     body: article.value?.title || slug.value,
     distractionFreeMode: false,
     language: locale.value === 'zh-CN' ? 'zh-CN' : 'en',
-    proxy: 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token',
+    proxy: config.gitalk.proxy,
   })
   gitalk.render('gitalk-container')
 }
