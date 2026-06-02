@@ -3,11 +3,13 @@
     <h1 class="page-title">{{ $t('tools.title') }}</h1>
     <p class="page-desc">{{ $t('tools.description') }}</p>
 
-    <div class="tools-grid">
+    <div v-if="showCards" class="tools-grid">
       <div
-        v-for="tool in tools"
-        :key="tool.name"
+        v-for="(tool, index) in tools"
+        :key="tool.component"
         class="tool-card"
+        :style="{ '--animation-delay': index * 80 + 'ms' }"
+        :class="{ 'card-visible': cardVisibleStates[tool.component] }"
         @click="openTool(tool)"
       >
         <div class="tool-icon">{{ tool.icon }}</div>
@@ -134,7 +136,7 @@
                     placeholder="#000000"
                     @input="onHexInput"
                   />
-                  <Button size="small" @click="copyColor('hex')">复制</Button>
+                  <Button size="small" @click="copyColor('hex')">{{ $t('tools.copy') }}</Button>
                 </div>
               </div>
               <div class="color-item">
@@ -145,7 +147,7 @@
                     placeholder="rgb(0, 0, 0)"
                     @input="onRgbInput"
                   />
-                  <Button size="small" @click="copyColor('rgb')">复制</Button>
+                  <Button size="small" @click="copyColor('rgb')">{{ $t('tools.copy') }}</Button>
                 </div>
               </div>
               <div class="color-item">
@@ -156,7 +158,7 @@
                     placeholder="hsl(0, 0%, 0%)"
                     @input="onHslInput"
                   />
-                  <Button size="small" @click="copyColor('hsl')">复制</Button>
+                  <Button size="small" @click="copyColor('hsl')">{{ $t('tools.copy') }}</Button>
                 </div>
               </div>
             </div>
@@ -255,55 +257,31 @@ interface RegexMatch {
   groups?: Record<string, string>
 }
 
-const { locale, t } = useI18n()
+const { locale, t, tm } = useI18n()
 
-const tools = ref<Tool[]>([
-  {
-    name: 'JSON 格式化',
-    icon: '📋',
-    description: '格式化、压缩、验证 JSON 数据，支持语法高亮展示。',
-    tags: ['JSON', '格式化', '压缩'],
-    component: 'JsonFormatter',
-  },
-  {
-    name: 'Base64 编解码',
-    icon: '🔐',
-    description: '文本与 Base64 编码之间的互相转换。',
-    tags: ['Base64', '编码', '解码'],
-    component: 'Base64Tool',
-  },
-  {
-    name: '正则表达式测试',
-    icon: '🔍',
-    description: '在线测试正则表达式，实时查看匹配结果。',
-    tags: ['Regex', '正则', '匹配'],
-    component: 'RegexTester',
-  },
-  {
-    name: '颜色转换器',
-    icon: '🎨',
-    description: 'HEX、RGB、HSL 颜色格式互相转换。',
-    tags: ['颜色', 'HEX', 'RGB', 'HSL'],
-    component: 'ColorConverter',
-  },
-  {
-    name: '时间戳转换',
-    icon: '⏰',
-    description: 'Unix 时间戳与可读日期互相转换。',
-    tags: ['时间', '时间戳', '日期'],
-    component: 'TimestampConverter',
-  },
-  {
-    name: '文本统计',
-    icon: '📊',
-    description: '统计文本字数、字符数、行数、段落数等信息。',
-    tags: ['文本', '统计', '字数'],
-    component: 'TextCounter',
-  },
-])
+const toolKeys = [
+  { key: 'jsonFormatter', component: 'JsonFormatter', icon: '📋' },
+  { key: 'base64', component: 'Base64Tool', icon: '🔐' },
+  { key: 'regex', component: 'RegexTester', icon: '🔍' },
+  { key: 'color', component: 'ColorConverter', icon: '🎨' },
+  { key: 'timestamp', component: 'TimestampConverter', icon: '⏰' },
+  { key: 'textCounter', component: 'TextCounter', icon: '📊' },
+] as const
+
+const tools = computed<Tool[]>(() =>
+  toolKeys.map(({ key, component, icon }) => ({
+    name: t(`tools.${key}Name`),
+    icon,
+    description: t(`tools.${key}Desc`),
+    tags: tm(`tools.${key}Tags`) as string[],
+    component,
+  }))
+)
 
 const activeTool = ref<Tool | null>(null)
 const dialogOpen = ref(false)
+const showCards = ref(false)
+const cardVisibleStates = ref<Record<string, boolean>>({})
 
 // JSON formatter
 const jsonInput = ref('')
@@ -356,13 +334,23 @@ async function copyText(text: string) {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   const update = () => {
     currentTimestamp.value = Math.floor(Date.now() / 1000)
     currentDateStr.value = new Date().toLocaleString(locale.value)
   }
   update()
   timer = setInterval(update, 1000)
+
+  await nextTick()
+  showCards.value = true
+
+  // 逐个显示卡片
+  tools.value.forEach((tool, index) => {
+    setTimeout(() => {
+      cardVisibleStates.value[tool.component] = true
+    }, index * 80) // 每个卡片间隔80ms
+  })
 })
 
 onUnmounted(() => {
@@ -684,6 +672,7 @@ countText()
   gap: 16px;
 }
 
+// 工具卡片逐个下落动画
 .tool-card {
   background: var(--bg-card);
   border-radius: 12px;
@@ -692,11 +681,31 @@ countText()
   box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: cardDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--animation-delay, 0ms);
+
+  &.card-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px var(--shadow);
     border-color: var(--accent);
+  }
+}
+
+@keyframes cardDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -731,6 +740,15 @@ countText()
   border-radius: 12px;
   font-size: 0.75rem;
   border: 1px solid var(--border);
+  transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
+  cursor: default;
+
+  &:hover {
+    background: var(--accent);
+    color: var(--bg-card);
+    border-color: var(--accent);
+    transform: scale(1.08);
+  }
 }
 
 // Modal title slot

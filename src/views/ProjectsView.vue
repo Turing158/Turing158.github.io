@@ -9,8 +9,20 @@
         <span class="category-count">{{ category.projects.length }}</span>
       </div>
 
-      <div v-if="category.projects.length > 0" class="projects-grid" :class="{ 'projects-grid--compact': category.key === 'blog' }">
-        <div v-for="project in category.projects" :key="project.name" class="project-card">
+      <TransitionGroup
+        v-if="category.projects.length > 0 && showCards"
+        name="project-card"
+        tag="div"
+        class="projects-grid"
+        :class="{ 'projects-grid--compact': category.key === 'blog' }"
+        appear
+      >
+        <div
+          v-for="(project, index) in category.projects"
+          :key="project.name"
+          class="project-card"
+          :style="{ '--delay': index * 60 + 'ms' }"
+        >
           <h3 class="project-name">{{ project.name }}</h3>
           <p class="project-desc">{{ project.description }}</p>
           <div class="project-tech">
@@ -22,7 +34,7 @@
             <Button size="small" @click="open(`${project.url}/issues`)">{{ $t('projects.issues') }}</Button>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
 
       <div v-else class="category-empty">暂无项目</div>
     </div>
@@ -30,13 +42,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import { categories as projectCategories } from '@/data/projects'
 
 const router = useRouter()
 const categories = ref(projectCategories)
+const showCards = ref(false)
+
+onMounted(async () => {
+  await nextTick()
+  showCards.value = true
+})
 
 function open(url: string) {
   window.open(url, '_blank')
@@ -130,15 +148,35 @@ function goToCommits(url: string) {
   padding: 20px;
   border: 1px solid var(--border);
   box-shadow: 0 2px 8px var(--shadow);
-  transition: transform 0.2s, box-shadow 0.2s;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition: transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px var(--shadow);
   }
+}
+
+/* 项目卡片入场动画：从上往下落下（必须在 .project-card 之后，确保优先级） */
+.project-card-enter-active {
+  transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: var(--delay, 0ms);
+}
+
+.project-card-enter-from {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+.project-card-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.project-card-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 .project-name {
@@ -166,6 +204,14 @@ function goToCommits(url: string) {
   border-radius: 12px;
   font-size: 0.75rem;
   border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+
+  &:hover {
+    transform: scale(1.1) translateY(-1px);
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
 }
 
 .project-actions {

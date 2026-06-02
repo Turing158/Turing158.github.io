@@ -1,4 +1,13 @@
 <template>
+  <!-- 移动端遮罩层 -->
+  <transition name="toc-overlay">
+    <div
+      v-if="isMobile && isOpen && headings.length > 0"
+      class="toc-overlay"
+      @click="isOpen = false"
+    />
+  </transition>
+
   <transition name="toc-slide">
     <aside
       class="toc-drawer"
@@ -416,6 +425,25 @@ onUnmounted(() => {
 .toc-slide-enter-from,
 .toc-slide-leave-to {
   width: 0;
+  opacity: 0;
+}
+
+/* 移动端遮罩层 */
+.toc-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 198;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.toc-overlay-enter-active,
+.toc-overlay-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.toc-overlay-enter-from,
+.toc-overlay-leave-to {
   opacity: 0;
 }
 

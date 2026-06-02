@@ -18,6 +18,10 @@ const GITALK_CLIENT_SECRET = import.meta.env.VITE_GITALK_CLIENT_SECRET || '173a6
 const BLOG_TITLE = 'Turing_ICE'
 const BLOG_AUTHOR = 'Turing158'
 
+// --- 浏览器标题模板 ---
+// 可用变量: {current_page} — 当前页面名称
+const TITLE_TEMPLATE = '{current_page} | Blog - {blog_title}'
+
 // --- 开发中项目仓库列表（用于获取最近提交） ---
 const DEVELOPING_REPOS = [
   'StarFall-Minecraft-Launcher',
@@ -47,6 +51,7 @@ export const config = {
   blog: {
     title: BLOG_TITLE,
     author: BLOG_AUTHOR,
+    titleTemplate: TITLE_TEMPLATE,
   },
   developingRepos: DEVELOPING_REPOS,
   holiday: {

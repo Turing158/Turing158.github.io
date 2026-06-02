@@ -36,7 +36,9 @@
       "mcp__ide__getDiagnostics",
       "Bash(grep -oP '#[0-9a-fA-F]{3,8}|rgba?\\\\\\([^\\)]+\\\\\\)' \"E:\\\\project\\\\personal\\\\node_modules\\\\animal-island-vue\\\\dist/index.css\")",
       "Bash(jobs -l)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "mcp__playwright__browser_wait_for",
+      "Bash(git add *)"
     ]
   }
 }

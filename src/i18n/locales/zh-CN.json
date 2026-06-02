@@ -7,12 +7,29 @@
     "about": "关于",
     "commits": "提交"
   },
+  "pageTitle": {
+    "home": "主页",
+    "articles": "文章",
+    "articleDetail": "文章详情",
+    "projects": "项目",
+    "tools": "工具",
+    "about": "关于",
+    "commits": "提交记录"
+  },
   "home": {
     "recentCommits": "最新提交",
     "recentArticles": "最新文章",
     "viewAll": "查看全部",
     "noCommits": "暂无提交记录",
-    "noArticles": "暂无文章"
+    "noArticles": "暂无文章",
+    "loading": "加载中...",
+    "loadFailed": "加载失败",
+    "holidayNoMore": "今年没有更多节日了",
+    "holidayToday": "就是今天！",
+    "githubNotConfigured": "请配置 GitHub 信息以显示提交记录",
+    "profileBio": "Java / C# 开发爱好者",
+    "hoursLeft": "还剩 {n} 小时",
+    "daysLeft": "还剩 {n} 天"
   },
   "articles": {
     "title": "文章",
@@ -84,6 +101,25 @@
     "title": "工具集",
     "description": "常用在线工具，开箱即用。",
     "copied": "已复制!",
+    "jsonFormatterName": "JSON 格式化",
+    "jsonFormatterDesc": "格式化、压缩、验证 JSON 数据，支持语法高亮展示。",
+    "jsonFormatterTags": ["JSON", "格式化", "压缩"],
+    "base64Name": "Base64 编解码",
+    "base64Desc": "文本与 Base64 编码之间的互相转换。",
+    "base64Tags": ["Base64", "编码", "解码"],
+    "regexName": "正则表达式测试",
+    "regexDesc": "在线测试正则表达式，实时查看匹配结果。",
+    "regexTags": ["Regex", "正则", "匹配"],
+    "colorName": "颜色转换器",
+    "colorDesc": "HEX、RGB、HSL 颜色格式互相转换。",
+    "colorTags": ["颜色", "HEX", "RGB", "HSL"],
+    "timestampName": "时间戳转换",
+    "timestampDesc": "Unix 时间戳与可读日期互相转换。",
+    "timestampTags": ["时间", "时间戳", "日期"],
+    "textCounterName": "文本统计",
+    "textCounterDesc": "统计文本字数、字符数、行数、段落数等信息。",
+    "textCounterTags": ["文本", "统计", "字数"],
+    "copy": "复制",
     "jsonFormatter": {
       "inputLabel": "输入 JSON",
       "placeholder": "在此粘贴 JSON...",
@@ -104,7 +140,8 @@
       "swap": "互换",
       "copy": "复制",
       "clear": "清空",
-      "outputLabel": "输出结果"
+      "outputLabel": "输出结果",
+      "error": "错误"
     },
     "regex": {
       "patternLabel": "正则表达式",
@@ -153,5 +190,13 @@
   },
   "comments": {
     "title": "评论"
+  },
+  "time": {
+    "secondsAgo": "{n}秒前",
+    "minutesAgo": "{n}分钟前",
+    "hoursAgo": "{n}小时前",
+    "yesterday": "昨天",
+    "dayBeforeYesterday": "前天",
+    "daysAgo": "{n}天前"
   }
 }

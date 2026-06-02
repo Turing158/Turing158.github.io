@@ -5,21 +5,28 @@
       <div class="widget clock-widget">
         <Time class="clock-time" />
         <Divider />
-        <div v-if="!holidaysLoaded" class="holiday-loading">加载中...</div>
-        <div v-else-if="holidaysError" class="holiday-loading">加载失败</div>
-        <div v-else-if="!countdown" class="holiday-loading">今年没有更多节日了</div>
+        <div v-if="!holidaysLoaded" class="holiday-loading loading-text">
+          <span class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </span>
+          {{ $t('home.loading') }}
+        </div>
+        <div v-else-if="holidaysError" class="holiday-loading">{{ $t('home.loadFailed') }}</div>
+        <div v-else-if="!countdown" class="holiday-loading">{{ $t('home.holidayNoMore') }}</div>
         <div v-else class="holiday-content">
           <div class="holiday-name">{{ countdown.holiday.name }}</div>
           <div v-if="countdown.isToday" class="holiday-countdown">
-            <div class="holiday-today">就是今天！</div>
+            <div class="holiday-today">{{ $t('home.holidayToday') }}</div>
             <div class="holiday-greeting">{{ countdown.greeting }}</div>
           </div>
           <div v-else-if="countdown.hoursLeft !== undefined && countdown.hoursLeft > 0" class="holiday-countdown">
-            <div class="holiday-urgent">还剩 {{ countdown.hoursLeft }} 小时</div>
+            <div class="holiday-urgent">{{ $t('home.hoursLeft', { n: countdown.hoursLeft }) }}</div>
             <div class="holiday-greeting">{{ countdown.greeting }}</div>
           </div>
           <div v-else class="holiday-countdown">
-            <div class="holiday-days">还剩 {{ countdown.daysLeft }} 天</div>
+            <div class="holiday-days">{{ $t('home.daysLeft', { n: countdown.daysLeft }) }}</div>
           </div>
         </div>
       </div>
@@ -30,7 +37,7 @@
           <img :src="avatarUrl" alt="avatar" class="profile-avatar" />
         </div>
         <div class="profile-name">{{ blogName }}</div>
-        <div class="profile-bio">Java / C# 开发爱好者</div>
+        <div class="profile-bio">{{ $t('home.profileBio') }}</div>
       </div>
 
       <!-- Commits Widget -->
@@ -38,8 +45,15 @@
         <div class="widget-header">
           <div class="widget-title">📦 {{ $t('home.recentCommits') }}</div>
         </div>
-        <div v-if="commitsLoading" class="widget-content">{{ $t('common.loading') }}</div>
-        <div v-else-if="!hasGitHubConfig" class="widget-content">请配置 GitHub 信息以显示提交记录</div>
+        <div v-if="commitsLoading" class="widget-content loading-text">
+          <span class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </span>
+          {{ $t('common.loading') }}
+        </div>
+        <div v-else-if="!hasGitHubConfig" class="widget-content">{{ $t('home.githubNotConfigured') }}</div>
         <div v-else-if="recentCommits.length === 0" class="widget-content">{{ $t('home.noCommits') }}</div>
         <div v-else class="commits-list">
           <a
@@ -76,7 +90,14 @@
         <div class="widget-header">
           <div class="widget-title">📝 {{ $t('home.recentArticles') }}</div>
         </div>
-        <div v-if="loading" class="widget-content">{{ $t('common.loading') }}</div>
+        <div v-if="loading" class="widget-content loading-text">
+          <span class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </span>
+          {{ $t('common.loading') }}
+        </div>
         <div v-else-if="recentArticles.length === 0" class="widget-content">{{ $t('home.noArticles') }}</div>
         <div v-else class="article-list">
           <router-link

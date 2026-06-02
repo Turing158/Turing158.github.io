@@ -1,5 +1,14 @@
 <template>
   <div class="main-layout">
+    <!-- 移动端遮罩层：侧边栏展开时显示 -->
+    <transition name="overlay-fade">
+      <div
+        v-if="isMobile && !isCollapsed"
+        class="sidebar-overlay"
+        @click="isCollapsed = true"
+      />
+    </transition>
+
     <aside class="sidebar" :class="{ collapsed: isCollapsed }">
       <div class="sidebar-header">
         <div class="avatar-wrap">
@@ -14,7 +23,8 @@
           :key="item.path"
           :to="item.path"
           class="nav-link"
-          :class="{ active: route.path === item.path }"
+          :class="{ active: item.activeNames?.includes(route.name as string) }"
+          @click="isMobile && (isCollapsed = true)"
         >
           <span class="nav-indicator" aria-hidden="true"></span>
           <span class="nav-icon">
@@ -72,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTheme, type ThemeName } from '@/composables/useTheme'
@@ -86,9 +96,23 @@ const route = useRoute()
 const { locale } = useI18n()
 const { theme: currentTheme, setTheme } = useTheme()
 
+const isMobile = ref(window.innerWidth < 768)
 const isCollapsed = ref(window.innerWidth < 768)
 const blogName = 'Turing_ICE'
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
+
+// 监听窗口变化，同步 isMobile 状态
+const onResize = () => {
+  isMobile.value = window.innerWidth < 768
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize)
+})
 
 // TOC 状态管理
 const tocHeadings = ref<TocHeading[]>([])
@@ -107,11 +131,11 @@ if (typeof window !== 'undefined') {
 }
 
 const navItems = [
-  { path: '/', icon: 'home', labelKey: 'nav.home' },
-  { path: '/articles', icon: 'articles', labelKey: 'nav.articles' },
-  { path: '/projects', icon: 'projects', labelKey: 'nav.projects' },
-  { path: '/tools', icon: 'tools', labelKey: 'nav.tools' },
-  { path: '/about', icon: 'about', labelKey: 'nav.about' },
+  { path: '/', icon: 'home', labelKey: 'nav.home', activeNames: ['home'] },
+  { path: '/articles', icon: 'articles', labelKey: 'nav.articles', activeNames: ['articles', 'article-detail'] },
+  { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
+  { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools'] },
+  { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
 ]
 
 const themes = [
@@ -511,6 +535,25 @@ const toggleLang = () => {
 .page-leave-to {
   opacity: 0;
   transform: translateY(-12px);
+}
+
+/* 移动端遮罩层 */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+}
+
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
 }
 
 @media (max-width: 768px) {

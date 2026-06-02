@@ -1,5 +1,10 @@
 <template>
   <div class="commits-view">
+    <!-- 返回按钮 -->
+    <Button class="back-button" type="primary" @click="goBack">
+      <span class="back-arrow">⬅</span>
+    </Button>
+
     <!-- 顶部 -->
     <div class="commits-header">
       <h1 class="page-title">{{ repoName }}</h1>
@@ -14,7 +19,12 @@
     </div>
 
     <!-- 加载 / 错误 / 空 -->
-    <div v-if="loading" class="status-wrap">
+    <div v-if="loading" class="status-wrap loading-text">
+      <span class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </span>
       <span>{{ $t('pageCommits.loading') }}</span>
     </div>
     <div v-else-if="error" class="status-wrap status-error">
@@ -151,8 +161,11 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+
+const router = useRouter()
 
 const GITHUB_OWNER = 'Turing158'
 
@@ -180,6 +193,8 @@ const ROW_H = 72    // 每行高度
 const DOT = 12      // 圆点直径
 const graphW = 56   // 图形列宽度
 const spineX = graphW / 2  // 主干竖线 x 位置（居中）
+const DOT_TOP = 15       // 圆点 top 值
+const DOT_CENTER = DOT_TOP + DOT / 2  // 圆点中心距行顶 = 21px
 
 function firstLine(msg: string) { return msg.split('\n')[0].trim() }
 function restLines(msg: string) { return msg.split('\n').slice(1).join('\n').trimEnd() }
@@ -206,6 +221,14 @@ function initials(c: CommitData) {
 }
 function openProject() { window.open(`https://github.com/${GITHUB_OWNER}/${repoName.value}`, '_blank') }
 function openCommits() { window.open(`https://github.com/${GITHUB_OWNER}/${repoName.value}/commits`, '_blank') }
+const goBack = () => {
+  if (window.history.state?.back) {
+    router.back()
+  } else {
+    router.push('/projects')
+  }
+}
+
 function openCommit(sha: string) { window.open(`https://github.com/${GITHUB_OWNER}/${repoName.value}/commit/${sha}`, '_blank') }
 
 // ── Lane 分配算法 ──
@@ -282,8 +305,8 @@ function incomingCurves(row: number): Curve[] {
   const info = laneInfos.value[row]
 
   for (const br of info.incomingBranches) {
-    const fromY = br.fromRow * ROW_H + ROW_H / 2  // 来源节点圆心 y
-    const toY = row * ROW_H + ROW_H / 2            // 当前节点圆心 y
+    const fromY = br.fromRow * ROW_H + DOT_CENTER  // 来源节点圆心 y
+    const toY = row * ROW_H + DOT_CENTER            // 当前节点圆心 y
     const vertH = toY - fromY
 
     // 分支 lane 在主干左侧，每个分支 lane 占 14px
@@ -337,6 +360,32 @@ onMounted(fetchCommits)
   max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
+}
+
+// ── 返回按钮 ──
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  .back-arrow {
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    .back-arrow {
+      transform: translateX(-4px);
+    }
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
 }
 
 // ── 顶部 ──
@@ -401,10 +450,10 @@ onMounted(fetchCommits)
 
   &--top {
     top: 0;
-    height: 36px;  // 上半段到圆点中心
+    height: 21px;  // 上半段到圆点中心 (dot top:15 + radius:6 = 21)
   }
   &--bottom {
-    top: 26px;
+    top: 21px;
     bottom: 0;
   }
 }

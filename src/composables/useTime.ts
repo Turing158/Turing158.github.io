@@ -1,12 +1,14 @@
 /**
  * 时间格式化工具
- * - 小于1分钟：*秒前
- * - 小于1小时：*分钟前
- * - 小于1天：*小时前
- * - 小于1周：昨天、前天、*天前
+ * - 小于1分钟：*秒前 / * seconds ago
+ * - 小于1小时：*分钟前 / * minutes ago
+ * - 小于1天：*小时前 / * hours ago
+ * - 小于1周：昨天、前天、*天前 / Yesterday, Day before yesterday, * days ago
  * - 大于1周：年/月/日
  * - 鼠标悬停显示：年/月/日 时:分:秒
  */
+
+import { useI18n } from 'vue-i18n'
 
 export function formatRelativeTime(dateStr: string): string {
   const date = new Date(dateStr)
@@ -22,28 +24,30 @@ export function formatRelativeTime(dateStr: string): string {
   const diffHour = Math.floor(diffMin / 60)
   const diffDay = Math.floor(diffHour / 24)
 
+  const { t } = useI18n()
+
   if (diffSec < 60) {
-    return `${diffSec}秒前`
+    return t('time.secondsAgo', { n: diffSec })
   }
 
   if (diffMin < 60) {
-    return `${diffMin}分钟前`
+    return t('time.minutesAgo', { n: diffMin })
   }
 
   if (diffHour < 24) {
-    return `${diffHour}小时前`
+    return t('time.hoursAgo', { n: diffHour })
   }
 
   if (diffDay === 1) {
-    return '昨天'
+    return t('time.yesterday')
   }
 
   if (diffDay === 2) {
-    return '前天'
+    return t('time.dayBeforeYesterday')
   }
 
   if (diffDay < 7) {
-    return `${diffDay}天前`
+    return t('time.daysAgo', { n: diffDay })
   }
 
   // 大于1周：年/月/日

@@ -21,7 +21,14 @@
       </section>
     </article>
 
-    <div v-else-if="loading" class="status">{{ $t('common.loading') }}</div>
+    <div v-else-if="loading" class="status loading-text">
+      <span class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </span>
+      <span>{{ $t('common.loading') }}</span>
+    </div>
     <div v-else class="status">{{ $t('common.error') }}</div>
   </div>
 </template>
@@ -39,6 +46,7 @@ import Gitalk from 'gitalk'
 import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 import { config } from '@/config'
+import { updateDocumentTitle } from '@/router'
 
 const route = useRoute()
 const router = useRouter()
@@ -98,6 +106,11 @@ const initGitalk = () => {
 
 onMounted(async () => {
   await fetchArticles()
+
+  // 文章标题加载完成后更新浏览器标题
+  if (article.value?.title) {
+    updateDocumentTitle(article.value.title)
+  }
 
   nextTick(() => {
     updateHeadings()

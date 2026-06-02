@@ -2,7 +2,14 @@
   <div class="articles-view">
     <h1 class="page-title">{{ $t('articles.title') }}</h1>
 
-    <div v-if="loading" class="status">{{ $t('common.loading') }}</div>
+    <div v-if="loading" class="status loading-text">
+      <span class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </span>
+      <span>{{ $t('common.loading') }}</span>
+    </div>
     <div v-else-if="articles.length === 0" class="status">{{ $t('articles.noArticles') }}</div>
 
     <div v-else>
@@ -31,12 +38,19 @@
       </div>
 
       <!-- 文章列表 -->
-      <div class="articles-list">
+      <TransitionGroup
+        v-if="showCards"
+        name="article-list"
+        tag="div"
+        class="articles-list"
+        appear
+      >
         <router-link
-          v-for="article in pagedArticles"
+          v-for="(article, index) in pagedArticles"
           :key="article.slug"
           :to="`/article/${article.slug}`"
           class="article-card"
+          :style="{ '--delay': index * 60 + 'ms' }"
         >
           <div class="article-card-content">
             <h2 class="article-card-title">{{ article.title }}</h2>
@@ -47,7 +61,7 @@
             </div>
           </div>
         </router-link>
-      </div>
+      </TransitionGroup>
 
       <!-- 无匹配提示 -->
       <div v-if="filteredArticles.length === 0" class="status">
@@ -99,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useArticles } from '@/composables/useArticles'
 import { useAppStore } from '@/stores/app'
@@ -179,12 +193,35 @@ const pageNumbers = computed(() => {
   return pages
 })
 
+const showCards = ref(false)
+
 onMounted(async () => {
   await fetchArticles()
+  await nextTick()
+  showCards.value = true
 })
 </script>
 
 <style lang="less" scoped>
+/* ── 文章卡片入场动画（必须在最前面，避免被其他样式覆盖） ── */
+.article-list-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.article-list-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.article-list-leave-active {
+  transition: all 0.2s ease;
+}
+
+.article-list-leave-to {
+  opacity: 0;
+  transform: translateX(-12px);
+}
+
 .articles-view {
   max-width: 800px;
   margin: 0 auto;
@@ -313,7 +350,30 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px var(--shadow);
+    
   }
+}
+
+/* 文章卡片入场动画：从左往右滑入（依次入场） */
+.article-list-enter-active {
+  transition-property: opacity, transform;
+  transition-duration: 0.35s;
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: var(--delay, 0ms);
+}
+
+.article-list-enter-from {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.article-list-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.article-list-leave-to {
+  opacity: 0;
+  transform: translateX(-12px);
 }
 
 .article-card-title {
@@ -348,6 +408,14 @@ onMounted(async () => {
   border-radius: 12px;
   font-size: 0.75rem;
   border: 1px solid var(--border);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: default;
+
+  &:hover {
+    transform: scale(1.1) translateY(-1px);
+    border-color: var(--accent);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
 }
 
 /* ── 分页 ─────────────────────────────────────── */

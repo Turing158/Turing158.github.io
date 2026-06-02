@@ -12,7 +12,15 @@
     "recentArticles": "Recent Articles",
     "viewAll": "View All",
     "noCommits": "No commits yet",
-    "noArticles": "No articles yet"
+    "noArticles": "No articles yet",
+    "loading": "Loading...",
+    "loadFailed": "Load failed",
+    "holidayNoMore": "No more holidays this year",
+    "holidayToday": "It's today!",
+    "githubNotConfigured": "Please configure GitHub info to show commits",
+    "profileBio": "Java / C# Developer & Tech Enthusiast",
+    "hoursLeft": "{n} hours left",
+    "daysLeft": "{n} days left"
   },
   "articles": {
     "title": "Articles",
@@ -84,6 +92,25 @@
     "title": "Tools",
     "description": "Common online tools, ready to use.",
     "copied": "Copied!",
+    "jsonFormatterName": "JSON Formatter",
+    "jsonFormatterDesc": "Format, minify, and validate JSON data with syntax highlighting.",
+    "jsonFormatterTags": ["JSON", "Format", "Minify"],
+    "base64Name": "Base64 Encoder/Decoder",
+    "base64Desc": "Convert text to and from Base64 encoding.",
+    "base64Tags": ["Base64", "Encode", "Decode"],
+    "regexName": "Regex Tester",
+    "regexDesc": "Test regular expressions online and see matches in real time.",
+    "regexTags": ["Regex", "Pattern", "Match"],
+    "colorName": "Color Converter",
+    "colorDesc": "Convert between HEX, RGB, and HSL color formats.",
+    "colorTags": ["Color", "HEX", "RGB", "HSL"],
+    "timestampName": "Timestamp Converter",
+    "timestampDesc": "Convert between Unix timestamps and readable dates.",
+    "timestampTags": ["Time", "Timestamp", "Date"],
+    "textCounterName": "Text Counter",
+    "textCounterDesc": "Count characters, words, lines, paragraphs and more.",
+    "textCounterTags": ["Text", "Count", "Stats"],
+    "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
       "placeholder": "Paste JSON here...",
@@ -104,7 +131,8 @@
       "swap": "Swap",
       "copy": "Copy",
       "clear": "Clear",
-      "outputLabel": "Output"
+      "outputLabel": "Output",
+      "error": "Error"
     },
     "regex": {
       "patternLabel": "Regular Expression",
@@ -151,7 +179,24 @@
     "collapse": "Collapse",
     "expand": "Open menu"
   },
+  "time": {
+    "secondsAgo": "{n} seconds ago",
+    "minutesAgo": "{n} minutes ago",
+    "hoursAgo": "{n} hours ago",
+    "yesterday": "Yesterday",
+    "dayBeforeYesterday": "Day before yesterday",
+    "daysAgo": "{n} days ago"
+  },
   "comments": {
     "title": "Comments"
+  },
+  "pageTitle": {
+    "home": "Home",
+    "articles": "Articles",
+    "articleDetail": "Article",
+    "projects": "Projects",
+    "tools": "Tools",
+    "about": "About",
+    "commits": "Commits"
   }
 }
