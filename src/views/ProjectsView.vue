@@ -29,9 +29,9 @@
             <span v-for="tech in project.tech" :key="tech" class="tech-tag">{{ tech }}</span>
           </div>
           <div class="project-actions">
-            <Button type="primary" size="small" @click="open(project.url)">{{ $t('projects.visit') }}</Button>
-            <Button size="small" @click="goToCommits(project.url)">{{ $t('projects.commits') }}</Button>
             <Button size="small" @click="open(`${project.url}/issues`)">{{ $t('projects.issues') }}</Button>
+            <Button size="small" @click="goToCommits(project.url)">{{ $t('projects.commits') }}</Button>
+            <Button type="primary" size="small" @click="open(project.url)">{{ $t('projects.visit') }}</Button>
           </div>
         </div>
       </TransitionGroup>
@@ -216,6 +216,7 @@ function goToCommits(url: string) {
 
 .project-actions {
   display: flex;
+  justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
 }

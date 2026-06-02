@@ -203,9 +203,12 @@ onMounted(async () => {
 </script>
 
 <style lang="less" scoped>
-/* ── 文章卡片入场动画（必须在最前面，避免被其他样式覆盖） ── */
+/* ── TransitionGroup 动画 ─────────────────────────── */
+/* 入场：从左滑入，依次延迟 */
 .article-list-enter-active {
-  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: var(--delay, 0ms);
 }
 
 .article-list-enter-from {
@@ -213,13 +216,20 @@ onMounted(async () => {
   transform: translateX(-20px);
 }
 
+/* 出场：淡出 + 离开文档流，让剩余卡片可立即开始 FLIP 过渡 */
 .article-list-leave-active {
-  transition: all 0.2s ease;
+  position: absolute;
+  width: 100%;
+  transition: opacity 0.25s ease;
 }
 
 .article-list-leave-to {
   opacity: 0;
-  transform: translateX(-12px);
+}
+
+/* 关键：move 类让剩余卡片在位置上平滑过渡（FLIP 动画） */
+.article-list-move {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .articles-view {
@@ -334,6 +344,7 @@ onMounted(async () => {
 
 /* ── 文章列表 ─────────────────────────────────── */
 .articles-list {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -350,30 +361,7 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px var(--shadow);
-    
   }
-}
-
-/* 文章卡片入场动画：从左往右滑入（依次入场） */
-.article-list-enter-active {
-  transition-property: opacity, transform;
-  transition-duration: 0.35s;
-  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
-  transition-delay: var(--delay, 0ms);
-}
-
-.article-list-enter-from {
-  opacity: 0;
-  transform: translateX(-20px);
-}
-
-.article-list-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.article-list-leave-to {
-  opacity: 0;
-  transform: translateX(-12px);
 }
 
 .article-card-title {

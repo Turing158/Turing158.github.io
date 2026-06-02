@@ -78,7 +78,8 @@
     "repoPlaceholder": "Enter repo name",
     "search": "Search",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "moreCommits": "More Commits"
   },
   "about": {
     "title": "About",
