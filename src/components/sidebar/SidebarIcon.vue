@@ -119,6 +119,11 @@ const icons: Record<string, Shape[]> = {
     { type: 'circle', cx: 18, cy: 17, r: 3 },
     { type: 'line', x1: 12, y1: 14, x2: 18, y2: 14 },
   ],
+  releases: [
+    { type: 'path', d: 'M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z' },
+    { type: 'polyline', points: '3.27 6.96 12 12.01 20.73 6.96' },
+    { type: 'line', x1: 12, y1: 22.08, x2: 12, y2: 12 },
+  ],
 }
 
 const paths = computed<Shape[]>(() => icons[props.name] ?? [])

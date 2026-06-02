@@ -29,6 +29,19 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pageTitle.projects' },
   },
   {
+    path: '/releases',
+    name: 'releases',
+    component: () => import('@/views/ReleasesView.vue'),
+    meta: { titleKey: 'pageTitle.releases' },
+  },
+  {
+    path: '/release/:repo',
+    name: 'release-detail',
+    component: () => import('@/views/ReleaseDetailView.vue'),
+    meta: { titleKey: 'pageTitle.releaseDetail' },
+    props: true,
+  },
+  {
     path: '/tools',
     name: 'tools',
     component: () => import('@/views/ToolsView.vue'),
@@ -69,6 +82,11 @@ router.beforeEach((to) => {
 
   // 提交记录页：动态替换为仓库名
   if (to.name === 'commits' && to.params.repo) {
+    pageTitle = to.params.repo as string
+  }
+
+  // 发行详情页：动态替换为仓库名
+  if (to.name === 'release-detail' && to.params.repo) {
     pageTitle = to.params.repo as string
   }
 

@@ -1,15 +1,18 @@
 <template>
   <div class="commits-view">
-    <!-- 返回按钮 -->
-    <Button class="back-button" type="primary" @click="goBack">
-      <span class="back-arrow">⬅</span>
-    </Button>
+    <!-- 顶部按钮行 -->
+    <div class="header-bar">
+      <!-- 返回按钮 -->
+      <Button type="primary" class="back-button" @click="goBack">
+        <svg class="back-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
+      </Button>
 
-    <!-- 顶部 -->
-    <div class="commits-header">
-      <h1 class="page-title">{{ repoName }}</h1>
+      <!-- 右侧按钮 -->
       <div class="header-actions">
-        <Button type="primary" size="small" @click="openProject">
+        <Button size="small" @click="openProject">
           {{ $t('pageCommits.visitProject') }}
         </Button>
         <Button size="small" @click="openCommits">
@@ -17,6 +20,9 @@
         </Button>
       </div>
     </div>
+
+    <!-- 页面标题 -->
+    <h1 class="page-title">{{ repoName }}</h1>
 
     <!-- 加载 / 错误 / 空 -->
     <div v-if="loading" class="status-wrap loading-text">
@@ -362,52 +368,43 @@ onMounted(fetchCommits)
   padding: 32px 24px;
 }
 
-// ── 返回按钮 ──
+// ── 顶部按钮行 ──
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 12px;
+}
+
 .back-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
 
-  .back-arrow {
-    font-size: 1.1rem;
-    transition: transform 0.3s ease;
+  .back-icon {
+    transition: transform 0.2s ease;
   }
 
-  &:hover {
-    .back-arrow {
-      transform: translateX(-4px);
-    }
-  }
-
-  &:active {
-    transform: scale(0.97);
+  &:hover .back-icon {
+    transform: translateX(-3px);
   }
 }
 
-// ── 顶部 ──
-.commits-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--border);
-  flex-wrap: wrap;
-  gap: 12px;
-}
 .page-title {
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-primary);
+  margin-bottom: 24px;
 }
+
 .header-actions {
   display: flex;
   gap: 10px;
-  flex-shrink: 0;
 }
 
 // ── 状态 ──

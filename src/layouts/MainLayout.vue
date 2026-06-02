@@ -134,6 +134,7 @@ const navItems = [
   { path: '/', icon: 'home', labelKey: 'nav.home', activeNames: ['home'] },
   { path: '/articles', icon: 'articles', labelKey: 'nav.articles', activeNames: ['articles', 'article-detail'] },
   { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
+  { path: '/releases', icon: 'releases', labelKey: 'nav.releases', activeNames: ['releases'] },
   { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools'] },
   { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
 ]

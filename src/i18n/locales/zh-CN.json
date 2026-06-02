@@ -3,6 +3,7 @@
     "home": "主页",
     "articles": "文章",
     "projects": "项目",
+    "releases": "发行",
     "tools": "工具",
     "about": "关于",
     "commits": "提交"
@@ -12,6 +13,8 @@
     "articles": "文章",
     "articleDetail": "文章详情",
     "projects": "项目",
+    "releases": "发行",
+    "releaseDetail": "发行详情",
     "tools": "工具",
     "about": "关于",
     "commits": "提交记录"
@@ -42,6 +45,27 @@
     "prev": "上一页",
     "next": "下一页",
     "perPage": "每页显示"
+  },
+  "releases": {
+    "title": "发行",
+    "noReleases": "暂无发行版本",
+    "prerelease": "预发行",
+    "publishedAt": "发布于",
+    "download": "下载",
+    "more": "更多",
+    "loading": "加载中...",
+    "loadFailed": "加载失败"
+  },
+  "pageReleases": {
+    "title": "发行详情",
+    "visitProject": "前往项目",
+    "more": "更多",
+    "moreReleases": "更多发行版本",
+    "prerelease": "预发行",
+    "assets": "资源列表",
+    "loading": "加载中...",
+    "loadFailed": "加载失败",
+    "retry": "重试"
   },
   "projects": {
     "title": "项目",

@@ -1,9 +1,15 @@
 <template>
   <div class="article-detail">
     <article class="article-content" v-if="article">
-      <Button class="back-button" type="primary" @click="goBack">
-        <span class="back-arrow">⬅</span>
-      </Button>
+      <!-- 顶部按钮行 -->
+      <div class="header-bar">
+        <Button type="primary" class="back-button" @click="goBack">
+          <svg class="back-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+        </Button>
+      </div>
 
       <header class="article-header">
         <h1 class="article-title">{{ article.title }}</h1>
@@ -131,6 +137,13 @@ watch(locale, () => {
   position: relative;
 }
 
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
 .article-header {
   margin-bottom: 32px;
   padding-bottom: 20px;
@@ -140,25 +153,18 @@ watch(locale, () => {
 .back-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
 
-  .back-arrow {
-    font-size: 1.1rem;
-    transition: transform 0.3s ease;
+  .back-icon {
+    transition: transform 0.2s ease;
   }
 
-  &:hover {
-    .back-arrow {
-      transform: translateX(-4px);
-    }
-  }
-
-  &:active {
-    transform: scale(0.97);
+  &:hover .back-icon {
+    transform: translateX(-3px);
   }
 }
 

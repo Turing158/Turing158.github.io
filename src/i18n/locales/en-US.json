@@ -3,6 +3,7 @@
     "home": "Home",
     "articles": "Articles",
     "projects": "Projects",
+    "releases": "Releases",
     "tools": "Tools",
     "about": "About",
     "commits": "Commits"
@@ -33,6 +34,24 @@
     "prev": "Previous",
     "next": "Next",
     "perPage": "Per page"
+  },
+  "releases": {
+    "title": "Releases",
+    "noReleases": "No releases yet",
+    "prerelease": "Prerelease",
+    "publishedAt": "Published at",
+    "loading": "Loading...",
+    "loadFailed": "Failed to load"
+  },
+  "releases": {
+    "title": "Releases",
+    "noReleases": "No releases yet",
+    "prerelease": "Prerelease",
+    "publishedAt": "Published on",
+    "download": "Download",
+    "more": "More",
+    "loading": "Loading...",
+    "loadFailed": "Load failed"
   },
   "projects": {
     "title": "Projects",
@@ -195,8 +214,21 @@
     "articles": "Articles",
     "articleDetail": "Article",
     "projects": "Projects",
+    "releases": "Releases",
+    "releaseDetail": "Release Detail",
     "tools": "Tools",
     "about": "About",
     "commits": "Commits"
+  },
+  "pageReleases": {
+    "title": "Release Detail",
+    "visitProject": "Visit Project",
+    "more": "More",
+    "moreReleases": "More Releases",
+    "prerelease": "Prerelease",
+    "assets": "Assets",
+    "loading": "Loading...",
+    "loadFailed": "Failed to load",
+    "retry": "Retry"
   }
 }
