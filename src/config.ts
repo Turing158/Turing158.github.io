@@ -10,6 +10,9 @@
 const GITHUB_OWNER = import.meta.env.VITE_GITHUB_OWNER || 'Turing158'
 const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'Turing158.github.io'
 
+// --- Gitee 配置 ---
+const GITEE_OWNER = import.meta.env.VITE_GITEE_OWNER || 'turing-ice'
+
 // --- Gitalk OAuth 配置 ---
 const GITALK_CLIENT_ID = import.meta.env.VITE_GITALK_CLIENT_ID || '0275b8f48f2a7e0ac1b0'
 const GITALK_CLIENT_SECRET = import.meta.env.VITE_GITALK_CLIENT_SECRET || '173a61730904837485e645de785bc24d0379d936'
@@ -42,6 +45,9 @@ export const config = {
   github: {
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
+  },
+  gitee: {
+    owner: GITEE_OWNER,
   },
   gitalk: {
     clientID: GITALK_CLIENT_ID,

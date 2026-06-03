@@ -124,6 +124,14 @@ const icons: Record<string, Shape[]> = {
     { type: 'polyline', points: '3.27 6.96 12 12.01 20.73 6.96' },
     { type: 'line', x1: 12, y1: 22.08, x2: 12, y2: 12 },
   ],
+  gripVertical: [
+    { type: 'circle', cx: 9, cy: 6, r: 1 },
+    { type: 'circle', cx: 15, cy: 6, r: 1 },
+    { type: 'circle', cx: 9, cy: 12, r: 1 },
+    { type: 'circle', cx: 15, cy: 12, r: 1 },
+    { type: 'circle', cx: 9, cy: 18, r: 1 },
+    { type: 'circle', cx: 15, cy: 18, r: 1 },
+  ],
 }
 
 const paths = computed<Shape[]>(() => icons[props.name] ?? [])

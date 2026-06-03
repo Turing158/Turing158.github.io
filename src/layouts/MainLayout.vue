@@ -61,11 +61,16 @@
       </div>
     </aside>
 
+    <!-- 展开按钮：长按拖动调整位置，短按展开侧边栏 -->
     <button
-      v-if="isCollapsed"
+      ref="expandBtnRef"
       class="expand-btn"
+      :class="{ 'is-dragging': isDragging, 'is-longpress': isLongPressing, 'is-visible': isCollapsed }"
+      :style="btnStyle"
       :aria-label="$t('common.expand')"
-      @click="isCollapsed = false"
+      @mousedown="onPointerDown"
+      @touchstart.passive="onPointerDown"
+      @click="onExpandClick"
     >
       <SidebarIcon name="menu" :size="20" />
     </button>
@@ -129,6 +134,115 @@ const updateTocHeadings = (headings: TocHeading[]) => {
 if (typeof window !== 'undefined') {
   (window as any).__updateTocHeadings = updateTocHeadings
 }
+
+// =============================================
+// 展开按钮长按拖动逻辑
+// =============================================
+const STORAGE_KEY = 'expand-btn-top'
+const LONG_PRESS_MS = 500
+
+const expandBtnRef = ref<HTMLElement | null>(null)
+const btnTop = ref(parseFloat(localStorage.getItem(STORAGE_KEY) || '33'))
+const isDragging = ref(false)
+const isLongPressing = ref(false)
+
+// 拖动内部状态
+let startY = 0
+let startTop = 0
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+let hasMoved = false
+let didDrag = false
+
+const btnStyle = computed(() => ({
+  top: `${btnTop.value}vh`,
+}))
+
+function clampTop(vh: number): number {
+  return Math.max(2, Math.min(95, vh))
+}
+
+function getEventY(e: MouseEvent | TouchEvent): number {
+  return 'touches' in e ? e.touches[0].clientY : e.clientY
+}
+
+function onPointerDown(e: MouseEvent | TouchEvent) {
+  if ('button' in e && e.button !== 0) return
+
+  startY = getEventY(e)
+  startTop = btnTop.value
+  hasMoved = false
+  didDrag = false
+
+  longPressTimer = setTimeout(() => {
+    if (!hasMoved) {
+      isLongPressing.value = true
+      isDragging.value = true
+      didDrag = true
+    }
+  }, LONG_PRESS_MS)
+
+  document.addEventListener('mousemove', onPointerMove)
+  document.addEventListener('mouseup', onPointerUp)
+  document.addEventListener('touchmove', onPointerMove, { passive: false })
+  document.addEventListener('touchend', onPointerUp)
+}
+
+function onPointerMove(e: MouseEvent | TouchEvent) {
+  const currentY = getEventY(e)
+  const deltaPx = currentY - startY
+  const vhDelta = (deltaPx / window.innerHeight) * 100
+
+  if (Math.abs(deltaPx) > 4) {
+    hasMoved = true
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      longPressTimer = null
+    }
+    if (!isDragging.value) {
+      isDragging.value = true
+      isLongPressing.value = true
+      didDrag = true
+    }
+  }
+
+  if (isDragging.value) {
+    e.preventDefault()
+    btnTop.value = clampTop(startTop + vhDelta)
+  }
+}
+
+function onPointerUp() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+
+  if (isDragging.value) {
+    localStorage.setItem(STORAGE_KEY, String(btnTop.value))
+  }
+
+  isDragging.value = false
+  isLongPressing.value = false
+
+  document.removeEventListener('mousemove', onPointerMove)
+  document.removeEventListener('mouseup', onPointerUp)
+  document.removeEventListener('touchmove', onPointerMove)
+  document.removeEventListener('touchend', onPointerUp)
+}
+
+function onExpandClick() {
+  if (!didDrag) {
+    isCollapsed.value = false
+  }
+}
+
+onUnmounted(() => {
+  document.removeEventListener('mousemove', onPointerMove)
+  document.removeEventListener('mouseup', onPointerUp)
+  document.removeEventListener('touchmove', onPointerMove)
+  document.removeEventListener('touchend', onPointerUp)
+})
+// =============================================
 
 const navItems = [
   { path: '/', icon: 'home', labelKey: 'nav.home', activeNames: ['home'] },
@@ -475,35 +589,79 @@ const toggleLang = () => {
   transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+// =============================================
+// 展开按钮：贴边 + 长按拖动 + 显隐动画
+// =============================================
 .expand-btn {
   position: fixed;
-  top: 16px;
-  left: 16px;
+  left: 0;
   z-index: 101;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
+  width: 36px;
+  height: 52px;
+  border-radius: 0 14px 14px 0;
   border: none;
   background: var(--bg-sidebar);
   color: var(--text-sidebar);
   cursor: pointer;
-  box-shadow: 0 2px 10px var(--shadow);
+  box-shadow: 2px 4px 12px var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.25s ease, color 0.25s ease,
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding-left: 2px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
 
+  // 默认隐藏状态
+  transform: translateX(-100%);
+  opacity: 0;
+  pointer-events: none;
+
+  // 显隐过渡动画
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease,
+    width 0.2s ease,
+    height 0.2s ease;
+
+  // 可见状态
+  &.is-visible {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  // hover 效果
   &:hover {
     background: var(--accent);
     color: #fff;
-    transform: scale(1.08);
+    box-shadow: 2px 6px 16px var(--shadow);
   }
 
   &:active {
-    transform: scale(0.94);
+    transform: translateX(0) scale(0.96);
+  }
+
+  // 长按蓄力中：按钮微微放大 + 阴影增强
+  &.is-longpress {
+    width: 40px;
+    height: 56px;
+    box-shadow: 2px 8px 20px var(--shadow);
+  }
+
+  // 拖动中：放大 + 高亮 + 禁用过渡（跟手）
+  &.is-dragging {
+    width: 40px;
+    height: 56px;
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 2px 8px 24px var(--shadow);
+    cursor: grabbing;
   }
 }
+// =============================================
 
 .content {
   flex: 1;
@@ -512,6 +670,8 @@ const toggleLang = () => {
   transition: margin-left 0.3s ease;
   display: flex;
   position: relative;
+  overflow-x: hidden;
+  min-width: 0;
 
   &.content-expanded {
     margin-left: 0;

@@ -8,8 +8,8 @@
         v-for="(tool, index) in tools"
         :key="tool.component"
         class="tool-card"
-        :style="{ '--animation-delay': index * 80 + 'ms' }"
         :class="{ 'card-visible': cardVisibleStates[tool.component] }"
+        :style="{ '--card-index': index }"
         @click="openTool(tool)"
       >
         <div class="tool-icon">{{ tool.icon }}</div>
@@ -680,11 +680,11 @@ countText()
   border: 1px solid var(--border);
   box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
   opacity: 0;
   transform: translateY(-20px);
-  animation: cardDrop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  animation-delay: var(--animation-delay, 0ms);
+  transition: opacity 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: var(--card-delay, 0ms);
 
   &.card-visible {
     opacity: 1;
@@ -695,17 +695,6 @@ countText()
     transform: translateY(-3px);
     box-shadow: 0 6px 20px var(--shadow);
     border-color: var(--accent);
-  }
-}
-
-@keyframes cardDrop {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

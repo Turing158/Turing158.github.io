@@ -3,6 +3,7 @@ import { readdirSync, readFileSync, existsSync, writeFileSync, mkdirSync } from 
 import { resolve, join } from 'path'
 import matter from 'gray-matter'
 import MarkdownIt from 'markdown-it'
+import anchor from 'markdown-it-anchor'
 import hljs from 'highlight.js'
 
 const md = new MarkdownIt({
@@ -19,11 +20,20 @@ const md = new MarkdownIt({
     }
     return ''
   },
+}).use(anchor, {
+  // 保持标题原文作为 id，确保与文章中的手动锚点链接一致
+  slugify: (s: string) => s.toString().trim(),
+  permalink: false,
 })
 
-// 所有链接在新标签页打开
+// 所有链接在新标签页打开（跳过页内锚点链接）
 md.renderer.rules.link_open = function (tokens, idx, options, _env, self) {
   const token = tokens[idx]
+  const href = token.attrGet('href') || ''
+  // 页内锚点链接（#xxx）不添加 target="_blank"
+  if (href.startsWith('#')) {
+    return self.renderToken(tokens, idx, options)
+  }
   const aIndex = token.attrIndex('target')
   if (aIndex < 0) {
     token.attrPush(['target', '_blank'])
@@ -40,6 +50,10 @@ md.renderer.rules.link_open = function (tokens, idx, options, _env, self) {
 function addBlankTargetToLinks(html: string): string {
   return html.replace(/<a\s+([^>]*)>/g, (_m: string, attrs: string) => {
     if (/target=/.test(attrs)) {
+      return `<a ${attrs}>`
+    }
+    // 跳过锚点链接（href 以 # 开头），不添加 target="_blank"
+    if (/href\s*=\s*["']#/.test(attrs)) {
       return `<a ${attrs}>`
     }
     return `<a ${attrs} target="_blank" rel="noopener noreferrer">`

@@ -3,12 +3,13 @@
     <h1 class="page-title">{{ $t('articles.title') }}</h1>
 
     <div v-if="loading" class="status loading-text">
+      <span>{{ $t('common.loading') }}</span>
       <span class="loading-dots">
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
         <div class="loading-dot"></div>
       </span>
-      <span>{{ $t('common.loading') }}</span>
+
     </div>
     <div v-else-if="articles.length === 0" class="status">{{ $t('articles.noArticles') }}</div>
 
@@ -233,7 +234,7 @@ onMounted(async () => {
 }
 
 .articles-view {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
 }

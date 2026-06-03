@@ -190,7 +190,7 @@ const contactLinks = computed<ContactLink[]>(() => [
 
 <style lang="less" scoped>
 .about-view {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
 }

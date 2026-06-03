@@ -131,7 +131,7 @@ watch(locale, () => {
 
 <style lang="less" scoped>
 .article-detail {
-  max-width: 800px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 32px 24px;
   position: relative;

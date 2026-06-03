@@ -81,6 +81,7 @@
           v-if="release.body"
           class="release-body"
           v-html="renderMarkdown(release.body)"
+          @click="onBodyClick"
         ></div>
 
         <!-- 资源列表 -->
@@ -136,6 +137,21 @@
             </a>
           </div>
         </div>
+
+        <!-- Reactions 反应 -->
+        <template v-if="formatReactions(release.reactions).length > 0">
+          <div class="card-divider"></div>
+          <div class="release-reactions">
+            <span
+              v-for="reaction in formatReactions(release.reactions)"
+              :key="reaction.key"
+              class="reaction-item"
+            >
+              <span class="reaction-emoji">{{ reaction.emoji }}</span>
+              <span class="reaction-count">{{ formatNumber(reaction.count) }}</span>
+            </span>
+          </div>
+        </template>
       </div>
 
       <!-- 更多发行版本按钮 -->
@@ -174,6 +190,19 @@ interface ReleaseAsset {
   browser_download_url: string
 }
 
+interface Reactions {
+  url: string
+  total_count: number
+  '+1': number
+  '-1': number
+  laugh: number
+  hooray: number
+  confused: number
+  heart: number
+  rocket: number
+  eyes: number
+}
+
 interface Release {
   id: number
   tag_name: string
@@ -182,6 +211,7 @@ interface Release {
   body: string | null
   html_url: string
   assets: ReleaseAsset[]
+  reactions?: Reactions
 }
 
 const loading = ref(false)
@@ -197,8 +227,38 @@ const md = new MarkdownIt({
   typographer: true,
 })
 
+// 标题文本转锚点 slug：保留字母/数字/下划线/中文，去除空格与符号（与 GitHub release 锚点格式一致）
+function slugify(text: string): string {
+  return text.trim().replace(/[^\w一-龥]+/g, '')
+}
+
+// 给标题加上 id，使锚点链接可定位
+md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
+  const inline = tokens[idx + 1]
+  if (inline && inline.type === 'inline') {
+    tokens[idx].attrSet('id', slugify(inline.content))
+  }
+  return self.renderToken(tokens, idx, options)
+}
+
 function renderMarkdown(content: string): string {
   return md.render(content)
+}
+
+// 拦截发行内容内的锚点链接点击，滚动到对应标题（限定在同一张卡片内）
+function onBodyClick(e: MouseEvent) {
+  const anchor = (e.target as HTMLElement).closest('a')
+  if (!anchor) return
+  const href = anchor.getAttribute('href')
+  if (!href || !href.startsWith('#')) return
+
+  e.preventDefault()
+  const id = decodeURIComponent(href.slice(1))
+  const card = anchor.closest('.release-card')
+  const target = card?.querySelector(`[id="${CSS.escape(id)}"]`) as HTMLElement | null
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 
 // 格式化文件大小
@@ -208,6 +268,30 @@ function formatFileSize(bytes: number): string {
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+// reactions 键名到 Emoji 的映射
+const REACTION_EMOJI: Record<string, string> = {
+  '+1': '👍',
+  '-1': '👎',
+  laugh: '😄',
+  hooray: '🎉',
+  confused: '😕',
+  heart: '❤️',
+  rocket: '🚀',
+  eyes: '👀',
+}
+
+// 格式化 reactions 数据：返回有数量的项（emoji + count）
+function formatReactions(reactions?: Reactions): { key: string; emoji: string; count: number }[] {
+  if (!reactions) return []
+  return Object.keys(REACTION_EMOJI)
+    .map((key) => ({
+      key,
+      emoji: REACTION_EMOJI[key],
+      count: (reactions[key as keyof Reactions] as number) || 0,
+    }))
+    .filter((item) => item.count > 0)
 }
 
 // 格式化数字
@@ -631,6 +715,41 @@ onMounted(fetchReleases)
   color: var(--text-secondary);
   opacity: 0.5;
   transition: all 0.2s ease;
+}
+
+// Reactions 反应
+.release-reactions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reaction-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  font-size: 0.85rem;
+  line-height: 1;
+  transition: all 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+}
+
+.reaction-emoji {
+  font-size: 1rem;
+}
+
+.reaction-count {
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 // 更多发行版本按钮

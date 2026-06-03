@@ -37,7 +37,45 @@
           <img :src="avatarUrl" alt="avatar" class="profile-avatar" />
         </div>
         <div class="profile-name">{{ blogName }}</div>
-        <div class="profile-bio">{{ $t('home.profileBio') }}</div>
+        <div class="profile-bio">{{ profileBio }}</div>
+        <div v-if="profile?.location" class="profile-location">
+          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"
+            />
+          </svg>
+          <span>{{ profile.location }}</span>
+        </div>
+        <div v-if="profile" class="profile-stats">
+          <a
+            class="profile-stat"
+            :href="`${githubProfileUrl}?tab=repositories`"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="stat-num">{{ profile.public_repos }}</span>
+            <span class="stat-label">{{ $t('home.repos') }}</span>
+          </a>
+          <a
+            class="profile-stat"
+            :href="`${githubProfileUrl}?tab=followers`"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="stat-num">{{ profile.followers }}</span>
+            <span class="stat-label">{{ $t('home.followers') }}</span>
+          </a>
+          <a
+            class="profile-stat"
+            :href="`${githubProfileUrl}?tab=following`"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="stat-num">{{ profile.following }}</span>
+            <span class="stat-label">{{ $t('home.following') }}</span>
+          </a>
+        </div>
       </div>
 
       <!-- Commits Widget -->
@@ -129,12 +167,111 @@
           </router-link>
         </div>
       </div>
+
+      <!-- Gitee Activity Widget -->
+      <div class="widget activity-widget">
+        <div class="widget-header">
+          <div class="widget-title">🦊 {{ $t('home.recentGiteeActivity') }}</div>
+        </div>
+        <div v-if="giteeLoading" class="widget-content loading-text">
+          <span class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </span>
+          {{ $t('common.loading') }}
+        </div>
+        <div v-else-if="giteeError" class="widget-content">{{ $t('home.loadFailed') }}</div>
+        <div v-else-if="giteeActivities.length === 0" class="widget-content">{{ $t('home.noGiteeActivity') }}</div>
+        <div v-else class="activity-list">
+          <a
+            v-for="(act, i) in giteeActivities"
+            :key="act.id"
+            :href="act.url"
+            target="_blank"
+            rel="noopener"
+            class="activity-item gitee-item"
+            :style="{ '--activity-index': i }"
+          >
+            <div class="activity-icon">{{ act.icon }}</div>
+            <div class="activity-body">
+              <div class="activity-text">
+                <span class="activity-action">{{ act.action }}</span>
+                <span class="activity-repo">{{ act.repo }}</span>
+              </div>
+              <div class="activity-time" :title="formatFullTime(act.date)">
+                {{ formatRelativeTime(act.date) }}
+              </div>
+            </div>
+            <div class="activity-arrow">↗</div>
+          </a>
+          <a
+            :href="giteeProfileUrl"
+            target="_blank"
+            rel="noopener"
+            class="view-all"
+          >
+            <span>{{ $t('home.viewMoreGiteeActivity') }}</span>
+            <span class="view-all-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- GitHub Activity Widget -->
+      <div class="widget activity-widget">
+        <div class="widget-header">
+          <div class="widget-title">📊 {{ $t('home.recentActivity') }}</div>
+        </div>
+        <div v-if="activityLoading" class="widget-content loading-text">
+          <span class="loading-dots">
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+            <div class="loading-dot"></div>
+          </span>
+          {{ $t('common.loading') }}
+        </div>
+        <div v-else-if="activityError" class="widget-content">{{ $t('home.loadFailed') }}</div>
+        <div v-else-if="activities.length === 0" class="widget-content">{{ $t('home.noActivity') }}</div>
+        <div v-else class="activity-list">
+          <a
+            v-for="(act, i) in activities"
+            :key="act.id"
+            :href="act.url"
+            target="_blank"
+            rel="noopener"
+            class="activity-item"
+            :style="{ '--activity-index': i }"
+          >
+            <div class="activity-icon" :class="`type-${act.type}`">{{ act.icon }}</div>
+            <div class="activity-body">
+              <div class="activity-text">
+                <span class="activity-action">{{ act.action }}</span>
+                <span class="activity-repo">{{ act.repo }}</span>
+              </div>
+              <div class="activity-time" :title="formatFullTime(act.date)">
+                {{ formatRelativeTime(act.date) }}
+              </div>
+            </div>
+            <div class="activity-arrow">↗</div>
+          </a>
+          <a
+            :href="githubProfileUrl"
+            target="_blank"
+            rel="noopener"
+            class="view-all"
+          >
+            <span>{{ $t('home.viewMoreActivity') }}</span>
+            <span class="view-all-arrow">→</span>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Time, Divider } from 'animal-island-vue'
 import { useArticles } from '@/composables/useArticles'
 import { useAppStore } from '@/stores/app'
@@ -144,10 +281,42 @@ import { config } from '@/config'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()
+const { t } = useI18n()
 
 const blogName = config.blog.title
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
 const hasGitHubConfig = !!(config.github.owner && config.github.repo)
+const githubUser = config.github.owner
+const githubProfileUrl = `https://github.com/${githubUser}`
+const giteeUser = config.gitee.owner
+const giteeProfileUrl = `https://gitee.com/${giteeUser}`
+
+// GitHub Profile
+interface GitHubProfile {
+  public_repos: number
+  followers: number
+  following: number
+  bio: string | null
+  location: string | null
+}
+const profile = ref<GitHubProfile | null>(null)
+const profileBio = computed(() => profile.value?.bio || t('home.profileBio'))
+onMounted(async () => {
+  try {
+    const res = await fetch(`https://api.github.com/users/${githubUser}`)
+    if (!res.ok) return
+    const data = await res.json()
+    profile.value = {
+      public_repos: data.public_repos ?? 0,
+      followers: data.followers ?? 0,
+      following: data.following ?? 0,
+      bio: data.bio ?? null,
+      location: data.location ?? null,
+    }
+  } catch {
+    // 静默失败，回退到默认简介
+  }
+})
 
 // Clock — Time 组件自带定时器，无需手动管理
 const now = ref(new Date())
@@ -168,6 +337,320 @@ onMounted(() => { fetchHolidays() })
 const recentArticles = computed(() => store.articles.slice(0, 5))
 onMounted(async () => {
   await fetchArticles()
+})
+
+// GitHub Activity Events
+interface ActivityItem {
+  id: string
+  type: string
+  icon: string
+  action: string
+  repo: string
+  url: string
+  date: string
+}
+const activities = ref<ActivityItem[]>([])
+const activityLoading = ref(true)
+const activityError = ref(false)
+
+function mapEvent(ev: any): ActivityItem | null {
+  if (!ev || !ev.type || !ev.repo?.name) return null
+  const repo = ev.repo.name
+  const repoUrl = `https://github.com/${repo}`
+  const payload = ev.payload || {}
+  let icon = '📊'
+  let action = ''
+  let url = repoUrl
+
+  switch (ev.type) {
+    case 'PushEvent': {
+      const n = payload.distinct_size ?? payload.size ?? payload.commits?.length ?? 0
+      const ref = (payload.ref || '').replace(/^refs\/heads\//, '') || 'main'
+      icon = '🚀'
+      if (n > 1) action = t('home.activity.push', { n, ref })
+      else if (n === 1) action = t('home.activity.pushOne', { ref })
+      else action = t('home.activity.pushEmpty', { ref })
+      const sha = payload.commits?.[payload.commits.length - 1]?.sha
+      url = sha ? `${repoUrl}/commit/${sha}` : `${repoUrl}/commits/${ref}`
+      break
+    }
+    case 'CreateEvent': {
+      icon = '🌱'
+      const refType = payload.ref_type
+      if (refType === 'repository') {
+        action = t('home.activity.createRepo')
+      } else if (refType === 'branch') {
+        action = t('home.activity.createBranch', { ref: payload.ref })
+        url = `${repoUrl}/tree/${payload.ref}`
+      } else if (refType === 'tag') {
+        action = t('home.activity.createTag', { ref: payload.ref })
+        url = `${repoUrl}/releases/tag/${payload.ref}`
+      } else {
+        action = t('home.activity.other')
+      }
+      break
+    }
+    case 'DeleteEvent': {
+      icon = '🗑️'
+      action = t('home.activity.delete', { refType: payload.ref_type, ref: payload.ref })
+      break
+    }
+    case 'PullRequestEvent': {
+      icon = '🔀'
+      const n = payload.number || payload.pull_request?.number
+      const merged = payload.pull_request?.merged
+      const act = payload.action
+      if (merged) action = t('home.activity.prMerged', { n })
+      else if (act === 'closed') action = t('home.activity.prClosed', { n })
+      else if (act === 'reopened') action = t('home.activity.prReopened', { n })
+      else action = t('home.activity.prOpened', { n })
+      url = payload.pull_request?.html_url || `${repoUrl}/pull/${n}`
+      break
+    }
+    case 'IssuesEvent': {
+      icon = '🐛'
+      const n = payload.issue?.number
+      const act = payload.action
+      if (act === 'closed') action = t('home.activity.issueClosed', { n })
+      else if (act === 'reopened') action = t('home.activity.issueReopened', { n })
+      else action = t('home.activity.issueOpened', { n })
+      url = payload.issue?.html_url || `${repoUrl}/issues/${n}`
+      break
+    }
+    case 'IssueCommentEvent': {
+      icon = '💬'
+      const n = payload.issue?.number
+      action = t('home.activity.issueComment', { n })
+      url = payload.comment?.html_url || `${repoUrl}/issues/${n}`
+      break
+    }
+    case 'WatchEvent':
+      icon = '⭐'
+      action = t('home.activity.watch')
+      break
+    case 'ForkEvent':
+      icon = '🍴'
+      action = t('home.activity.fork')
+      url = payload.forkee?.html_url || repoUrl
+      break
+    case 'ReleaseEvent': {
+      icon = '🎉'
+      const tag = payload.release?.tag_name || payload.release?.name
+      action = tag
+        ? t('home.activity.release', { tag })
+        : t('home.activity.releaseNoTag')
+      url = payload.release?.html_url || `${repoUrl}/releases`
+      break
+    }
+    case 'PublicEvent':
+      icon = '🌐'
+      action = t('home.activity.publicRepo')
+      break
+    case 'MemberEvent':
+      icon = '👥'
+      action = t('home.activity.member')
+      break
+    default:
+      action = t('home.activity.other')
+  }
+
+  return {
+    id: ev.id,
+    type: ev.type.replace('Event', '').toLowerCase(),
+    icon,
+    action,
+    repo,
+    url,
+    date: ev.created_at,
+  }
+}
+
+onMounted(async () => {
+  try {
+    const res = await fetch(`https://api.github.com/users/${githubUser}/events?per_page=10`)
+    if (!res.ok) {
+      activityError.value = true
+      return
+    }
+    const data = await res.json()
+    activities.value = (Array.isArray(data) ? data : [])
+      .map(mapEvent)
+      .filter((x): x is ActivityItem => x !== null)
+      .slice(0, 10)
+  } catch {
+    activityError.value = true
+  } finally {
+    activityLoading.value = false
+  }
+})
+
+// Gitee Activity Events
+const giteeActivities = ref<ActivityItem[]>([])
+const giteeLoading = ref(true)
+const giteeError = ref(false)
+
+function mapGiteeEvent(ev: any): ActivityItem | null {
+  if (!ev || !ev.action) return null
+
+  const projectName = ev.project?.name_with_namespace || ev.title || ''
+  const projectPath = ev.project?.path || ''
+  let icon = '📊'
+  let action = ''
+  let repo = projectName
+  let url = projectPath ? `https://gitee.com${projectPath}` : giteeProfileUrl
+
+  switch (ev.action) {
+    case 'push': {
+      const n = ev.commit_count || ev.commits?.length || 0
+      const ref = ev.short_ref_name || ev.ref_name || 'main'
+      icon = '🚀'
+      action = n === 1
+        ? t('home.giteeActivity.pushOne', { ref })
+        : t('home.giteeActivity.push', { n, ref })
+      if (ev.project_compare_path) url = `https://gitee.com${ev.project_compare_path}`
+      else if (ev.project_tree_path) url = `https://gitee.com${ev.project_tree_path}`
+      break
+    }
+    case 'created':
+    case 'create_project':
+    case 'transfer':
+      icon = '🌱'
+      action = t('home.giteeActivity.created')
+      break
+    case 'destroyed':
+      icon = '🗑️'
+      action = t('home.giteeActivity.destroyed')
+      repo = ev.title || projectName
+      url = giteeProfileUrl
+      break
+    case 'left':
+      icon = '👋'
+      action = t('home.giteeActivity.left')
+      repo = ev.title || projectName
+      url = giteeProfileUrl
+      break
+    case 'joined':
+      icon = '🤝'
+      action = t('home.giteeActivity.joined')
+      repo = ev.title || projectName
+      break
+    case 'followed': {
+      icon = '👤'
+      const m = ev.content?.match(/href="(\/[^"]+)"[^>]*>([^<]+)</)
+      const name = m?.[2] || ''
+      const path = m?.[1] || ''
+      action = `${t('home.giteeActivity.followed')} ·`
+      repo = name ? `@${name}` : ''
+      url = path ? `https://gitee.com${path}` : url
+      break
+    }
+    case 'starred':
+    case 'star':
+      icon = '⭐'
+      action = t('home.giteeActivity.starred')
+      break
+    case 'forked':
+    case 'fork':
+      icon = '🍴'
+      action = t('home.giteeActivity.forked')
+      break
+    case 'merge_requested':
+    case 'merge_request_opened':
+    case 'opened_mr': {
+      icon = '🔀'
+      const n = ev.iid || ev.target?.iid || ''
+      action = t('home.giteeActivity.mrOpened', { n })
+      break
+    }
+    case 'merge_request_closed':
+    case 'closed_mr': {
+      icon = '🔀'
+      const n = ev.iid || ev.target?.iid || ''
+      action = t('home.giteeActivity.mrClosed', { n })
+      break
+    }
+    case 'merge_request_merged':
+    case 'merged_mr': {
+      icon = '🔀'
+      const n = ev.iid || ev.target?.iid || ''
+      action = t('home.giteeActivity.mrMerged', { n })
+      break
+    }
+    case 'issue_opened':
+    case 'opened_issue': {
+      icon = '🐛'
+      const n = ev.iid || ev.target?.iid || ''
+      action = t('home.giteeActivity.issueOpened', { n })
+      break
+    }
+    case 'issue_closed':
+    case 'closed_issue': {
+      icon = '🐛'
+      const n = ev.iid || ev.target?.iid || ''
+      action = t('home.giteeActivity.issueClosed', { n })
+      break
+    }
+    case 'commented':
+    case 'comment':
+      icon = '💬'
+      action = t('home.giteeActivity.comment')
+      break
+    case 'released': {
+      icon = '🎉'
+      const tag = ev.target?.tag_name || ev.target?.name || ''
+      action = tag ? t('home.giteeActivity.release', { tag }) : t('home.activity.releaseNoTag')
+      break
+    }
+    default: {
+      const label = [ev.action_human_name, ev.type_human_name].filter(Boolean).join('')
+      action = t('home.giteeActivity.other', { label: label || ev.action })
+    }
+  }
+
+  return {
+    id: String(ev.id),
+    type: ev.action,
+    icon,
+    action,
+    repo,
+    url,
+    date: ev.created_at,
+  }
+}
+
+async function fetchGiteeTimeline(): Promise<any[]> {
+  const target = `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`
+  const sources = [
+    target,
+    `https://corsproxy.io/?url=${encodeURIComponent(target)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+  ]
+  for (const url of sources) {
+    try {
+      const res = await fetch(url, { headers: { Accept: 'application/json' } })
+      if (!res.ok) continue
+      const text = await res.text()
+      const data = JSON.parse(text)
+      if (Array.isArray(data)) return data
+    } catch {
+      // try next source
+    }
+  }
+  throw new Error('All sources failed')
+}
+
+onMounted(async () => {
+  try {
+    const data = await fetchGiteeTimeline()
+    giteeActivities.value = data
+      .map(mapGiteeEvent)
+      .filter((x): x is ActivityItem => x !== null)
+      .slice(0, 10)
+  } catch {
+    giteeError.value = true
+  } finally {
+    giteeLoading.value = false
+  }
 })
 </script>
 
@@ -333,6 +816,67 @@ onMounted(async () => {
 .profile-bio {
   color: var(--text-secondary);
   font-size: 0.85rem;
+}
+
+.profile-location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+
+  svg {
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+}
+
+.profile-stats {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%;
+  max-width: 240px;
+}
+
+.profile-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 10px;
+  text-decoration: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: 0 6px 14px var(--shadow);
+
+    .stat-num {
+      color: var(--accent);
+    }
+  }
+}
+
+.stat-num {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  transition: color 0.3s ease;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
 }
 
 // Commits Widget
@@ -655,9 +1199,147 @@ onMounted(async () => {
   transition: transform 0.3s ease;
 }
 
+// Activity Widget
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  animation: activity-fade-in 0.5s ease forwards;
+  animation-delay: calc(var(--activity-index) * 0.06s);
+  opacity: 0;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transform-origin: center;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+    box-shadow: 0 6px 16px var(--shadow);
+
+    &::before {
+      transform: scaleY(1);
+    }
+
+    .activity-icon {
+      transform: scale(1.1) rotate(-6deg);
+    }
+
+    .activity-arrow {
+      opacity: 1;
+      transform: translate(2px, -2px);
+    }
+
+    .activity-repo {
+      color: var(--accent);
+    }
+  }
+}
+
+@keyframes activity-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.activity-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  background: var(--bg-card);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  transition: transform 0.3s ease;
+}
+
+.activity-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-text {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activity-action {
+  color: var(--text-secondary);
+  margin-right: 4px;
+}
+
+.activity-repo {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  transition: color 0.3s ease;
+}
+
+.activity-time {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.activity-arrow {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--accent);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
 @media (max-width: 768px) {
   .widgets-grid {
     grid-template-columns: 1fr;
+  }
+
+  .activity-text {
+    font-size: 0.82rem;
+  }
+
+  .activity-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
   }
 }
 </style>
