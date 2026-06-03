@@ -91,14 +91,6 @@
     "title": "Releases",
     "noReleases": "No releases yet",
     "prerelease": "Prerelease",
-    "publishedAt": "Published at",
-    "loading": "Loading...",
-    "loadFailed": "Failed to load"
-  },
-  "releases": {
-    "title": "Releases",
-    "noReleases": "No releases yet",
-    "prerelease": "Prerelease",
     "publishedAt": "Published on",
     "download": "Download",
     "more": "More",

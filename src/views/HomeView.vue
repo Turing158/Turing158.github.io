@@ -270,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Time, Divider } from 'animal-island-vue'
 import { useArticles } from '@/composables/useArticles'
@@ -281,7 +281,7 @@ import { config } from '@/config'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 
 const blogName = config.blog.title
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
@@ -465,6 +465,24 @@ function mapEvent(ev: any): ActivityItem | null {
   }
 }
 
+// 重新翻译活动数据
+function retranslateActivities() {
+  activities.value = activities.value.map(act => {
+    // 从原始数据重新翻译
+    const rawEvent = rawGitHubEvents.value.find(ev => ev.id === act.id)
+    if (rawEvent) {
+      const newAct = mapEvent(rawEvent)
+      if (newAct) {
+        return newAct
+      }
+    }
+    return act
+  })
+}
+
+// 存储原始 GitHub 事件数据
+const rawGitHubEvents = ref<any[]>([])
+
 onMounted(async () => {
   try {
     const res = await fetch(`https://api.github.com/users/${githubUser}/events?per_page=10`)
@@ -473,7 +491,8 @@ onMounted(async () => {
       return
     }
     const data = await res.json()
-    activities.value = (Array.isArray(data) ? data : [])
+    rawGitHubEvents.value = Array.isArray(data) ? data : []
+    activities.value = rawGitHubEvents.value
       .map(mapEvent)
       .filter((x): x is ActivityItem => x !== null)
       .slice(0, 10)
@@ -482,6 +501,12 @@ onMounted(async () => {
   } finally {
     activityLoading.value = false
   }
+})
+
+// 监听语言变化，重新翻译
+watch(locale, () => {
+  retranslateActivities()
+  retranslateGiteeActivities()
 })
 
 // Gitee Activity Events
@@ -639,9 +664,28 @@ async function fetchGiteeTimeline(): Promise<any[]> {
   throw new Error('All sources failed')
 }
 
+// 存储原始 Gitee 事件数据
+const rawGiteeEvents = ref<any[]>([])
+
+// 重新翻译 Gitee 活动数据
+function retranslateGiteeActivities() {
+  giteeActivities.value = giteeActivities.value.map(act => {
+    // 从原始数据重新翻译
+    const rawEvent = rawGiteeEvents.value.find(ev => String(ev.id) === act.id)
+    if (rawEvent) {
+      const newAct = mapGiteeEvent(rawEvent)
+      if (newAct) {
+        return newAct
+      }
+    }
+    return act
+  })
+}
+
 onMounted(async () => {
   try {
     const data = await fetchGiteeTimeline()
+    rawGiteeEvents.value = data
     giteeActivities.value = data
       .map(mapGiteeEvent)
       .filter((x): x is ActivityItem => x !== null)
@@ -675,6 +719,8 @@ onMounted(async () => {
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
@@ -1304,6 +1350,8 @@ onMounted(async () => {
 .activity-action {
   color: var(--text-secondary);
   margin-right: 4px;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .activity-repo {
@@ -1312,6 +1360,9 @@ onMounted(async () => {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.85rem;
   transition: color 0.3s ease;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .activity-time {
