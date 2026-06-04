@@ -17,7 +17,8 @@
     "releaseDetail": "发行详情",
     "tools": "工具",
     "about": "关于",
-    "commits": "提交记录"
+    "commits": "提交记录",
+    "responsiveTimeDemo": "响应式时间组件演示"
   },
   "home": {
     "recentCommits": "最新提交",

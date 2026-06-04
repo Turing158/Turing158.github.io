@@ -280,6 +280,7 @@ const toggleLang = () => {
   top: 0;
   left: 0;
   height: 100vh;
+  height: 100dvh;
   z-index: 100;
   transition: transform 0.3s ease;
   box-shadow: 2px 0 8px var(--shadow);
@@ -434,6 +435,7 @@ const toggleLang = () => {
 
 .sidebar-footer {
   padding: 16px;
+  padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;

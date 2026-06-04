@@ -263,7 +263,8 @@
     "releaseDetail": "Release Detail",
     "tools": "Tools",
     "about": "About",
-    "commits": "Commits"
+    "commits": "Commits",
+    "responsiveTimeDemo": "Responsive Time Component Demo"
   },
   "pageReleases": {
     "title": "Release Detail",

@@ -3,7 +3,7 @@
     <div class="widgets-grid">
       <!-- Clock Widget -->
       <div class="widget clock-widget">
-        <Time class="clock-time" />
+        <ResponsiveTime class="clock-time" />
         <Divider />
         <div v-if="!holidaysLoaded" class="holiday-loading loading-text">
           <span class="loading-dots">
@@ -272,7 +272,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Time, Divider } from 'animal-island-vue'
+import { Divider } from 'animal-island-vue'
+import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
 import { useArticles } from '@/composables/useArticles'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
