@@ -174,6 +174,9 @@
     "textCounterName": "Text Counter",
     "textCounterDesc": "Count characters, words, lines, paragraphs and more.",
     "textCounterTags": ["Text", "Count", "Stats"],
+    "randomGeneratorName": "Random Generator",
+    "randomGeneratorDesc": "Generate random numbers with custom range, count, and continuous mode.",
+    "randomGeneratorTags": ["Random", "Generate", "Draw"],
     "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
@@ -276,5 +279,20 @@
     "loading": "Loading...",
     "loadFailed": "Failed to load",
     "retry": "Retry"
+  },
+  "search": {
+    "trigger": "Search",
+    "title": "Search",
+    "placeholder": "Search articles, projects, releases...",
+    "noResults": "No results found",
+    "startTyping": "Start typing to search",
+    "loading": "Searching...",
+    "error": "Search failed",
+    "download": "Download",
+    "more": "More",
+    "issues": "Issues",
+    "commits": "Commits",
+    "visit": "Visit",
+    "prerelease": "Prerelease"
   }
 }

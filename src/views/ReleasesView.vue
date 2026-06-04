@@ -84,40 +84,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { useReleases } from '@/composables/useReleases'
 
 const router = useRouter()
 
-interface ReleaseAsset {
-  browser_download_url: string
-}
-
-interface ReleaseAuthor {
-  login: string
-  avatar_url: string
-  html_url: string
-}
-
-interface Release {
-  repo: string
-  tag_name: string
-  prerelease: boolean
-  published_at: string
-  html_url: string
-  author: ReleaseAuthor
-  assets: ReleaseAsset[]
-}
-
-const repos = ['StarFall-Minecraft-Launcher', 'SFMC']
-const GITHUB_OWNER = 'Turing158'
-
-const loading = ref(true)
-const error = ref(false)
-const releases = ref<Release[]>([])
+const { loading, error, releases, fetchReleases } = useReleases()
 
 const displayedReleases = computed(() =>
   releases.value.filter(r => r.tag_name)
@@ -129,58 +104,6 @@ function open(url: string) {
 
 function goToDetail(repo: string) {
   router.push(`/release/${repo}`)
-}
-
-async function fetchReleases() {
-  loading.value = true
-  error.value = false
-
-  try {
-    const results = await Promise.allSettled(
-      repos.map(repo =>
-        axios
-          .get<Release[]>(
-            `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/releases?per_page=1`
-          )
-          .then(res => {
-            const data = res.data?.[0]
-            if (data) {
-              return {
-                repo,
-                tag_name: data.tag_name,
-                prerelease: data.prerelease,
-                published_at: data.published_at,
-                html_url: data.html_url,
-                author: {
-                  login: data.author.login,
-                  avatar_url: data.author.avatar_url,
-                  html_url: data.author.html_url,
-                },
-                assets: (data.assets ?? []).map(a => ({
-                  browser_download_url: a.browser_download_url,
-                })),
-              } as Release
-            }
-            return null
-          })
-      )
-    )
-
-    const successful = results
-      .filter((r): r is PromiseFulfilledResult<Release | null> => r.status === 'fulfilled')
-      .map(r => r.value)
-      .filter((r): r is Release => r !== null)
-
-    if (successful.length === 0) {
-      error.value = true
-    } else {
-      releases.value = successful
-    }
-  } catch {
-    error.value = true
-  } finally {
-    loading.value = false
-  }
 }
 
 onMounted(() => {

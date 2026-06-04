@@ -230,6 +230,122 @@
             </div>
           </div>
         </template>
+
+        <!-- 随机数生成器 -->
+        <template v-else-if="activeTool.component === 'RandomGenerator'">
+          <div class="tool-form random-generator">
+            <!-- 配置区 -->
+            <div class="random-config">
+              <div class="config-row">
+                <div class="config-item">
+                  <label class="config-label">{{ $t('tools.randomGenerator.min') }}</label>
+                  <BlogInput
+                    v-model.number="randomMin"
+                    type="number"
+                    :placeholder="'0'"
+                  />
+                </div>
+                <div class="config-separator">
+                  <span class="separator-line"></span>
+                  <span class="separator-text">{{ $t('tools.randomGenerator.to') }}</span>
+                  <span class="separator-line"></span>
+                </div>
+                <div class="config-item">
+                  <label class="config-label">{{ $t('tools.randomGenerator.max') }}</label>
+                  <BlogInput
+                    v-model.number="randomMax"
+                    type="number"
+                    :placeholder="'100'"
+                  />
+                </div>
+              </div>
+
+              <div class="config-row">
+                <div class="config-item">
+                  <label class="config-label">{{ $t('tools.randomGenerator.count') }}</label>
+                  <BlogInput
+                    v-model.number="randomCount"
+                    type="number"
+                    min="1"
+                    max="100"
+                    :placeholder="'1'"
+                  />
+                </div>
+                <div class="config-item checkbox-item">
+                  <label class="config-label checkbox-label">
+                    <input
+                      type="checkbox"
+                      v-model="randomUnique"
+                      class="checkbox-input"
+                    />
+                    <span class="checkbox-custom"></span>
+                    {{ $t('tools.randomGenerator.unique') }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- 操作按钮区 -->
+            <div class="random-actions">
+              <Button
+                type="primary"
+                size="small"
+                @click="generateOnce"
+                :disabled="isGenerating"
+              >
+                {{ $t('tools.randomGenerator.generate') }}
+              </Button>
+              <Button
+                :type="isGenerating ? 'danger' : 'secondary'"
+                size="small"
+                @click="toggleContinuous"
+              >
+                <span v-if="isGenerating" class="btn-content">
+                  <span class="stop-icon">■</span>
+                  {{ $t('tools.randomGenerator.stop') }}
+                </span>
+                <span v-else class="btn-content">
+                  <span class="play-icon">▶</span>
+                  {{ $t('tools.randomGenerator.start') }}
+                </span>
+              </Button>
+              <Button
+                size="small"
+                @click="clearRandom"
+                :disabled="isGenerating"
+              >
+                {{ $t('tools.randomGenerator.clear') }}
+              </Button>
+            </div>
+
+            <!-- 结果展示区 -->
+            <div class="random-results">
+              <div class="results-header">
+                <span class="results-title">{{ $t('tools.randomGenerator.results') }}</span>
+                <span v-if="randomResults.length > 0" class="results-count">
+                  {{ randomResults.length }} {{ $t('tools.randomGenerator.numbers') }}
+                </span>
+              </div>
+              <div class="results-display" :class="{ 'is-generating': isGenerating }">
+                <TransitionGroup name="number-pop" tag="div" class="numbers-grid">
+                  <div
+                    v-for="(num, index) in displayResults"
+                    :key="`${num}-${index}`"
+                    class="number-ball"
+                    :class="{ 'is-latest': index === displayResults.length - 1 }"
+                    :style="{ '--ball-index': index }"
+                  >
+                    <span class="number-value">{{ num }}</span>
+                  </div>
+                </TransitionGroup>
+                <div v-if="displayResults.length === 0" class="empty-state">
+                  <span class="empty-icon">🎲</span>
+                  <span class="empty-text">{{ $t('tools.randomGenerator.empty') }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </template>
     </BlogDialog>
   </div>

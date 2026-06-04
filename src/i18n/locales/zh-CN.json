@@ -197,6 +197,9 @@
     "textCounterName": "文本统计",
     "textCounterDesc": "统计文本字数、字符数、行数、段落数等信息。",
     "textCounterTags": ["文本", "统计", "字数"],
+    "randomGeneratorName": "随机数生成器",
+    "randomGeneratorDesc": "自定义范围、个数生成随机数，支持连续生成模式。",
+    "randomGeneratorTags": ["随机数", "生成", "抽奖"],
     "copy": "复制",
     "jsonFormatter": {
       "inputLabel": "输入 JSON",
@@ -257,6 +260,24 @@
       "lines": "行数",
       "paragraphs": "段落数",
       "bytes": "字节数"
+    },
+    "randomGenerator": {
+      "minValue": "最小值",
+      "maxValue": "最大值",
+      "count": "生成个数",
+      "allowDuplicate": "允许重复",
+      "generate": "生成",
+      "startContinuous": "开始连续生成",
+      "stopContinuous": "停止",
+      "clear": "清空",
+      "copy": "复制结果",
+      "result": "生成结果",
+      "noResult": "点击按钮生成随机数",
+      "invalidRange": "最小值不能大于最大值",
+      "invalidCount": "个数必须大于 0",
+      "continuousRunning": "连续生成中...",
+      "generatedCount": "已生成 {n} 次",
+      "uniqueError": "范围内无法生成 {n} 个不重复的随机数"
     }
   },
   "common": {
@@ -276,5 +297,20 @@
     "yesterday": "昨天",
     "dayBeforeYesterday": "前天",
     "daysAgo": "{n}天前"
+  },
+  "search": {
+    "trigger": "搜索",
+    "title": "搜索",
+    "placeholder": "搜索文章、项目、发行...",
+    "noResults": "没有找到匹配的结果",
+    "startTyping": "输入关键词开始搜索",
+    "loading": "搜索中...",
+    "error": "搜索失败",
+    "download": "下载",
+    "more": "更多",
+    "issues": "议题",
+    "commits": "提交",
+    "visit": "前往",
+    "prerelease": "预发行"
   }
 }

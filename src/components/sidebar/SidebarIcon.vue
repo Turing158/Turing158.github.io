@@ -132,6 +132,10 @@ const icons: Record<string, Shape[]> = {
     { type: 'circle', cx: 9, cy: 18, r: 1 },
     { type: 'circle', cx: 15, cy: 18, r: 1 },
   ],
+  search: [
+    { type: 'circle', cx: 11, cy: 11, r: 8 },
+    { type: 'line', x1: 21, y1: 21, x2: 16.65, y2: 16.65 },
+  ],
 }
 
 const paths = computed<Shape[]>(() => icons[props.name] ?? [])

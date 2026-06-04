@@ -32,6 +32,13 @@
           </span>
           <span class="nav-text">{{ $t(item.labelKey) }}</span>
         </router-link>
+        <button class="nav-link search-trigger" @click="openSearch">
+          <span class="nav-indicator" aria-hidden="true"></span>
+          <span class="nav-icon">
+            <SidebarIcon name="search" :size="20" />
+          </span>
+          <span class="nav-text">{{ $t('search.trigger') }}</span>
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -83,6 +90,8 @@
       </router-view>
       <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" />
     </main>
+
+    <SearchDialog ref="searchDialogRef" />
   </div>
 </template>
 
@@ -94,12 +103,16 @@ import { useTheme, type ThemeName } from '@/composables/useTheme'
 import { setLocale } from '@/i18n'
 import ArticleTOCDrawer from '@/components/article/ArticleTOCDrawer.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
+import SearchDialog from '@/components/search/SearchDialog.vue'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 export type { TocHeading }
 
 const route = useRoute()
 const { locale } = useI18n()
 const { theme: currentTheme, setTheme } = useTheme()
+
+const searchDialogRef = ref<InstanceType<typeof SearchDialog> | null>(null)
+const openSearch = () => searchDialogRef.value?.open()
 
 const isMobile = ref(window.innerWidth < 768)
 const isCollapsed = ref(window.innerWidth < 768)
@@ -332,10 +345,31 @@ const toggleLang = () => {
 
 .sidebar-nav {
   flex: 1;
+  min-height: 0;
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
   gap: 4px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--accent);
+    border-radius: 0 10px 10px 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+
 }
 
 .nav-link {
@@ -347,6 +381,7 @@ const toggleLang = () => {
   border-radius: 10px;
   color: var(--text-sidebar);
   font-size: 0.95rem;
+  flex-shrink: 0;
   overflow: hidden;
   transition: background-color 0.25s ease, color 0.25s ease;
 
@@ -431,6 +466,18 @@ const toggleLang = () => {
   position: relative;
   z-index: 1;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// 搜索触发按钮 — 复用 .nav-link 样式，重置 button 默认值
+.search-trigger {
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .sidebar-footer {
