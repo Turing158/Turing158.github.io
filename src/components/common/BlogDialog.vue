@@ -41,7 +41,7 @@
           </div>
 
           <!-- Body -->
-          <div class="blog-dialog-body">
+          <div class="blog-dialog-body" :style="bodyStyle">
             <slot />
           </div>
 
@@ -67,6 +67,7 @@ interface Props {
   maxHeight?: string | number
   closeOnClickOverlay?: boolean
   showClose?: boolean
+  bodyOverflow?: string
   onOpen?: () => void
   onClose?: () => void
 }
@@ -79,6 +80,7 @@ const props = withDefaults(defineProps<Props>(), {
   maxHeight: undefined,
   closeOnClickOverlay: false,
   showClose: true,
+  bodyOverflow: undefined,
   onOpen: undefined,
   onClose: undefined,
 })
@@ -117,6 +119,16 @@ const dialogStyle = computed(() => {
   if (mh) style.maxHeight = mh
 
   return style
+})
+
+const bodyStyle = computed(() => {
+  if (props.bodyOverflow !== undefined) {
+    return {
+      overflow: props.bodyOverflow,
+      ...(props.bodyOverflow === 'visible' ? { minHeight: '0' } : {}),
+    }
+  }
+  return {}
 })
 
 function open() {

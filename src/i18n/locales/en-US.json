@@ -177,6 +177,12 @@
     "randomGeneratorName": "Random Generator",
     "randomGeneratorDesc": "Generate random numbers with custom range, count, and continuous mode.",
     "randomGeneratorTags": ["Random", "Generate", "Draw"],
+    "randomStringName": "Random String Generator",
+    "randomStringDesc": "Generate random strings with custom length, count, and charset.",
+    "randomStringTags": ["Random", "String", "Password"],
+    "holidayQueryName": "Holiday Lookup",
+    "holidayQueryDesc": "Browse public holidays for any year and country with live countdowns.",
+    "holidayQueryTags": ["Holiday", "Countdown", "Lookup"],
     "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
@@ -237,6 +243,78 @@
       "lines": "Lines",
       "paragraphs": "Paragraphs",
       "bytes": "Bytes"
+    },
+    "randomGenerator": {
+      "min": "Min",
+      "max": "Max",
+      "to": "to",
+      "count": "Count",
+      "unique": "Unique",
+      "generate": "Generate",
+      "start": "Start",
+      "stop": "Stop",
+      "clear": "Clear",
+      "copyAll": "Copy All",
+      "clickToCopy": "Click to copy",
+      "separatorTitle": "Custom Separator",
+      "separatorHint": "Choose what to insert between numbers when copying all. Click OK to save and copy.",
+      "separatorPlaceholder": "Any string, e.g. \" \", \", \", \"\\n\"",
+      "separatorPreview": "Preview:",
+      "separatorConfirm": "OK",
+      "separatorCancel": "Cancel",
+      "separatorReset": "Reset to space",
+      "separatorSaved": "Separator saved",
+      "sepSpace": "Space",
+      "sepComma": "Comma",
+      "sepNewline": "Newline",
+      "sepDash": "Dash",
+      "sepPipe": "Pipe",
+      "sepEmpty": "None",
+      "results": "Results",
+      "numbers": "numbers",
+      "empty": "Adjust settings and hit generate",
+      "invalidRange": "Min must be less than or equal to Max",
+      "invalidCount": "Count must be greater than 0",
+      "uniqueError": "Cannot generate {n} unique numbers within the range"
+    },
+    "randomString": {
+      "length": "Length",
+      "count": "Count",
+      "charset": "Charset",
+      "lower": "Lowercase",
+      "upper": "Uppercase",
+      "digit": "Digits",
+      "symbol": "Symbols",
+      "generate": "Generate",
+      "start": "Start",
+      "stop": "Stop",
+      "clear": "Clear",
+      "copyAll": "Copy All",
+      "results": "Results",
+      "items": "items",
+      "empty": "Adjust settings and hit generate",
+      "invalidLength": "Length must be greater than 0",
+      "invalidCount": "Count must be greater than 0",
+      "invalidCharset": "Select at least one charset"
+    },
+    "holidayQuery": {
+      "year": "Year",
+      "country": "Country",
+      "query": "Query",
+      "loading": "Loading...",
+      "loadFailed": "Failed to load",
+      "retry": "Retry",
+      "results": "Holidays",
+      "count": "items",
+      "empty": "Choose a year and country, then click Query",
+      "noResults": "No public holidays for this year",
+      "toggleNameTip": "Click to switch name",
+      "passed": "Passed",
+      "daysLeft": "{n} days left",
+      "hoursLeft": "{n} hours left",
+      "minutesLeft": "{n} minutes left",
+      "secondsLeft": "{n} seconds left",
+      "countries": {}
     }
   },
   "common": {
@@ -294,5 +372,11 @@
     "commits": "Commits",
     "visit": "Visit",
     "prerelease": "Prerelease"
+  },
+  "components": {
+    "select": {
+      "noData": "No data",
+      "loading": "Loading..."
+    }
   }
 }

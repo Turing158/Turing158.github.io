@@ -3,6 +3,7 @@
     class="blog-input"
     :class="{
       'is-textarea': type === 'textarea',
+      'is-number': type === 'number',
       'has-prefix': $slots.prefix,
       'has-suffix': $slots.suffix,
       'is-disabled': disabled,
@@ -12,6 +13,23 @@
     <span v-if="$slots.prefix" class="blog-input-prefix">
       <slot name="prefix" />
     </span>
+
+    <button
+      v-if="type === 'number'"
+      type="button"
+      class="blog-input-stepper blog-input-stepper--minus"
+      :disabled="disabled || readonly || isAtMin"
+      :aria-label="'Decrement'"
+      @pointerdown="onStepperPointerDown($event, -1)"
+      @pointerup="onStepperPointerUp"
+      @pointerleave="onStepperPointerUp"
+      @pointercancel="onStepperPointerUp"
+      @click="onStepperClick($event, -1)"
+    >
+      <svg width="10" height="2" viewBox="0 0 10 2" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M1 1H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
 
     <textarea
       v-if="type === 'textarea'"
@@ -35,12 +53,32 @@
       :value="modelValue"
       :placeholder="placeholder"
       :maxlength="maxLength"
+      :min="type === 'number' ? min : undefined"
+      :max="type === 'number' ? max : undefined"
+      :step="type === 'number' ? step : undefined"
       :disabled="disabled"
       :readonly="readonly"
       class="blog-input-field"
       @input="onFieldInput"
       @change="onFieldChange"
     />
+
+    <button
+      v-if="type === 'number'"
+      type="button"
+      class="blog-input-stepper blog-input-stepper--plus"
+      :disabled="disabled || readonly || isAtMax"
+      :aria-label="'Increment'"
+      @pointerdown="onStepperPointerDown($event, 1)"
+      @pointerup="onStepperPointerUp"
+      @pointerleave="onStepperPointerUp"
+      @pointercancel="onStepperPointerUp"
+      @click="onStepperClick($event, 1)"
+    >
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M5 1V9M1 5H9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
 
     <span v-if="$slots.suffix" class="blog-input-suffix">
       <slot name="suffix" />
@@ -53,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, type CSSProperties } from 'vue'
+import { computed, ref, onBeforeUnmount, type CSSProperties } from 'vue'
 
 interface Props {
   modelValue: string
@@ -66,6 +104,9 @@ interface Props {
   resizable?: boolean
   disabled?: boolean
   readonly?: boolean
+  min?: number
+  max?: number
+  step?: number
   onChange?: (value: string) => void
   onInput?: (value: string) => void
 }
@@ -80,6 +121,9 @@ const props = withDefaults(defineProps<Props>(), {
   resizable: true,
   disabled: false,
   readonly: false,
+  min: undefined,
+  max: undefined,
+  step: 1,
   onChange: undefined,
   onInput: undefined,
 })
@@ -124,6 +168,90 @@ function onFieldChange(e: Event) {
   emit('change', value)
   props.onChange?.(value)
 }
+
+// ── Number stepper ──
+const currentNumber = computed(() => {
+  const n = parseFloat(props.modelValue)
+  return Number.isFinite(n) ? n : 0
+})
+
+const isAtMin = computed(() => {
+  if (props.type !== 'number' || props.min === undefined) return false
+  return currentNumber.value <= props.min
+})
+
+const isAtMax = computed(() => {
+  if (props.type !== 'number' || props.max === undefined) return false
+  return currentNumber.value >= props.max
+})
+
+function clampNumber(n: number): number {
+  let v = n
+  if (props.min !== undefined) v = Math.max(props.min, v)
+  if (props.max !== undefined) v = Math.min(props.max, v)
+  return v
+}
+
+function formatStep(n: number): string {
+  const step = props.step ?? 1
+  if (Number.isInteger(step)) return String(Math.round(n))
+  const decimals = (String(step).split('.')[1] || '').length
+  return n.toFixed(decimals)
+}
+
+function stepBy(direction: number) {
+  if (props.disabled || props.readonly) return
+  const step = props.step ?? 1
+  const next = clampNumber(currentNumber.value + direction * step)
+  if (next === currentNumber.value) return
+  const value = formatStep(next)
+  emit('update:modelValue', value)
+  emit('input', value)
+  emit('change', value)
+  props.onInput?.(value)
+  props.onChange?.(value)
+}
+
+let pressTimer: ReturnType<typeof setTimeout> | null = null
+let repeatTimer: ReturnType<typeof setInterval> | null = null
+let pressedHeld = false
+
+function clearStepperTimers() {
+  if (pressTimer) {
+    clearTimeout(pressTimer)
+    pressTimer = null
+  }
+  if (repeatTimer) {
+    clearInterval(repeatTimer)
+    repeatTimer = null
+  }
+}
+
+function onStepperPointerDown(e: PointerEvent, direction: number) {
+  if (e.button !== 0) return
+  pressedHeld = false
+  clearStepperTimers()
+  pressTimer = setTimeout(() => {
+    pressedHeld = true
+    repeatTimer = setInterval(() => stepBy(direction), 60)
+  }, 400)
+}
+
+function onStepperPointerUp() {
+  clearStepperTimers()
+}
+
+function onStepperClick(_e: MouseEvent, direction: number) {
+  if (pressedHeld) {
+    pressedHeld = false
+    return
+  }
+  stepBy(direction)
+}
+
+onBeforeUnmount(() => {
+  clearStepperTimers()
+})
 
 function focus() {
   inputRef.value?.focus()
@@ -234,6 +362,71 @@ defineExpose({
     &::placeholder {
       opacity: 0.35;
     }
+  }
+
+  // Hide native number spinner — replaced by custom stepper buttons
+  &[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+    text-align: center;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+  &[type='number']::-webkit-outer-spin-button,
+  &[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.blog-input-stepper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
+
+  svg {
+    transition: transform 0.2s ease;
+  }
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent);
+
+    svg {
+      transform: scale(1.15);
+    }
+  }
+
+  &:active:not(:disabled) {
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+
+    svg {
+      transform: scale(0.9);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.35;
+  }
+
+  &--minus {
+    border-right: 1px solid var(--border);
+  }
+
+  &--plus {
+    border-left: 1px solid var(--border);
   }
 }
 

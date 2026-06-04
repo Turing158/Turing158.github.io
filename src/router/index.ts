@@ -60,12 +60,13 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pageTitle.commits' },
     props: true,
   },
-  {
-    path: '/responsive-time-demo',
-    name: 'responsive-time-demo',
-    component: () => import('@/views/ResponsiveTimeDemo.vue'),
-    meta: { titleKey: 'pageTitle.responsiveTimeDemo' },
-  },
+  // FIXME: ResponsiveTimeDemo.vue is missing — temporarily disabled
+  // {
+  //   path: '/responsive-time-demo',
+  //   name: 'responsive-time-demo',
+  //   component: () => import('@/views/ResponsiveTimeDemo.vue'),
+  //   meta: { titleKey: 'pageTitle.responsiveTimeDemo' },
+  // },
 ]
 
 const router = createRouter({
