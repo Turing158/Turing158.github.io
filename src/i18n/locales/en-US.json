@@ -183,6 +183,12 @@
     "holidayQueryName": "Holiday Lookup",
     "holidayQueryDesc": "Browse public holidays for any year and country with live countdowns.",
     "holidayQueryTags": ["Holiday", "Countdown", "Lookup"],
+    "md5Name": "MD5 Hash",
+    "md5Desc": "Hash text with MD5 and toggle uppercase/lowercase output.",
+    "md5Tags": ["MD5", "Hash", "Crypto"],
+    "shaName": "SHA Hash",
+    "shaDesc": "Hash text with SHA-1/SHA-256/SHA-512 and toggle uppercase/lowercase output.",
+    "shaTags": ["SHA", "Hash", "Crypto"],
     "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
@@ -296,6 +302,33 @@
       "invalidLength": "Length must be greater than 0",
       "invalidCount": "Count must be greater than 0",
       "invalidCharset": "Select at least one charset"
+    },
+    "md5": {
+      "inputLabel": "Input Text",
+      "placeholder": "Enter text to hash...",
+      "uppercase": "Uppercase output",
+      "encode": "Encode",
+      "copy": "Copy",
+      "clear": "Clear",
+      "outputLabel": "Output",
+      "empty": "Please enter content",
+      "nothingToCopy": "Nothing to copy"
+    },
+    "sha": {
+      "inputLabel": "Input Text",
+      "placeholder": "Enter text to hash...",
+      "algorithmLabel": "Algorithm",
+      "sha1": "SHA-1",
+      "sha256": "SHA-256",
+      "sha512": "SHA-512",
+      "uppercase": "Uppercase output",
+      "encode": "Encode",
+      "copy": "Copy",
+      "clear": "Clear",
+      "outputLabel": "Output",
+      "empty": "Please enter content",
+      "nothingToCopy": "Nothing to copy",
+      "unsupported": "Your browser does not support the Web Crypto API"
     },
     "holidayQuery": {
       "year": "Year",

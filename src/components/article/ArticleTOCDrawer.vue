@@ -98,9 +98,22 @@ const props = defineProps<{
   headings: TocHeading[]
 }>()
 
+const emit = defineEmits<{
+  'update:openState': [isOpen: boolean]
+}>()
+
 // 桌面端默认展开，移动端默认关闭
 const isMobile = ref(window.innerWidth < 1024)
 const isOpen = ref(!isMobile.value)
+
+// 通知父组件目录状态变化
+watch(isOpen, (newVal) => {
+  emit('update:openState', newVal)
+  // 同时通知 window 全局函数（兼容现有逻辑）
+  if (typeof window !== 'undefined' && (window as any).__updateTocOpenState) {
+    (window as any).__updateTocOpenState(newVal)
+  }
+})
 
 const onResize = () => {
   isMobile.value = window.innerWidth < 1024
@@ -229,18 +242,15 @@ onUnmounted(() => {
 .toc-drawer {
   width: 260px;
   height: calc(100vh - 32px);
-  position: sticky;
+  position: fixed;
+  right: 16px;
   top: 16px;
-  align-self: flex-start;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: -2px 0 16px var(--shadow);
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 4px 20px var(--shadow);
   overflow: hidden;
-  flex-shrink: 0;
-  margin-right: 16px;
+  z-index: 50;
 }
 
 .toc-header {
@@ -249,7 +259,6 @@ onUnmounted(() => {
   gap: 8px;
   padding: 16px;
   border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
 }
 
 .toc-icon {
@@ -292,10 +301,14 @@ onUnmounted(() => {
 }
 
 .toc-nav {
-  flex: 1;
-  min-height: 0;
+  position: absolute;
+  top: 57px; /* header height */
+  bottom: 50px; /* actions height */
+  left: 0;
+  right: 0;
   overflow-y: auto;
   padding: 8px 12px 12px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .toc-link {
@@ -344,13 +357,17 @@ onUnmounted(() => {
 
 /* 底部操作区 */
 .toc-actions {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 50px;
-  flex-shrink: 0;
   border-top: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
+  background: var(--bg-card);
 }
 
 .toc-actions-left {
@@ -390,7 +407,7 @@ onUnmounted(() => {
   position: fixed;
   right: 16px;
   top: 80px;
-  z-index: 200;
+  z-index: 49;
   width: 44px;
   height: 44px;
   border-radius: 12px;
@@ -418,13 +435,12 @@ onUnmounted(() => {
 
 .toc-slide-enter-active,
 .toc-slide-leave-active {
-  transition: width 0.3s ease, opacity 0.3s ease;
-  overflow: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .toc-slide-enter-from,
 .toc-slide-leave-to {
-  width: 0;
+  transform: translateX(100%);
   opacity: 0;
 }
 
@@ -455,14 +471,12 @@ onUnmounted(() => {
     z-index: 199;
     width: 280px;
     height: 100vh;
-    max-height: 100vh;
     border-radius: 0;
     border-left: 1px solid var(--border);
     border-top: none;
     border-right: none;
     border-bottom: none;
     box-shadow: -4px 0 20px var(--shadow);
-    margin-right: 0;
   }
 
   .toc-float-btn {

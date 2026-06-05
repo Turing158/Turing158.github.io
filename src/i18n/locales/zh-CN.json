@@ -206,6 +206,12 @@
     "holidayQueryName": "节日查询",
     "holidayQueryDesc": "查询任意年份与国家的公共节假日及实时倒计时。",
     "holidayQueryTags": ["节日", "倒计时", "查询"],
+    "md5Name": "MD5 加密",
+    "md5Desc": "对文本进行 MD5 加密，支持大小写切换输出。",
+    "md5Tags": ["MD5", "加密", "哈希"],
+    "shaName": "SHA 加密",
+    "shaDesc": "对文本进行 SHA-1/SHA-256/SHA-512 加密，支持大小写切换输出。",
+    "shaTags": ["SHA", "加密", "哈希"],
     "copy": "复制",
     "jsonFormatter": {
       "inputLabel": "输入 JSON",
@@ -319,6 +325,33 @@
       "invalidLength": "长度必须大于 0",
       "invalidCount": "数量必须大于 0",
       "invalidCharset": "至少选择一种字符集"
+    },
+    "md5": {
+      "inputLabel": "输入文本",
+      "placeholder": "输入要加密的文本...",
+      "uppercase": "大写输出",
+      "encode": "加密",
+      "copy": "复制",
+      "clear": "清空",
+      "outputLabel": "输出结果",
+      "empty": "请输入内容",
+      "nothingToCopy": "没有可复制的内容"
+    },
+    "sha": {
+      "inputLabel": "输入文本",
+      "placeholder": "输入要加密的文本...",
+      "algorithmLabel": "算法",
+      "sha1": "SHA-1",
+      "sha256": "SHA-256",
+      "sha512": "SHA-512",
+      "uppercase": "大写输出",
+      "encode": "加密",
+      "copy": "复制",
+      "clear": "清空",
+      "outputLabel": "输出结果",
+      "empty": "请输入内容",
+      "nothingToCopy": "没有可复制的内容",
+      "unsupported": "当前浏览器不支持 Web Crypto API"
     },
     "holidayQuery": {
       "year": "年份",

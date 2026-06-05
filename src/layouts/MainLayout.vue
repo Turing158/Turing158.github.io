@@ -82,13 +82,13 @@
       <SidebarIcon name="menu" :size="20" />
     </button>
 
-    <main class="content" :class="{ 'content-expanded': isCollapsed }">
+    <main class="content" :class="{ 'content-expanded': isCollapsed, 'content-with-toc': isArticleDetail && isTocOpen }">
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
           <component :is="Component" />
         </transition>
       </router-view>
-      <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" />
+      <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" @update:openState="isTocOpen = $event" />
     </main>
 
     <SearchDialog ref="searchDialogRef" />
@@ -134,6 +134,7 @@ onUnmounted(() => {
 
 // TOC 状态管理
 const tocHeadings = ref<TocHeading[]>([])
+const isTocOpen = ref(true) // 桌面端默认展开
 
 // 只在文章详情页显示 TOC
 const isArticleDetail = computed(() => route.name === 'article-detail')
@@ -143,9 +144,33 @@ const updateTocHeadings = (headings: TocHeading[]) => {
   tocHeadings.value = headings
 }
 
+// 提供给子组件更新目录开关状态的方法
+const updateTocOpenState = (isOpen: boolean) => {
+  isTocOpen.value = isOpen
+}
+
+// 监听窗口变化，同步桌面端目录默认状态
+const onResizeForToc = () => {
+  const mobile = window.innerWidth < 1024
+  // 桌面端默认展开，移动端默认关闭
+  if (!mobile) {
+    isTocOpen.value = true
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', onResizeForToc)
+  onResizeForToc() // 初始化
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResizeForToc)
+})
+
 // 暴露给 window，让 ArticleDetailView 可以调用
 if (typeof window !== 'undefined') {
   (window as any).__updateTocHeadings = updateTocHeadings
+  ;(window as any).__updateTocOpenState = updateTocOpenState
 }
 
 // =============================================
@@ -716,7 +741,7 @@ const toggleLang = () => {
   flex: 1;
   margin-left: var(--sidebar-width);
   min-height: 100vh;
-  transition: margin-left 0.3s ease;
+  transition: margin-left 0.3s ease, padding-right 0.3s ease;
   display: flex;
   position: relative;
   overflow-x: hidden;
@@ -729,6 +754,14 @@ const toggleLang = () => {
   > :first-child {
     flex: 1;
     min-width: 0;
+  }
+}
+
+/* 桌面端：为悬浮目录留出右侧空间，避免遮挡文章 */
+@media (min-width: 1024px) {
+  /* 只在目录打开时才留出空间 */
+  .content.content-with-toc {
+    padding-right: 292px; /* 260px TOC + 32px gap */
   }
 }
 

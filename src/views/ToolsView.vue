@@ -469,6 +469,83 @@
           </div>
         </template>
 
+        <!-- MD5 加密 -->
+        <template v-else-if="activeTool.component === 'Md5Tool'">
+          <div class="tool-form">
+            <label class="tool-label">{{ $t('tools.md5.inputLabel') }}</label>
+            <BlogInput
+              v-model="md5Input"
+              type="textarea"
+              :placeholder="$t('tools.md5.placeholder')"
+              :rows="5"
+            />
+            <div class="md5-options">
+              <Checkbox
+                v-model="md5UppercaseModel"
+                :options="md5UppercaseOptions"
+              />
+            </div>
+            <div class="tool-actions">
+              <Button type="primary" size="small" @click="encodeMd5">{{ $t('tools.md5.encode') }}</Button>
+              <Button size="small" @click="copyMd5">{{ $t('tools.md5.copy') }}</Button>
+              <Button danger size="small" @click="clearMd5">{{ $t('tools.md5.clear') }}</Button>
+            </div>
+            <label class="tool-label">{{ $t('tools.md5.outputLabel') }}</label>
+            <pre class="tool-output">{{ md5Output }}</pre>
+          </div>
+        </template>
+
+        <!-- SHA 加密 -->
+        <template v-else-if="activeTool.component === 'ShaTool'">
+          <div class="tool-form">
+            <label class="tool-label">{{ $t('tools.sha.inputLabel') }}</label>
+            <BlogInput
+              v-model="shaInput"
+              type="textarea"
+              :placeholder="$t('tools.sha.placeholder')"
+              :rows="5"
+            />
+            <div class="sha-options">
+              <div class="sha-algo-row">
+                <label class="config-label">{{ $t('tools.sha.algorithmLabel') }}</label>
+                <div class="sha-radio-group">
+                  <label
+                    v-for="opt in shaAlgoOptions"
+                    :key="opt.value"
+                    class="sha-radio-item"
+                    :class="{ 'is-checked': shaSelectedAlgo === opt.value }"
+                  >
+                    <input
+                      type="radio"
+                      :value="opt.value"
+                      v-model="shaSelectedAlgo"
+                      class="sha-radio-input"
+                    />
+                    <span class="sha-radio-label">{{ opt.label }}</span>
+                  </label>
+                </div>
+              </div>
+              <Checkbox
+                v-model="shaUppercaseModel"
+                :options="shaUppercaseOptions"
+              />
+            </div>
+            <div class="tool-actions">
+              <Button type="primary" size="small" @click="encodeSha">{{ $t('tools.sha.encode') }}</Button>
+              <Button size="small" @click="copySha">{{ $t('tools.sha.copy') }}</Button>
+              <Button danger size="small" @click="clearSha">{{ $t('tools.sha.clear') }}</Button>
+            </div>
+            <label class="tool-label">{{ $t('tools.sha.outputLabel') }}</label>
+            <div class="sha-output-list">
+              <div v-for="(item, idx) in shaOutputList" :key="idx" class="sha-output-item">
+                <span class="sha-algo-tag">{{ item.algo }}</span>
+                <pre class="tool-output sha-output">{{ item.hash }}</pre>
+              </div>
+              <pre v-if="shaOutputList.length === 0" class="tool-output"></pre>
+            </div>
+          </div>
+        </template>
+
         <!-- 节日查询 -->
         <template v-else-if="activeTool.component === 'HolidayQueryTool'">
           <div class="tool-form holiday-query">
@@ -613,6 +690,7 @@ import BlogInput from '@/components/common/BlogInput.vue'
 import { Button, Checkbox } from 'animal-island-vue'
 import BlogSelect from '@/components/common/BlogSelect.vue'
 import BlogTip from '@/plugins/blog-tip'
+import { md5 } from '@/utils/md5'
 
 interface Tool {
   name: string
@@ -645,6 +723,8 @@ const toolKeys = [
   { key: 'randomGenerator', component: 'RandomGenerator', icon: '🎲' },
   { key: 'randomString', component: 'RandomStringGenerator', icon: '🔤' },
   { key: 'holidayQuery', component: 'HolidayQueryTool', icon: '🎉' },
+  { key: 'md5', component: 'Md5Tool', icon: '🔑' },
+  { key: 'sha', component: 'ShaTool', icon: '🔒' },
 ] as const
 
 const tools = computed<Tool[]>(() =>
@@ -695,6 +775,57 @@ let timer: ReturnType<typeof setInterval> | undefined
 // Text counter
 const counterInput = ref('')
 const textStats = ref({ chars: 0, charsNoSpace: 0, words: 0, lines: 0, paragraphs: 0, bytes: 0 })
+
+// MD5
+const md5Input = ref('')
+const md5Output = ref('')
+const md5Uppercase = ref(false)
+
+const md5UppercaseOptions = computed(() => [
+  { label: t('tools.md5.uppercase'), value: 'upper' },
+])
+const md5UppercaseModel = computed<(string | number | boolean)[]>({
+  get: () => (md5Uppercase.value ? ['upper'] : []),
+  set: (val) => {
+    md5Uppercase.value = Array.isArray(val) && val.includes('upper')
+    if (md5Output.value) {
+      md5Output.value = md5Uppercase.value
+        ? md5Output.value.toUpperCase()
+        : md5Output.value.toLowerCase()
+    }
+  },
+})
+
+// SHA
+const shaInput = ref('')
+const shaAlgos = ['sha1', 'sha256', 'sha512'] as const
+type ShaAlgo = (typeof shaAlgos)[number]
+const shaAlgoLabelMap: Record<ShaAlgo, string> = {
+  sha1: 'SHA-1',
+  sha256: 'SHA-256',
+  sha512: 'SHA-512',
+}
+const shaAlgoOptions = computed(() =>
+  shaAlgos.map((a) => ({ label: shaAlgoLabelMap[a], value: a }))
+)
+const shaSelectedAlgo = ref<ShaAlgo>('sha256')
+const shaUppercase = ref(false)
+const shaOutputList = ref<{ algo: string; hash: string }[]>([])
+const shaUppercaseOptions = computed(() => [
+  { label: t('tools.sha.uppercase'), value: 'upper' },
+])
+const shaUppercaseModel = computed<(string | number | boolean)[]>({
+  get: () => (shaUppercase.value ? ['upper'] : []),
+  set: (val) => {
+    shaUppercase.value = Array.isArray(val) && val.includes('upper')
+    if (shaOutputList.value.length > 0) {
+      shaOutputList.value = shaOutputList.value.map((item) => ({
+        ...item,
+        hash: shaUppercase.value ? item.hash.toUpperCase() : item.hash.toLowerCase(),
+      }))
+    }
+  },
+})
 
 // Random generator
 const randomMin = ref<number>(0)
@@ -1184,6 +1315,12 @@ function openTool(tool: Tool) {
   timestampOutput.value = ''
   counterInput.value = ''
   textStats.value = { chars: 0, charsNoSpace: 0, words: 0, lines: 0, paragraphs: 0, bytes: 0 }
+  md5Input.value = ''
+  md5Output.value = ''
+  shaInput.value = ''
+  shaSelectedAlgo.value = 'sha256'
+  shaUppercase.value = false
+  shaOutputList.value = []
   randomMin.value = 0
   randomMax.value = 100
   randomCount.value = 1
@@ -1284,6 +1421,86 @@ function swapBase64() {
   const temp = base64Input.value
   base64Input.value = base64Output.value
   base64Output.value = temp
+}
+
+// MD5 — 纯本地加密
+function applyMd5Case(hash: string): string {
+  return md5Uppercase.value ? hash.toUpperCase() : hash.toLowerCase()
+}
+
+function encodeMd5() {
+  if (!md5Input.value) {
+    BlogTip.show(t('tools.md5.empty'), { type: 'warning' })
+    return
+  }
+  try {
+    md5Output.value = applyMd5Case(md5(md5Input.value))
+  } catch (e: any) {
+    md5Output.value = `Error: ${e.message}`
+  }
+}
+
+function copyMd5() {
+  if (!md5Output.value) {
+    BlogTip.show(t('tools.md5.nothingToCopy'), { type: 'warning' })
+    return
+  }
+  copyText(md5Output.value)
+}
+
+function clearMd5() {
+  md5Input.value = ''
+  md5Output.value = ''
+}
+
+// SHA — 使用 Web Crypto API
+const SHA_ALGO_MAP: Record<ShaAlgo, string> = {
+  sha1: 'SHA-1',
+  sha256: 'SHA-256',
+  sha512: 'SHA-512',
+}
+
+async function shaHex(text: string, algo: ShaAlgo): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(text)
+  const subtle = (typeof crypto !== 'undefined' && crypto.subtle) as SubtleCrypto | undefined
+  if (!subtle) {
+    throw new Error(t('tools.sha.unsupported'))
+  }
+  const buf = await subtle.digest(SHA_ALGO_MAP[algo], data)
+  return Array.from(new Uint8Array(buf), (b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+function applyShaCase(hash: string): string {
+  return shaUppercase.value ? hash.toUpperCase() : hash.toLowerCase()
+}
+
+async function encodeSha() {
+  if (!shaInput.value) {
+    BlogTip.show(t('tools.sha.empty'), { type: 'warning' })
+    return
+  }
+  try {
+    const raw = await shaHex(shaInput.value, shaSelectedAlgo.value)
+    shaOutputList.value = [{ algo: shaAlgoLabelMap[shaSelectedAlgo.value], hash: applyShaCase(raw) }]
+  } catch (e: any) {
+    shaOutputList.value = [{ algo: 'Error', hash: e.message }]
+  }
+}
+
+function copySha() {
+  const list = shaOutputList.value
+  if (list.length === 0) {
+    BlogTip.show(t('tools.sha.nothingToCopy'), { type: 'warning' })
+    return
+  }
+  const text = list.map((item) => `${item.algo}: ${item.hash}`).join('\n')
+  copyText(text)
+}
+
+function clearSha() {
+  shaInput.value = ''
+  shaOutputList.value = []
 }
 
 // Regex — 使用 matchAll 避免零宽匹配死循环
@@ -2220,6 +2437,104 @@ countText()
 .separator-popup-leave-to {
   opacity: 0;
   transform: translateY(-8px);
+}
+
+// MD5 工具
+.md5-options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+// SHA 工具
+.sha-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.sha-algo-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sha-radio-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sha-radio-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  user-select: none;
+
+  &:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  &.is-checked {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg-card);
+  }
+}
+
+.sha-radio-input {
+  display: none;
+}
+
+.sha-radio-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.3px;
+}
+
+.sha-output-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sha-output-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sha-algo-tag {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  letter-spacing: 0.3px;
+}
+
+.sha-output {
+  margin: 0;
 }
 
 // ── 节日查询 ──
