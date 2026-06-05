@@ -14,6 +14,7 @@
       </span>
       <span v-for="tag in result.tags" :key="tag" class="tag">{{ tag }}</span>
     </div>
+    <span class="card-type-badge">{{ $t('search.typeArticle') }}</span>
   </router-link>
 
   <!-- 项目卡片 -->
@@ -30,10 +31,35 @@
       <Button size="small" @click="goToCommits(result.url)">
         {{ $t('search.commits') }}
       </Button>
-      <Button type="primary" size="small" @click="open(result.url)">
+      <Button
+        type="primary"
+        size="small"
+        @click="open(result.url)"
+        @mousedown="startLongPress(result)"
+        @mouseup="cancelLongPress"
+        @mouseleave="cancelLongPress"
+        @touchstart.prevent="startLongPress(result)"
+        @touchend.prevent="cancelLongPress"
+      >
         {{ $t('search.visit') }}
       </Button>
     </div>
+    <span class="card-type-badge">{{ $t('search.typeProject') }}</span>
+    <!-- 长按平台选择弹窗 -->
+    <BlogDialog v-model="showPlatformDialog" :title="dialogTitle" :width="360" :show-close="true" :close-on-click-overlay="true">
+      <div class="platform-dialog-content">
+        <button class="platform-btn platform-btn--github" @click="openGithub">
+          <svg class="platform-btn__icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>GitHub</span>
+        </button>
+        <button class="platform-btn platform-btn--gitee" @click="openGitee">
+          <img class="platform-btn__icon" src="https://gitee.com/favicon.ico" alt="Gitee" />
+          <span>Gitee</span>
+        </button>
+      </div>
+    </BlogDialog>
   </div>
 
   <!-- 发行版卡片 -->
@@ -83,12 +109,15 @@
         </Button>
       </div>
     </div>
+    <span class="card-type-badge">{{ $t('search.typeRelease') }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
+import BlogDialog from '@/components/common/BlogDialog.vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import type { SearchResult } from '@/types/search'
 
@@ -120,6 +149,59 @@ function goToDetail(repo: string) {
   props.shouldClose()
   router.push(`/release/${repo}`)
 }
+
+// ── 长按平台选择 ──
+const showPlatformDialog = ref(false)
+const longPressProject = ref<{ name: string; url: string } | null>(null)
+const longPressTimer = ref<ReturnType<typeof setTimeout> | null>(null)
+const LONG_PRESS_DURATION = 600
+
+onBeforeUnmount(() => {
+  clearLongPressTimer()
+})
+
+function clearLongPressTimer() {
+  if (longPressTimer.value) {
+    clearTimeout(longPressTimer.value)
+    longPressTimer.value = null
+  }
+}
+
+function startLongPress(project: { name: string; url: string }) {
+  clearLongPressTimer()
+  longPressTimer.value = setTimeout(() => {
+    longPressProject.value = project
+    showPlatformDialog.value = true
+    longPressTimer.value = null
+  }, LONG_PRESS_DURATION)
+}
+
+function cancelLongPress() {
+  clearLongPressTimer()
+}
+
+const dialogTitle = ref('')
+
+watch(showPlatformDialog, (val) => {
+  if (val && longPressProject.value) {
+    dialogTitle.value = longPressProject.value.name
+  }
+})
+
+function openGithub() {
+  if (longPressProject.value) {
+    open(longPressProject.value.url)
+  }
+  showPlatformDialog.value = false
+}
+
+function openGitee() {
+  if (longPressProject.value) {
+    const repoName = extractRepoName(longPressProject.value.url)
+    open(`https://gitee.com/turing-ice/${repoName}`)
+  }
+  showPlatformDialog.value = false
+}
 </script>
 
 <style lang="less" scoped>
@@ -135,6 +217,7 @@ function goToDetail(repo: string) {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
@@ -202,6 +285,14 @@ function goToDetail(repo: string) {
   white-space: nowrap;
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover{
+    transform: scale(1.1) translateY(-1px);                                                                        
+    color: var(--accent);                                                                                                                                                                        
+    background: color-mix(in srgb, var(--accent) 20%, transparent);                                                
+    box-shadow: 0 2px 8px var(--shadow);
+  }
 }
 
 // ========================
@@ -223,6 +314,15 @@ function goToDetail(repo: string) {
   white-space: nowrap;
   background: color-mix(in srgb, var(--accent) 15%, transparent);
   color: var(--accent);
+  cursor: default;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover{
+    transform: scale(1.1) translateY(-1px);                                                                        
+    color: var(--accent);                                                                                                                                                                        
+    background: color-mix(in srgb, var(--accent) 20%, transparent);                                                
+    box-shadow: 0 2px 8px var(--shadow);
+  }
 }
 
 // ========================
@@ -234,6 +334,99 @@ function goToDetail(repo: string) {
   gap: 6px;
   margin-top: auto;
   flex-wrap: wrap;
+}
+
+// ========================
+// 卡片类型标签（右下角）
+// ========================
+.card-type-badge {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  color: var(--text-secondary);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  user-select: none;
+  z-index: 1;
+  cursor: default;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover{
+    transform: scale(1.1) translateY(-1px);
+    color: var(--accent);
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+}
+
+// ========================
+// 长按平台选择弹窗
+// ========================
+.platform-dialog-content {
+  display: flex;
+  gap: 16px;
+  padding: 8px 0;
+}
+
+.platform-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &__icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    object-fit: contain;
+    border-radius: 3px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px var(--shadow);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+
+  &--github {
+    &:hover {
+      background: #24292f;
+      color: #fff;
+      border-color: #24292f;
+    }
+  }
+
+  &--gitee {
+    &:hover {
+      background: #c71d23;
+      color: #fff;
+      border-color: #c71d23;
+
+      .platform-btn__icon {
+        filter: brightness(2);
+      }
+    }
+  }
 }
 
 // ========================
@@ -267,6 +460,11 @@ function goToDetail(repo: string) {
 .tag-version {
   background: var(--accent);
   color: #fff;
+
+  &:hover{
+    color: #fff;
+    background: var(--accent);
+  }
 }
 
 .tag-prerelease {

@@ -371,7 +371,10 @@
     "issues": "Issues",
     "commits": "Commits",
     "visit": "Visit",
-    "prerelease": "Prerelease"
+    "prerelease": "Prerelease",
+    "typeArticle": "Article",
+    "typeProject": "Project",
+    "typeRelease": "Release"
   },
   "components": {
     "select": {

@@ -27,7 +27,6 @@
       width="640px"
       max-width="90vw"
       max-height="80vh"
-      :body-overflow="activeTool?.component === 'HolidayQueryTool' ? 'visible' : undefined"
       @open="onDialogOpen"
       @close="onDialogClose"
     >
@@ -1063,11 +1062,17 @@ let holidayTickTimer: ReturnType<typeof setInterval> | undefined
 
 const countryOptions = computed(() => {
   const collator = new Intl.Collator(locale.value)
+  const isZh = locale.value.startsWith('zh')
   return countryList.value
     .map((c) => {
-      const key = `tools.holidayQuery.countries.${c.countryCode}`
-      const translated = t(key)
-      const label = translated === key ? c.name : translated
+      let label = c.name
+      if (isZh) {
+        const key = `tools.holidayQuery.countries.${c.countryCode}`
+        const translated = t(key)
+        if (translated !== key) {
+          label = translated
+        }
+      }
       return { value: c.countryCode, label }
     })
     .sort((a, b) => collator.compare(a.label, b.label))
@@ -2219,6 +2224,11 @@ countText()
 
 // ── 节日查询 ──
 .holiday-query {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+
   .config-item--country {
     flex: 1.2;
     min-width: 0;
@@ -2230,8 +2240,9 @@ countText()
 }
 
 .holiday-display {
-  min-height: 200px;
-  max-height: 420px;
+  flex: 1;
+  min-height: 120px;
+  max-height: 300px;
   overflow-y: auto;
   padding: 4px;
 
@@ -2355,6 +2366,10 @@ countText()
 }
 
 @media (max-width: 640px) {
+  .holiday-display {
+    min-height: 80px;
+    max-height: 200px;
+  }
   .holiday-row {
     flex-wrap: wrap;
     gap: 8px;

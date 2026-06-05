@@ -401,7 +401,10 @@
     "issues": "议题",
     "commits": "提交",
     "visit": "前往",
-    "prerelease": "预发行"
+    "prerelease": "预发行",
+    "typeArticle": "文章",
+    "typeProject": "项目",
+    "typeRelease": "发行"
   },
   "components": {
     "select": {
