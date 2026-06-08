@@ -1,4 +1,6 @@
-# CLAUDE.md — personal-blog
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## 项目概述
 
@@ -8,15 +10,26 @@
 
 - **框架:** Vue 3 (Composition API, `<script setup>`)
 - **构建:** Vite 6
-- **语言:** TypeScript (~5.6.0)
-- **样式:** Less (scoped styles)
-- **路由:** vue-router 4 (Hash 模式)
+- **语言:** TypeScript (~5.6.0, strict mode)
+- **样式:** Less (scoped styles, CSS 变量)
+- **路由:** vue-router 4 (Hash 模式, `createWebHashHistory`)
 - **国际化:** vue-i18n 9 (zh-CN / en-US)
 - **状态管理:** pinia 3
 - **Markdown:** markdown-it + gray-matter + highlight.js
 - **第三方 UI:** animal-island-vue (Button, Time, Divider)
 - **评论系统:** gitalk
 - **工具库:** axios, date-fns
+
+## 命令
+
+```bash
+npm run dev       # 开发服务器 (端口 3000)
+npm run build     # 生产构建
+npm run preview   # 预览构建结果
+npm run typecheck # TypeScript 类型检查 (vue-tsc --noEmit)
+```
+
+**注意:** 本项目使用 `python` 命令（非 `python3`）。
 
 ## 目录结构
 
@@ -30,9 +43,15 @@ src/
     common/
       BlogDialog.vue        # 通用弹窗组件
       BlogInput.vue         # 通用输入框组件
+      BlogSelect.vue        # 通用选择器组件
       BlogTipContainer.vue  # 消息提示容器（blog-tip 插件的视图层）
       MarkdownRenderer.vue  # Markdown 渲染器（含代码复制功能）
       ProgressBar.vue       # 页面加载进度条
+      LoadingSpinner.vue    # 加载动画组件
+      ResponsiveTime.vue    # 响应式时间组件
+    search/
+      SearchDialog.vue      # 搜索对话框
+      SearchCard.vue        # 搜索结果卡片
     sidebar/
       SidebarIcon.vue       # 侧边栏图标组件（SVG 图标集合）
   views/
@@ -40,14 +59,22 @@ src/
     ArticlesView.vue        # 文章列表页
     ArticleDetailView.vue   # 文章详情页（含 gitalk 评论）
     ProjectsView.vue        # 项目页
-    AboutView.vue           # 关于页
+    CommitsView.vue         # 提交记录页
+    ReleasesView.vue        # 发行列表页
+    ReleaseDetailView.vue   # 发行详情页
     ToolsView.vue           # 工具页
+    AboutView.vue           # 关于页
   composables/
     useArticles.ts          # 文章加载（本地 + GitHub API 双源）
     useGitalk.ts            # gitalk 评论初始化
     useHolidays.ts          # 节假日倒计时（nager.at API）
+    useReleases.ts          # 发行版本获取
+    useSearch.ts            # 搜索功能
     useTheme.ts             # 主题切换 (forest / ocean / sunset)
     useTime.ts              # 时间格式化（相对时间 + 完整时间）
+  config.ts                 # 全局配置（从 .env 读取，含默认值）
+  data/
+    projects.ts             # 项目数据（开发中/已完成/教程/搁置）
   generated/
     _articles.ts            # 自动生成：articles-plugin 构建时生成
   i18n/
@@ -67,6 +94,9 @@ src/
     animal-island-theme.css # animal-island-vue 主题覆盖
   types/
     article.ts              # Article / ArticleFrontmatter 类型定义
+    search.ts               # Search 相关类型定义
+  utils/
+    md5.ts                  # MD5 加密工具
   App.vue                   # 根组件
   main.ts                   # 入口文件
   env.d.ts                  # 环境变量类型声明
@@ -80,10 +110,13 @@ src/
 | `/articles` | articles | 文章列表 |
 | `/article/:slug` | article-detail | 文章详情 |
 | `/projects` | projects | 项目 |
+| `/releases` | releases | 发行列表 |
+| `/release/:repo` | release-detail | 发行详情 |
 | `/tools` | tools | 工具 |
 | `/about` | about | 关于 |
+| `/commits/:repo?` | commits | 提交记录 |
 
-使用 `createWebHashHistory` 哈希路由。
+使用 `createWebHashHistory('/')` 哈希路由。
 
 ## 关键组件说明
 
@@ -148,6 +181,27 @@ Markdown 正文...
 | `VITE_GITALK_CLIENT_ID` | Gitalk OAuth App Client ID |
 | `VITE_GITALK_CLIENT_SECRET` | Gitalk OAuth App Client Secret |
 
+## 配置系统 (`src/config.ts`)
+
+配置优先级：`.env` 环境变量 > 代码默认值
+
+```typescript
+// 访问配置
+import { config } from '@/config'
+
+config.github.owner    // GitHub 用户名
+config.gitalk.clientID // Gitalk Client ID
+config.blog.title      // 博客标题 'Turing_ICE'
+config.developingRepos // 开发中项目仓库列表
+config.cache.articlesTTL // 文章缓存 TTL (5分钟)
+```
+
+**关键特性:**
+- 使用 `import.meta.env.VITE_*` 读取环境变量
+- 提供本地开发默认值（GitHub 配置默认指向 `Turing158/Turing158.github.io`）
+- Gitalk 配置内置默认 OAuth 凭据
+- 标题模板: `{current_page} | Blog - {blog_title}`
+
 ## 主题系统
 
 - 3 套主题：`forest`（默认）/ `ocean` / `sunset`
@@ -161,6 +215,17 @@ Markdown 正文...
 - 语言包位于 `src/i18n/locales/`
 - 持久化到 `localStorage`（key: `blog-lang`）
 
+## 项目数据 (`src/data/projects.ts`)
+
+项目按类别组织：
+- `developing` — 开发中项目（用于获取最近提交）
+- `completed` — 已完成项目
+- `blog` — 博客相关项目
+- `tutorial` — 教程项目
+- `shelved` — 搁置项目
+
+每个项目包含：`name`, `description`, `tech[]`, `url`
+
 ## 代码规范
 
 - 使用 `<script setup lang="ts">` 写法
@@ -168,22 +233,31 @@ Markdown 正文...
 - 缩进: 2 空格
 - 组件命名: PascalCase
 - 文件命名: PascalCase (组件) / camelCase (composables)
+- 路径别名: `@/` 指向 `src/`
+- TypeScript strict mode 已启用 (`strict: true`)
 
-## 命令
+## 部署
 
-```bash
-npm run dev       # 开发服务器
-npm run build     # 生产构建
-npm run preview   # 预览构建结果
-npm run typecheck # TypeScript 类型检查 (vue-tsc --noEmit)
-```
+GitHub Actions 自动部署到 GitHub Pages (`.github/workflows/deploy.yml`)
+
+**触发条件:** 推送至 `master` 分支
+
+**部署步骤:**
+1. `npm ci` 安装依赖
+2. `npm run build` 构建（注入环境变量）
+3. `actions/deploy-pages@v4` 部署
+
+**GitHub Secrets 配置:**
+- `GITHUB_OWNER` — GitHub 用户名
+- `GITHUB_REPO` — 仓库名
+- `GITALK_CLIENT_ID` — Gitalk OAuth App Client ID
+- `GITALK_CLIENT_SECRET` — Gitalk OAuth App Client Secret
 
 ## 注意事项
 
-- 本项目使用 `python` 命令（非 `python3`）
 - 路径分隔符使用 Windows 风格 (`\`)，但代码中使用 `/`
 - 侧边栏宽度通过 CSS 变量 `--sidebar-width` 控制（默认 240px）
 - 主题系统通过 `useTheme` composable 管理
 - 节假日数据来自 `https://date.nager.at/api/v3/publicholidays/{year}/CN`
 - 项目追踪的仓库：`StarFall-Minecraft-Launcher`
-- 请用中文回复我
+- 文章插件会在构建时自动生成 `src/generated/_articles.ts`，**不要手动编辑此文件**

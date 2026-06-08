@@ -168,6 +168,16 @@
         </div>
       </div>
 
+      <!-- Gramophone Widget (Comments) -->
+      <div class="widget gramophone-widget">
+        <div class="widget-header">
+          <div class="widget-title">🎵 {{ $t('home.gramophone') }}</div>
+        </div>
+        <div class="gramophone-content">
+          <div id="gitalk-container-home" class="gitalk-container"></div>
+        </div>
+      </div>
+
       <!-- Gitee Activity Widget -->
       <div class="widget activity-widget">
         <div class="widget-header">
@@ -270,7 +280,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Divider } from 'animal-island-vue'
 import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
@@ -278,11 +288,17 @@ import { useArticles } from '@/composables/useArticles'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useHolidays } from '@/composables/useHolidays'
+import { useGitalk } from '@/composables/useGitalk'
 import { config } from '@/config'
+import '@/styles/gitalk-theme.css'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()
 const { t, locale } = useI18n()
+
+// Gramophone (Gitalk Comments)
+const { init: initGitalk } = useGitalk('gitalk-container-home', 'home-comments', '留声机评论')
+const gramophoneInitialized = ref(false)
 
 const blogName = config.blog.title
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
@@ -695,6 +711,14 @@ onMounted(async () => {
     giteeError.value = true
   } finally {
     giteeLoading.value = false
+  }
+
+  // Initialize Gitalk for Gramophone widget
+  if (!gramophoneInitialized.value) {
+    nextTick(() => {
+      initGitalk()
+      gramophoneInitialized.value = true
+    })
   }
 })
 </script>
@@ -1244,6 +1268,48 @@ onMounted(async () => {
 .view-all-arrow {
   font-size: 1.1rem;
   transition: transform 0.3s ease;
+}
+
+// Gramophone Widget
+.gramophone-widget {
+  grid-column: span 2;
+  height: auto;
+  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.gramophone-content {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.gitalk-container {
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  // Override gitalk theme styles for gramophone widget
+  :deep(.gt-container) {
+    max-height: none;
+  }
+
+  // Hide footer in gramophone widget
+  :deep(.gt-copyright) {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .gramophone-widget {
+    grid-column: span 1;
+    max-height: 500px;
+  }
+
+  .gramophone-content,
+  .gitalk-container {
+    max-height: 500px;
+  }
 }
 
 // Activity Widget
