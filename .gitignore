@@ -6,3 +6,4 @@ src/generated
 .playwright-mcp
 scripts
 dev-dist
+dev-docs

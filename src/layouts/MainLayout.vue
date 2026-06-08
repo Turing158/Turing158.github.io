@@ -157,12 +157,22 @@ const onResize = () => {
   isMobile.value = window.innerWidth < 768
 }
 
+// Ctrl/Cmd + K 打开搜索
+function handleKeydown(e: KeyboardEvent) {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault()
+    openSearch()
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
+  window.addEventListener('keydown', handleKeydown)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', onResize)
+  window.removeEventListener('keydown', handleKeydown)
 })
 
 // TOC 状态管理

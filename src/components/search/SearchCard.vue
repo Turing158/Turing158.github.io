@@ -6,21 +6,21 @@
     class="search-card search-card--article"
     @click="props.shouldClose()"
   >
-    <h3 class="card-title">{{ result.title }}</h3>
-    <p class="card-desc">{{ result.description }}</p>
+    <h3 class="card-title" v-html="highlight(result.title, query)" />
+    <p class="card-desc" v-html="highlight(result.description, query)" />
     <div class="card-meta">
       <span class="card-date" :title="formatFullTime(result.date)">
         {{ formatRelativeTime(result.date) }}
       </span>
-      <span v-for="tag in result.tags" :key="tag" class="tag">{{ tag }}</span>
+      <span v-for="tag in result.tags" :key="tag" class="tag" v-html="highlight(tag, query)" />
     </div>
     <span class="card-type-badge">{{ $t('search.typeArticle') }}</span>
   </router-link>
 
   <!-- 项目卡片 -->
   <div v-else-if="result.type === 'project'" class="search-card search-card--project">
-    <h3 class="card-title">{{ result.name }}</h3>
-    <p class="card-desc">{{ result.description }}</p>
+    <h3 class="card-title" v-html="highlight(result.name, query)" />
+    <p class="card-desc" v-html="highlight(result.description, query)" />
     <div v-if="result.tech.length > 0" class="card-tech">
       <span v-for="tech in result.tech" :key="tech" class="tech-tag">{{ tech }}</span>
     </div>
@@ -65,7 +65,7 @@
   <!-- 发行版卡片 -->
   <div v-else-if="result.type === 'release'" class="search-card search-card--release">
     <div class="card-header">
-      <span class="repo-name">{{ result.repo }}</span>
+      <span class="repo-name" v-html="highlight(result.repo, query)" />
       <div class="header-tags">
         <span class="tag tag-version">{{ result.tag_name }}</span>
         <span v-if="result.prerelease" class="tag tag-prerelease">
@@ -119,10 +119,12 @@ import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { highlight } from '@/utils/search-highlighter'
 import type { SearchResult } from '@/types/search'
 
 const props = defineProps<{
   result: SearchResult
+  query: string
   shouldClose: () => void
 }>()
 
@@ -205,9 +207,9 @@ function openGitee() {
 </script>
 
 <style lang="less" scoped>
-// ========================
-// 通用卡片基础样式
-// ========================
+/* ======================== */
+/* 通用卡片基础样式         */
+/* ======================== */
 .search-card {
   background: var(--bg-card);
   border-radius: 12px;
@@ -226,15 +228,15 @@ function openGitee() {
   }
 }
 
-// 文章卡片的 link 样式重置
+/* 文章卡片的 link 样式重置 */
 .search-card--article {
   text-decoration: none;
   color: inherit;
 }
 
-// ========================
-// 标题 & 描述
-// ========================
+/* ======================== */
+/* 标题 & 描述              */
+/* ======================== */
 .card-title {
   font-size: 1.05rem;
   font-weight: 600;
@@ -254,9 +256,19 @@ function openGitee() {
   overflow: hidden;
 }
 
-// ========================
-// 元信息行（文章卡片）
-// ========================
+/* ======================== */
+/* 搜索高亮                 */
+/* ======================== */
+:deep(.search-highlight) {
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
+  color: var(--accent);
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+/* ======================== */
+/* 元信息行（文章卡片）      */
+/* ======================== */
 .card-meta {
   display: flex;
   align-items: center;
@@ -272,9 +284,9 @@ function openGitee() {
   cursor: default;
 }
 
-// ========================
-// 标签徽章（文章 / 发行版通用）
-// ========================
+/* ======================== */
+/* 标签徽章（文章/发行版）   */
+/* ======================== */
 .tag {
   display: inline-flex;
   align-items: center;
@@ -288,16 +300,16 @@ function openGitee() {
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover{
-    transform: scale(1.1) translateY(-1px);                                                                        
-    color: var(--accent);                                                                                                                                                                        
-    background: color-mix(in srgb, var(--accent) 20%, transparent);                                                
+    transform: scale(1.1) translateY(-1px);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
     box-shadow: 0 2px 8px var(--shadow);
   }
 }
 
-// ========================
-// 技术标签（项目卡片）
-// ========================
+/* ======================== */
+/* 技术标签（项目卡片）      */
+/* ======================== */
 .card-tech {
   display: flex;
   gap: 6px;
@@ -318,16 +330,16 @@ function openGitee() {
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   &:hover{
-    transform: scale(1.1) translateY(-1px);                                                                        
-    color: var(--accent);                                                                                                                                                                        
-    background: color-mix(in srgb, var(--accent) 20%, transparent);                                                
+    transform: scale(1.1) translateY(-1px);
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
     box-shadow: 0 2px 8px var(--shadow);
   }
 }
 
-// ========================
-// 按钮组（项目 / 发行版卡片）
-// ========================
+/* ======================== */
+/* 按钮组（项目/发行版卡片） */
+/* ======================== */
 .card-actions {
   display: flex;
   align-items: center;
@@ -336,9 +348,9 @@ function openGitee() {
   flex-wrap: wrap;
 }
 
-// ========================
-// 卡片类型标签（右下角）
-// ========================
+/* ======================== */
+/* 卡片类型标签（右下角）    */
+/* ======================== */
 .card-type-badge {
   position: absolute;
   bottom: 10px;
@@ -366,9 +378,9 @@ function openGitee() {
   }
 }
 
-// ========================
-// 长按平台选择弹窗
-// ========================
+/* ======================== */
+/* 长按平台选择弹窗         */
+/* ======================== */
 .platform-dialog-content {
   display: flex;
   gap: 16px;
@@ -429,9 +441,9 @@ function openGitee() {
   }
 }
 
-// ========================
-// 发行版卡片：头部
-// ========================
+/* ======================== */
+/* 发行版卡片：头部         */
+/* ======================== */
 .search-card--release {
   justify-content: space-between;
   gap: 14px;
@@ -473,9 +485,9 @@ function openGitee() {
   border: 1px solid rgba(245, 158, 11, 0.3);
 }
 
-// ========================
-// 发行版卡片：底部（作者 + 时间 + 按钮）
-// ========================
+/* ======================== */
+/* 发行版卡片：底部         */
+/* ======================== */
 .card-footer {
   display: flex;
   align-items: flex-end;

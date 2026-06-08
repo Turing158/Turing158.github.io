@@ -412,7 +412,13 @@
     "prerelease": "Prerelease",
     "typeArticle": "Article",
     "typeProject": "Project",
-    "typeRelease": "Release"
+    "typeRelease": "Release",
+    "resultsCount": "{n} results found",
+    "tabAll": "All",
+    "tabArticles": "Articles",
+    "tabProjects": "Projects",
+    "tabReleases": "Releases",
+    "shortcut": "Ctrl+K to search"
   },
   "components": {
     "select": {
