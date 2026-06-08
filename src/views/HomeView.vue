@@ -285,12 +285,20 @@ import { useI18n } from 'vue-i18n'
 import { Divider } from 'animal-island-vue'
 import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
 import { useArticles } from '@/composables/useArticles'
+import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useHolidays } from '@/composables/useHolidays'
 import { useGitalk } from '@/composables/useGitalk'
 import { config } from '@/config'
 import '@/styles/gitalk-theme.css'
+
+// SEO
+usePageSeo(
+  computed(() => `${config.blog.title} | Blog`),
+  'Turing_ICE 的个人博客，分享技术文章、开发工具和学习笔记',
+  '#/'
+)
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()

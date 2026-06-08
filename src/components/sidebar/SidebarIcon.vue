@@ -101,6 +101,9 @@ const icons: Record<string, Shape[]> = {
     { type: 'path', d: 'M8 9 12 5l4 4' },
     { type: 'line', x1: 1, y1: 22, x2: 23, y2: 22 },
   ],
+  dark: [
+    { type: 'path', d: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z' },
+  ],
   lang: [
     { type: 'circle', cx: 12, cy: 12, r: 9 },
     { type: 'line', x1: 3, y1: 12, x2: 21, y2: 12 },
@@ -135,6 +138,11 @@ const icons: Record<string, Shape[]> = {
   search: [
     { type: 'circle', cx: 11, cy: 11, r: 8 },
     { type: 'line', x1: 21, y1: 21, x2: 16.65, y2: 16.65 },
+  ],
+  system: [
+    { type: 'rect', x: 2, y: 3, width: 20, height: 14, rx: 2 },
+    { type: 'line', x1: 8, y1: 21, x2: 16, y2: 21 },
+    { type: 'line', x1: 12, y1: 17, x2: 12, y2: 21 },
   ],
 }
 

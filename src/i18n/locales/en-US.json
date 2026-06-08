@@ -149,9 +149,13 @@
     "email": "Email"
   },
   "theme": {
+    "system": "System",
+    "systemLight": "Light Theme",
+    "systemDark": "Dark Theme",
     "forest": "Forest",
     "ocean": "Ocean",
-    "sunset": "Sunset"
+    "sunset": "Sunset",
+    "dark": "Dark Blue"
   },
   "tools": {
     "title": "Tools",

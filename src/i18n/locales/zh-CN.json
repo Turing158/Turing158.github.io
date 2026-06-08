@@ -172,9 +172,13 @@
     "email": "电子邮箱"
   },
   "theme": {
+    "system": "系统",
+    "systemLight": "亮色主题",
+    "systemDark": "暗色主题",
     "forest": "森林",
     "ocean": "海洋",
-    "sunset": "日落"
+    "sunset": "日落",
+    "dark": "暗蓝色"
   },
   "tools": {
     "title": "工具集",

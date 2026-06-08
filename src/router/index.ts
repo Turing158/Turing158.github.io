@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { config } from '@/config'
 import i18n from '@/i18n'
+import { useSeo } from '@/composables/useSeo'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -112,8 +113,26 @@ export function updateDocumentTitle(pageTitle: string) {
     .replace('{blog_title}', blogTitle)
 }
 
-router.afterEach(() => {
+router.afterEach((to) => {
   progressListeners.forEach(l => l.onDone())
+
+  // 为每个页面设置默认 SEO
+  const titleKey = to.meta.titleKey as string | undefined
+  let pageTitle = titleKey ? i18n.global.t(titleKey) : ''
+
+  if (to.name === 'commits' && to.params.repo) {
+    pageTitle = to.params.repo as string
+  }
+  if (to.name === 'release-detail' && to.params.repo) {
+    pageTitle = to.params.repo as string
+  }
+
+  // 使用 useSeo 设置页面级 meta
+  useSeo({
+    title: pageTitle,
+    url: to.fullPath,
+    type: 'website',
+  })
 })
 
 export default router

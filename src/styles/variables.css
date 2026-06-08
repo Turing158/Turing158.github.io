@@ -4,6 +4,7 @@
   --bg-secondary: #e8e0d0;
   --bg-sidebar: #2d4a3e;
   --bg-card: #ffffff;
+  --bg-card-hover: #fafafa;
   --text-primary: #2c2c2c;
   --text-secondary: #666666;
   --text-sidebar: #e8e0d0;
@@ -11,10 +12,15 @@
   --accent: #4a7c59;
   --accent-hover: #5a9c69;
   --border: #d4c9b8;
+  --border-strong: #c4b9a8;
   --shadow: rgba(45, 74, 62, 0.1);
+  --shadow-strong: rgba(45, 74, 62, 0.15);
   --code-bg: #e6ddd0;
   --toc-active: #4a7c59;
   --sidebar-width: 240px;
+  --toggle-bg: #d4c9b8;
+  --toggle-active: #4a7c59;
+  --toggle-knob: #ffffff;
 }
 
 [data-theme="ocean"] {
@@ -22,6 +28,7 @@
   --bg-secondary: #dce6f0;
   --bg-sidebar: #1a3a5c;
   --bg-card: #ffffff;
+  --bg-card-hover: #f5f8fc;
   --text-primary: #1a2d44;
   --text-secondary: #4a6a8a;
   --text-sidebar: #c8d8e8;
@@ -29,9 +36,14 @@
   --accent: #2a6f97;
   --accent-hover: #3a8fb7;
   --border: #b8cce0;
+  --border-strong: #a0b8d0;
   --shadow: rgba(26, 58, 92, 0.1);
+  --shadow-strong: rgba(26, 58, 92, 0.15);
   --code-bg: #e8eef4;
   --toc-active: #2a6f97;
+  --toggle-bg: #b8cce0;
+  --toggle-active: #2a6f97;
+  --toggle-knob: #ffffff;
 }
 
 [data-theme="sunset"] {
@@ -39,6 +51,7 @@
   --bg-secondary: #f5ddd8;
   --bg-sidebar: #6b2d3e;
   --bg-card: #ffffff;
+  --bg-card-hover: #fef8f6;
   --text-primary: #3d1a1a;
   --text-secondary: #7a4a4a;
   --text-sidebar: #f0d8d8;
@@ -46,7 +59,68 @@
   --accent: #c05533;
   --accent-hover: #e06543;
   --border: #e8c8b8;
+  --border-strong: #d8b8a8;
   --shadow: rgba(107, 45, 62, 0.1);
+  --shadow-strong: rgba(107, 45, 62, 0.15);
   --code-bg: #f5e8e0;
   --toc-active: #c05533;
+  --toggle-bg: #e8c8b8;
+  --toggle-active: #c05533;
+  --toggle-knob: #ffffff;
+}
+
+[data-theme="dark"] {
+  --bg-primary: #0c1222;
+  --bg-secondary: #162032;
+  --bg-sidebar: #020617;
+  --bg-card: #162032;
+  --bg-card-hover: #1c2840;
+  --text-primary: #e2e8f0;
+  --text-secondary: #8899aa;
+  --text-sidebar: #8899aa;
+  --text-sidebar-active: #2eaadc;
+  --accent: #2eaadc;
+  --accent-hover: #3bb8e8;
+  --border: #283548;
+  --border-strong: #334155;
+  --shadow: rgba(0, 0, 0, 0.35);
+  --shadow-strong: rgba(0, 0, 0, 0.5);
+  --code-bg: #131d2c;
+  --toc-active: #2eaadc;
+  --toggle-bg: #283548;
+  --toggle-active: #2eaadc;
+  --toggle-knob: #0c1222;
+}
+
+/* 暗色模式图片暗化 filter */
+[data-theme="dark"] img {
+  filter: brightness(0.9);
+}
+
+[data-theme="dark"] img:hover {
+  filter: brightness(1);
+}
+
+/* 暗色模式代码块高亮适配 */
+[data-theme="dark"] .code-block-wrapper {
+  filter: brightness(0.95);
+}
+
+/* 暗色模式滚动条 */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }

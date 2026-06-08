@@ -3,6 +3,7 @@
     <ProgressBar />
     <MainLayout />
     <BlogTipContainer />
+    <PwaInstallPrompt />
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import MainLayout from '@/layouts/MainLayout.vue'
 import ProgressBar from '@/components/common/ProgressBar.vue'
 import BlogTipContainer from '@/components/common/BlogTipContainer.vue'
+import PwaInstallPrompt from '@/components/common/PwaInstallPrompt.vue'
 </script>
 
 <style lang="less">

@@ -43,18 +43,42 @@
 
       <div class="sidebar-footer">
         <div class="theme-switcher">
+          <!-- 系统按钮 -->
           <button
-            v-for="t in themes"
+            class="theme-btn theme-btn--system"
+            :class="{ active: systemMode }"
+            :title="$t('theme.system')"
+            :aria-label="$t('theme.system')"
+            :aria-pressed="systemMode"
+            @click="toggleSystemMode"
+          >
+            <SidebarIcon name="system" :size="18" />
+          </button>
+          <!-- 亮色主题按钮 -->
+          <button
+            v-for="t in lightThemes"
             :key="t.value"
             class="theme-btn"
-            :class="{ active: currentTheme === t.value }"
+            :class="{ active: systemMode ? systemLightTheme === t.value : currentTheme === t.value }"
             :data-theme="t.value"
             :title="$t(t.labelKey)"
             :aria-label="$t(t.labelKey)"
-            :aria-pressed="currentTheme === t.value"
-            @click="setTheme(t.value)"
+            :aria-pressed="systemMode ? systemLightTheme === t.value : currentTheme === t.value"
+            @click="handleThemeClick(t.value)"
           >
             <SidebarIcon :name="t.icon" :size="18" />
+          </button>
+          <!-- 暗色主题按钮 -->
+          <button
+            class="theme-btn"
+            :class="{ active: systemMode ? systemDarkTheme === 'dark' : currentTheme === 'dark' }"
+            :data-theme="'dark'"
+            :title="$t('theme.dark')"
+            :aria-label="$t('theme.dark')"
+            :aria-pressed="systemMode ? systemDarkTheme === 'dark' : currentTheme === 'dark'"
+            @click="handleThemeClick('dark')"
+          >
+            <SidebarIcon name="dark" :size="18" />
           </button>
         </div>
         <button class="lang-btn" @click="toggleLang">
@@ -109,7 +133,16 @@ export type { TocHeading }
 
 const route = useRoute()
 const { locale } = useI18n()
-const { theme: currentTheme, setTheme } = useTheme()
+const {
+  theme: currentTheme,
+  setTheme,
+  systemMode,
+  systemLightTheme,
+  systemDarkTheme,
+  toggleSystemMode,
+  setSystemLightTheme,
+  setSystemDarkTheme,
+} = useTheme()
 
 const searchDialogRef = ref<InstanceType<typeof SearchDialog> | null>(null)
 const openSearch = () => searchDialogRef.value?.open()
@@ -291,11 +324,25 @@ const navItems = [
   { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
 ]
 
-const themes = [
+const lightThemes: { value: ThemeName; icon: string; labelKey: string }[] = [
   { value: 'forest' as ThemeName, icon: 'forest', labelKey: 'theme.forest' },
   { value: 'ocean' as ThemeName, icon: 'ocean', labelKey: 'theme.ocean' },
   { value: 'sunset' as ThemeName, icon: 'sunset', labelKey: 'theme.sunset' },
 ]
+
+function handleThemeClick(t: ThemeName) {
+  if (systemMode.value) {
+    // 系统模式下：分别设置亮色/暗色主题
+    if (t === 'dark') {
+      setSystemDarkTheme(t)
+    } else {
+      setSystemLightTheme(t as Exclude<ThemeName, 'dark'>)
+    }
+  } else {
+    // 普通模式：直接切换
+    setTheme(t)
+  }
+}
 
 const toggleLang = () => {
   const newLang = locale.value === 'zh-CN' ? 'en-US' : 'zh-CN'
@@ -517,7 +564,7 @@ const toggleLang = () => {
 .theme-switcher {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .theme-btn {
@@ -537,6 +584,16 @@ const toggleLang = () => {
   :deep(svg) {
     display: block;
     transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  // 系统按钮
+  &--system {
+    &:not(.active) {
+      background: rgba(148, 163, 184, 0.2); // slate-400
+      &:hover {
+        background: rgba(148, 163, 184, 0.35);
+      }
+    }
   }
 
   // 非 active 状态 - 使用对应主题色
@@ -562,6 +619,14 @@ const toggleLang = () => {
       background: rgba(192, 85, 51, 0.25); // sunset accent: #c05533
       &:hover {
         background: rgba(192, 85, 51, 0.45);
+      }
+    }
+
+    // Dark 主题按钮
+    &[data-theme="dark"] {
+      background: rgba(15, 23, 42, 0.3); // dark accent: #0f172a
+      &:hover {
+        background: rgba(15, 23, 42, 0.5);
       }
     }
 

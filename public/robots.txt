@@ -1,0 +1,19 @@
+# robots.txt for Turing_ICE Blog
+# https://turing158.github.io
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://turing158.github.io/sitemap.xml
+
+# Crawl-delay for bots
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Baiduspider
+Crawl-delay: 2
+
+# Disallow admin/private paths (future-proof)
+Disallow: /admin/
+Disallow: /api/

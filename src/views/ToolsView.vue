@@ -289,7 +289,7 @@
                 {{ $t('tools.randomGenerator.generate') }}
               </Button>
               <Button
-                :type="isGenerating ? 'danger' : 'secondary'"
+                :danger="isGenerating"
                 size="small"
                 @click="toggleContinuous"
               >
@@ -319,6 +319,7 @@
               </span>
               <Button
                 size="small"
+                danger
                 @click="clearRandom"
                 :disabled="isGenerating"
               >
@@ -403,7 +404,7 @@
                 {{ $t('tools.randomString.generate') }}
               </Button>
               <Button
-                :type="isStringGenerating ? 'danger' : 'secondary'"
+                :danger="isStringGenerating"
                 size="small"
                 @click="toggleStringContinuous"
               >
@@ -432,6 +433,7 @@
                 </Button>
               </span>
               <Button
+                danger
                 size="small"
                 @click="clearString"
                 :disabled="isStringGenerating"
@@ -691,6 +693,10 @@ import { Button, Checkbox } from 'animal-island-vue'
 import BlogSelect from '@/components/common/BlogSelect.vue'
 import BlogTip from '@/plugins/blog-tip'
 import { md5 } from '@/utils/md5'
+import { usePageSeo } from '@/composables/useSeo'
+
+// SEO
+usePageSeo('工具', '开发者工具集：JSON格式化、Base64编解码、正则测试、颜色转换等', '#/tools')
 
 interface Tool {
   name: string

@@ -92,7 +92,7 @@ const formattedMinutes = computed(() => padZero(currentTime.value.getMinutes()))
   transition: all 0.2;
 
   // 适应主题色
-  color: var(--bg-sidebar, #8b7355);
+  color: var(--text-secondary, #8b7355);
 }
 
 .responsive-time__clock {
@@ -105,7 +105,7 @@ const formattedMinutes = computed(() => padZero(currentTime.value.getMinutes()))
   transition: all 0.2;
 
   // 适应主题色
-  color: var(--bg-sidebar, #8b7355);
+  color: var(--text-secondary, #8b7355);
 }
 
 .responsive-time__colon {
@@ -118,7 +118,7 @@ const formattedMinutes = computed(() => padZero(currentTime.value.getMinutes()))
   transition: all 0.2;
 
   // 适应主题色
-  color: var(--bg-sidebar, #8b7355);
+  color: var(--text-secondary, #8b7355);
 }
 
 @keyframes time-fade-up {

@@ -44,6 +44,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/common/MarkdownRenderer.vue'
 import { useArticles } from '@/composables/useArticles'
+import { useArticleSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { Button } from 'animal-island-vue'
@@ -60,6 +61,26 @@ const { locale } = useI18n()
 const { fetchArticles, loading } = useArticles()
 const store = useAppStore()
 
+const slug = computed(() => route.params.slug as string)
+
+const article = computed(() =>
+  store.articles.find((a) => a.slug === slug.value)
+)
+
+// SEO 优化（必须在 article 之后声明）
+const articleForSeo = computed(() => {
+  if (!article.value) return null
+  return {
+    title: article.value.title,
+    description: article.value.description,
+    date: article.value.date,
+    tags: article.value.tags,
+    cover: article.value.cover,
+    slug: article.value.slug,
+  }
+})
+useArticleSeo(articleForSeo)
+
 // 返回：有历史记录则返回上一页，否则回到文章列表
 const goBack = () => {
   if (window.history.state?.back) {
@@ -71,12 +92,6 @@ const goBack = () => {
 
 const mdRef = ref<InstanceType<typeof MarkdownRenderer> | null>(null)
 const headings = ref<TocHeading[]>([])
-
-const slug = computed(() => route.params.slug as string)
-
-const article = computed(() =>
-  store.articles.find((a) => a.slug === slug.value)
-)
 
 // 将 headings 传递给 layout 中的 TOC
 const updateHeadings = () => {

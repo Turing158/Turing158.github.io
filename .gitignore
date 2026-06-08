@@ -4,3 +4,5 @@ dist
 *.local
 src/generated
 .playwright-mcp
+scripts
+dev-dist

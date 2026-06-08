@@ -117,8 +117,12 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useArticles } from '@/composables/useArticles'
+import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+
+// SEO
+usePageSeo('文章', '查看所有技术文章和教程', '#/articles')
 
 const { fetchArticles, loading } = useArticles()
 const store = useAppStore()

@@ -72,6 +72,10 @@ import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import { categories as projectCategories } from '@/data/projects'
+import { usePageSeo } from '@/composables/useSeo'
+
+// SEO
+usePageSeo('项目', '开发中的项目、已完成项目和教程', '#/projects')
 
 const router = useRouter()
 const categories = ref(projectCategories)

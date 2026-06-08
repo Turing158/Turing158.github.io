@@ -120,6 +120,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { usePageSeo } from '@/composables/useSeo'
+
+// SEO
+usePageSeo('关于', '了解 Turing_ICE 的背景、技能和联系方式', '#/about')
 
 const { t } = useI18n()
 

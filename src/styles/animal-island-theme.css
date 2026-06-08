@@ -162,6 +162,23 @@
   box-shadow: 0 1px color-mix(in srgb, var(--accent) 70%, #000) !important;
 }
 
+/* ── Danger：危险操作按钮 ──────────────────────────────────── */
+.animal-btn--danger {
+  background: var(--bg-card) !important;
+  color: var(--animal-error-color) !important;
+  border-color: var(--animal-error-color) !important;
+  /* box-shadow: 0 5px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important; */
+}
+.animal-btn--danger:hover:not(:disabled) {
+  border-color: var(--animal-error-color-hover) !important;
+  color: var(--animal-error-color-hover) !important;
+  box-shadow: 0 3px 10px var(--shadow) !important;
+  /* box-shadow: 0 6px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important; */
+}
+.animal-btn--danger:active:not(:disabled) {
+  box-shadow: 0 1px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important;
+}
+
 /* ── Default：浅底 + 主题边框，hover/active 跟随强调色 ─────── */
 .animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading) {
   color: var(--text-primary) !important;
