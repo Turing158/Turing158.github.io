@@ -7,3 +7,10 @@ src/generated
 scripts
 dev-dist
 dev-docs
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
