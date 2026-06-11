@@ -86,7 +86,9 @@
     "noMatch": "No matching articles",
     "prev": "Previous",
     "next": "Next",
-    "perPage": "Per page"
+    "perPage": "Per page",
+    "views": "views",
+    "readingTime": "{time} min read"
   },
   "releases": {
     "title": "Releases",
@@ -370,6 +372,25 @@
     "dayBeforeYesterday": "Day before yesterday",
     "daysAgo": "{n} days ago"
   },
+  "notFound": {
+    "title": "Page Not Found",
+    "description": "Sorry, the page you are looking for doesn't exist or has been moved.",
+    "goHome": "Go Home",
+    "goBack": "Go Back",
+    "suggestions": "You can try the following:",
+    "viewArticles": "Browse Articles",
+    "viewProjects": "View Projects",
+    "aboutMe": "About Me"
+  },
+  "error": {
+    "title": "Server Error",
+    "description": "Sorry, something went wrong on our end. Please try again later.",
+    "retry": "Retry",
+    "goHome": "Go Home",
+    "showDetails": "Show Details",
+    "helpText": "If the problem persists, please",
+    "contactSupport": "contact support"
+  },
   "comments": {
     "title": "Comments"
   },
@@ -383,7 +404,9 @@
     "tools": "Tools",
     "about": "About",
     "commits": "Commits",
-    "responsiveTimeDemo": "Responsive Time Component Demo"
+    "responsiveTimeDemo": "Responsive Time Component Demo",
+    "notFound": "Page Not Found",
+    "error": "Server Error"
   },
   "pageReleases": {
     "title": "Release Detail",

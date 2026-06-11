@@ -68,6 +68,26 @@ const routes: RouteRecordRaw[] = [
   //   component: () => import('@/views/ResponsiveTimeDemo.vue'),
   //   meta: { titleKey: 'pageTitle.responsiveTimeDemo' },
   // },
+  // 错误页面路由
+  {
+    path: '/not-found',
+    name: 'not-found',
+    component: () => import('@/views/NotFoundView.vue'),
+    meta: { titleKey: 'pageTitle.notFound' },
+  },
+  {
+    path: '/error',
+    name: 'error',
+    component: () => import('@/views/ErrorView.vue'),
+    meta: { titleKey: 'pageTitle.error' },
+    props: true,
+  },
+  // 404 通配符路由（必须放在最后）
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'catch-all',
+    redirect: '/not-found',
+  },
 ]
 
 const router = createRouter({

@@ -18,7 +18,9 @@
     "tools": "工具",
     "about": "关于",
     "commits": "提交记录",
-    "responsiveTimeDemo": "响应式时间组件演示"
+    "responsiveTimeDemo": "响应式时间组件演示",
+    "notFound": "页面未找到",
+    "error": "服务器错误"
   },
   "home": {
     "recentCommits": "最新提交",
@@ -98,7 +100,9 @@
     "noMatch": "没有匹配的文章",
     "prev": "上一页",
     "next": "下一页",
-    "perPage": "每页显示"
+    "perPage": "每页显示",
+    "views": "次浏览",
+    "readingTime": "{time} 分钟阅读"
   },
   "releases": {
     "title": "发行",
@@ -414,6 +418,25 @@
     "switchLang": "English",
     "collapse": "收起",
     "expand": "展开菜单"
+  },
+  "notFound": {
+    "title": "页面未找到",
+    "description": "抱歉，您访问的页面不存在或已被移除。",
+    "goHome": "返回首页",
+    "goBack": "返回上一页",
+    "suggestions": "您可以尝试以下操作：",
+    "viewArticles": "浏览文章",
+    "viewProjects": "查看项目",
+    "aboutMe": "关于我"
+  },
+  "error": {
+    "title": "服务器错误",
+    "description": "抱歉，服务器遇到了问题。请稍后再试。",
+    "retry": "重试",
+    "goHome": "返回首页",
+    "showDetails": "显示详细信息",
+    "helpText": "如果问题持续存在，请",
+    "contactSupport": "联系支持"
   },
   "comments": {
     "title": "评论"

@@ -15,11 +15,33 @@
         <h1 class="article-title">{{ article.title }}</h1>
         <div class="article-meta">
           <span class="article-date" :title="formatFullTime(article.date)">{{ $t('articles.publishedAt') }} {{ formatRelativeTime(article.date) }}</span>
+          <span v-if="article.readingTime" class="article-reading-time" :title="`预计阅读 ${article.readingTime} 分钟`">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            {{ $t('articles.readingTime', { time: article.readingTime }) }}
+          </span>
+          <!-- 浏览量 -->
+          <span v-if="viewCount > 0" class="article-views-badge" :title="`${viewCount} 次浏览`">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            {{ formatViewCount(viewCount) }}
+          </span>
           <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
         </div>
       </header>
 
       <MarkdownRenderer ref="mdRef" :html="article.html" />
+
+      <!-- 分享按钮 -->
+      <ShareButtons
+        v-if="article"
+        :title="article.title"
+        :description="article.description"
+      />
 
       <section class="gitalk-section">
         <h3 class="gitalk-title">{{ $t('comments.title') }}</h3>
@@ -43,12 +65,15 @@
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/common/MarkdownRenderer.vue'
+import ShareButtons from '@/components/article/ShareButtons.vue'
 import { useArticles } from '@/composables/useArticles'
 import { useArticleSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { useViewCount } from '@/composables/useViewCount'
+import { formatViewCount } from '@/utils/formatViewCount'
 import Gitalk from 'gitalk'
 import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
@@ -93,6 +118,9 @@ const goBack = () => {
 const mdRef = ref<InstanceType<typeof MarkdownRenderer> | null>(null)
 const headings = ref<TocHeading[]>([])
 
+// 浏览量
+const { viewCount, incrementViewCount } = useViewCount(slug.value)
+
 // 将 headings 传递给 layout 中的 TOC
 const updateHeadings = () => {
   if (mdRef.value) {
@@ -132,6 +160,9 @@ onMounted(async () => {
   if (article.value?.title) {
     updateDocumentTitle(article.value.title)
   }
+
+  // 增加浏览量
+  incrementViewCount()
 
   nextTick(() => {
     updateHeadings()
@@ -203,6 +234,45 @@ watch(locale, () => {
   font-size: 0.85rem;
 }
 
+.article-reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+
+  svg {
+    opacity: 0.7;
+  }
+}
+
+.article-views-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+
+  svg {
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+}
+
 .tag {
   display: inline-block;
   background: var(--bg-secondary);
@@ -219,7 +289,7 @@ watch(locale, () => {
     color: #fff;
     background: var(--accent);
     border-color: var(--accent);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 25%, transparent);
   }
 }

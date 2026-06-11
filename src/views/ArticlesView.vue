@@ -58,7 +58,37 @@
             <p class="article-card-desc">{{ article.description }}</p>
             <div class="article-card-meta">
               <span class="article-card-date" :title="formatFullTime(article.date)">{{ formatRelativeTime(article.date) }}</span>
+              <span v-if="article.readingTime" class="article-card-reading-time" :title="`预计阅读 ${article.readingTime} 分钟`">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                {{ $t('articles.readingTime', { time: article.readingTime }) }}
+              </span>
+              <!-- 浏览量 -->
+              <span
+                v-if="viewCounts[article.slug] !== undefined"
+                class="article-card-views"
+                :title="`${viewCounts[article.slug]} 次浏览`"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                {{ formatViewCount(viewCounts[article.slug]) }}
+              </span>
               <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
+              <!-- 评论计数 -->
+              <span
+                v-if="commentCounts[article.slug] !== undefined"
+                class="article-card-comments"
+                :title="`${commentCounts[article.slug]} 条评论`"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {{ commentCounts[article.slug] }}
+              </span>
             </div>
           </div>
         </router-link>
@@ -120,6 +150,10 @@ import { useArticles } from '@/composables/useArticles'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { useGitalkCounts } from '@/composables/useGitalkCount'
+import { useViewCounts } from '@/composables/useViewCount'
+import { formatReadingTime } from '@/composables/useReadingTime'
+import { formatViewCount } from '@/utils/formatViewCount'
 
 // SEO
 usePageSeo('文章', '查看所有技术文章和教程', '#/articles')
@@ -129,6 +163,13 @@ const store = useAppStore()
 
 // 用 storeToRefs 保持响应式连接
 const { articles } = storeToRefs(store)
+
+// 评论计数
+const slugs = computed(() => articles.value.map(a => a.slug))
+const { counts: commentCounts } = useGitalkCounts(slugs.value)
+
+// 浏览量
+const { counts: viewCounts } = useViewCounts(slugs.value)
 
 // 所有唯一标签
 const allTags = computed(() => {
@@ -394,18 +435,87 @@ onMounted(async () => {
   font-size: 0.8rem;
 }
 
+.article-card-reading-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+
+  svg {
+    opacity: 0.7;
+  }
+
+  &:hover {
+    color: var(--accent);
+
+    svg {
+      opacity: 1;
+    }
+  }
+}
+
+.article-card-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+
+  svg {
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+}
+
+.article-card-comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-left: auto;
+
+  svg {
+    opacity: 0.7;
+  }
+
+  &:hover {
+    color: var(--accent);
+
+    svg {
+      opacity: 1;
+    }
+  }
+}
+
 .tag {
   background: var(--bg-secondary);
   color: var(--accent);
   padding: 2px 10px;
   border-radius: 12px;
   font-size: 0.75rem;
+  font-weight: 500;
   border: 1px solid var(--border);
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: default;
 
   &:hover {
-    transform: scale(1.1) translateY(-1px);
+    transform: scale(1.08) translateY(-1px);
     border-color: var(--accent);
     box-shadow: 0 2px 8px var(--shadow);
   }

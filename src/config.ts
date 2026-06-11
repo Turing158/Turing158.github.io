@@ -38,6 +38,11 @@ const GITALK_PROXY = 'https://proxy-gitalk-api.netlify.app/github_access_token'
 const HOLIDAY_API_BASE = 'https://date.nager.at/api/v3/publicholidays'
 const HOLIDAY_COUNTRY = 'CN'
 
+// --- LeanCloud 配置 ---
+const LEAN_CLOUD_APP_ID = import.meta.env.VITE_LEAN_CLOUD_APP_ID || '4cWni4584Fa7s6Z32sy5f8RW-gzGzoHsz'
+const LEAN_CLOUD_APP_KEY = import.meta.env.VITE_LEAN_CLOUD_APP_KEY || 'WFmjqoR1qce9xeikiZv6ZAtW'
+const LEAN_CLOUD_SERVER_URL = import.meta.env.VITE_LEAN_CLOUD_SERVER_URL || 'https://4cwni458.lc-cn-n1-shared.com'
+
 // --- 缓存 TTL（毫秒） ---
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
@@ -63,6 +68,11 @@ export const config = {
   holiday: {
     apiBase: HOLIDAY_API_BASE,
     country: HOLIDAY_COUNTRY,
+  },
+  leancloud: {
+    appId: LEAN_CLOUD_APP_ID,
+    appKey: LEAN_CLOUD_APP_KEY,
+    serverURL: LEAN_CLOUD_SERVER_URL,
   },
   cache: {
     articlesTTL: ARTICLES_CACHE_TTL,

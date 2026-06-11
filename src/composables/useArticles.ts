@@ -7,6 +7,7 @@ import type { Article } from '@/types/article'
 import localArticles from '@/generated/_articles'
 import { developingProjects } from '@/data/projects'
 import { config } from '@/config'
+import { calculateReadingTime } from '@/composables/useReadingTime'
 
 const GITHUB_OWNER = config.github.owner
 const GITHUB_REPO = config.github.repo
@@ -26,7 +27,11 @@ const md = new MarkdownIt({
 })
 
 function loadLocalArticles(): Article[] {
-  return localArticles as Article[]
+  // 为每篇文章计算阅读时间
+  return localArticles.map((article) => ({
+    ...article,
+    readingTime: calculateReadingTime(article.content),
+  })) as Article[]
 }
 
 async function loadGitHubArticles(): Promise<Article[]> {
@@ -55,6 +60,7 @@ async function loadGitHubArticles(): Promise<Article[]> {
       tags: data.tags || [],
       description: data.description || '',
       cover: data.cover,
+      readingTime: calculateReadingTime(content),
     })
   }
 

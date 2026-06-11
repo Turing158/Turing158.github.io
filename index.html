@@ -43,5 +43,19 @@
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <script>
+      // PWA Service Worker 注册
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js', { scope: './' })
+            .then(registration => {
+              console.log('[PWA] Service Worker 注册成功:', registration.scope)
+            })
+            .catch(error => {
+              console.error('[PWA] Service Worker 注册失败:', error)
+            })
+        })
+      }
+    </script>
   </body>
 </html>

@@ -10,4 +10,5 @@ export interface Article extends ArticleFrontmatter {
   slug: string
   content: string
   html: string
+  readingTime?: number // 预计阅读时间（分钟）
 }

@@ -4,6 +4,8 @@
     <MainLayout />
     <BlogTipContainer />
     <PwaInstallPrompt />
+    <PwaUpdatePrompt />
+    <PwaOfflinePage v-if="!isOnline" />
   </div>
 </template>
 
@@ -12,6 +14,11 @@ import MainLayout from '@/layouts/MainLayout.vue'
 import ProgressBar from '@/components/common/ProgressBar.vue'
 import BlogTipContainer from '@/components/common/BlogTipContainer.vue'
 import PwaInstallPrompt from '@/components/common/PwaInstallPrompt.vue'
+import PwaUpdatePrompt from '@/components/common/PwaUpdatePrompt.vue'
+import PwaOfflinePage from '@/components/common/PwaOfflinePage.vue'
+import { useNetworkStatus } from '@/composables/useNetworkStatus'
+
+const { isOnline } = useNetworkStatus()
 </script>
 
 <style lang="less">

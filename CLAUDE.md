@@ -40,6 +40,7 @@ src/
   components/
     article/
       ArticleTOCDrawer.vue  # 文章目录抽屉（固定高度 + 操作区 + 滚动进度）
+      ShareButtons.vue      # 文章分享按钮（复制链接、微信、微博、Twitter）
     common/
       BlogDialog.vue        # 通用弹窗组件
       BlogInput.vue         # 通用输入框组件
@@ -49,6 +50,9 @@ src/
       ProgressBar.vue       # 页面加载进度条
       LoadingSpinner.vue    # 加载动画组件
       ResponsiveTime.vue    # 响应式时间组件
+      PwaInstallPrompt.vue  # PWA 安装提示
+      PwaUpdatePrompt.vue   # PWA 版本更新提示
+      PwaOfflinePage.vue    # PWA 离线降级页面
     search/
       SearchDialog.vue      # 搜索对话框
       SearchCard.vue        # 搜索结果卡片
@@ -64,14 +68,22 @@ src/
     ReleaseDetailView.vue   # 发行详情页
     ToolsView.vue           # 工具页
     AboutView.vue           # 关于页
+    NotFoundView.vue         # 404 页面未找到
+    ErrorView.vue           # 500 服务器错误
   composables/
     useArticles.ts          # 文章加载（本地 + GitHub API 双源）
     useGitalk.ts            # gitalk 评论初始化
     useHolidays.ts          # 节假日倒计时（nager.at API）
+    useGitalk.ts            # gitalk 评论初始化
+    useGitalkCount.ts       # Gitalk 评论计数
+    useNetworkStatus.ts     # 网络状态检测
+    usePwaUpdate.ts         # PWA 版本更新管理
     useReleases.ts          # 发行版本获取
     useSearch.ts            # 搜索功能
     useTheme.ts             # 主题切换 (forest / ocean / sunset)
     useTime.ts              # 时间格式化（相对时间 + 完整时间）
+    useViewCount.ts         # 文章浏览量（LeanCloud 存储）
+    useReadingTime.ts       # 文章阅读时间估算
   config.ts                 # 全局配置（从 .env 读取，含默认值）
   data/
     projects.ts             # 项目数据（开发中/已完成/教程/搁置）
@@ -180,6 +192,9 @@ Markdown 正文...
 | `VITE_GITHUB_REPO` | GitHub 仓库名 |
 | `VITE_GITALK_CLIENT_ID` | Gitalk OAuth App Client ID |
 | `VITE_GITALK_CLIENT_SECRET` | Gitalk OAuth App Client Secret |
+| `VITE_LEAN_CLOUD_APP_ID` | LeanCloud App ID（用于文章浏览量） |
+| `VITE_LEAN_CLOUD_APP_KEY` | LeanCloud App Key |
+| `VITE_LEAN_CLOUD_SERVER_URL` | LeanCloud 服务器地址 |
 
 ## 配置系统 (`src/config.ts`)
 
@@ -253,6 +268,116 @@ GitHub Actions 自动部署到 GitHub Pages (`.github/workflows/deploy.yml`)
 - `GITALK_CLIENT_ID` — Gitalk OAuth App Client ID
 - `GITALK_CLIENT_SECRET` — Gitalk OAuth App Client Secret
 
+## PWA 系统
+
+### 功能特性
+- **离线访问:** Service Worker 缓存静态资源和 API 响应
+- **版本更新:** 自动检测新版本并提示用户更新
+- **安装提示:** 支持添加到主屏幕（standalone 模式）
+- **离线降级:** 自定义离线页面，替代浏览器默认提示
+
+### 核心组件
+
+#### PwaInstallPrompt.vue (`src/components/common/PwaInstallPrompt.vue`)
+- 安装提示横幅，延迟 3 秒显示
+- 检测 `beforeinstallprompt` 事件
+- 支持 iOS Safari `standalone` 检测
+
+#### PwaUpdatePrompt.vue (`src/components/common/PwaUpdatePrompt.vue`)
+- 版本更新通知，右下角 toast 样式
+- 自动 10 秒后消失
+- 点击"立即更新"触发 SW 更新并刷新页面
+
+#### PwaOfflinePage.vue (`src/components/common/PwaOfflinePage.vue`)
+- 全屏离线降级页面
+- 显示离线图标和重试按钮
+- 支持主题切换（CSS 变量）
+- 包含装饰性动画效果
+
+### Composables
+
+#### useNetworkStatus.ts (`src/composables/useNetworkStatus.ts`)
+- 监听 `online` / `offline` 事件
+- 提供响应式 `isOnline` 状态
+- 自动清理事件监听器
+
+#### usePwaUpdate.ts (`src/composables/usePwaUpdate.ts`)
+- 使用 `virtual:pwa-register/vue` 的 `useRegisterSW`
+- 监听 `onNeedRefresh` 和 `onOfflineReady` 事件
+- 提供 `triggerUpdate()` 方法激活新版本
+
+### 配置 (vite.config.ts)
+```typescript
+VitePWA({
+  registerType: 'autoUpdate',  // 自动更新 SW
+  workbox: {
+    navigateFallback: 'index.html',  // SPA 离线回退
+    navigateFallbackDenylist: [/^\/api\//],  // 排除 API 请求
+    runtimeCaching: [/* 缓存策略 */]
+  }
+})
+```
+
+### 缓存策略
+- **字体:** CacheFirst，1 年过期
+- **图片:** CacheFirst，30 天过期，最多 60 个
+- **GitHub API:** NetworkFirst，5 分钟过期，超时 10 秒
+
+## 文章浏览量系统
+
+使用 LeanCloud 作为后端存储，实现文章浏览计数功能：
+
+### 数据模型
+- **Class 名称:** `ArticleViewCount`
+- **字段:**
+  - `slug` (String): 文章标识
+  - `count` (Number): 浏览次数
+
+### 环境变量
+需要在 `.env` 或部署平台配置：
+```env
+VITE_LEAN_CLOUD_APP_ID=your-app-id
+VITE_LEAN_CLOUD_APP_KEY=your-app-key
+VITE_LEAN_CLOUD_SERVER_URL=https://your-domain.lc-cn-n1-shared.com
+```
+
+### 功能说明
+- 文章详情页访问时自动增加浏览量
+- 文章列表页显示每篇文章的浏览量
+- 使用内存缓存减少 API 请求
+- 支持国际化显示（中文："次浏览"，英文："views"）
+
+## 文章阅读时间估算
+
+根据文章字数计算预计阅读时间：
+- **中文：** 约 300 字/分钟
+- **英文：** 约 200 词/分钟
+
+### 计算逻辑
+1. 移除 Markdown 语法（代码块、链接、图片、标题标记等）
+2. 统计中文字符数和英文单词数
+3. 分别计算阅读时间后求和
+4. 最少显示 1 分钟
+
+### 显示位置
+- 文章列表页：每张文章卡片显示时钟图标 + "X 分钟阅读"
+- 文章详情页：标题下方显示
+
+## 注意事项
+
+## 浏览量数字格式化
+
+根据浏览量大小自动调整显示格式：
+
+| 范围 | 显示格式 | 示例 |
+|------|---------|------|
+| < 1万 | 原始数字 | 9,999 |
+| 1万 - 10万 | 万 + 4位小数 | 1.2345 万 |
+| 10万 - 100万 | 万 + 3位小数 | 12.345 万 |
+| 100万 - 1000万 | 万 + 2位小数 | 123.45 万 |
+| 1000万 - 1亿 | 万 + 1位小数 | 1234.5 万 |
+| ≥ 1亿 | 亿 + 1位小数 | 1.2 亿 |
+
 ## 注意事项
 
 - 路径分隔符使用 Windows 风格 (`\`)，但代码中使用 `/`
@@ -261,3 +386,4 @@ GitHub Actions 自动部署到 GitHub Pages (`.github/workflows/deploy.yml`)
 - 节假日数据来自 `https://date.nager.at/api/v3/publicholidays/{year}/CN`
 - 项目追踪的仓库：`StarFall-Minecraft-Launcher`
 - 文章插件会在构建时自动生成 `src/generated/_articles.ts`，**不要手动编辑此文件**
+- PWA 功能需要 HTTPS 环境（开发环境 localhost 除外）

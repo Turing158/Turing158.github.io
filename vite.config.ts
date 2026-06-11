@@ -56,6 +56,13 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB，允许大文件缓存
+        // SPA 离线回退：导航请求失败时返回 index.html
+        navigateFallback: 'index.html',
+        // 排除不需要回退的路径（如 API 请求）
+        navigateFallbackDenylist: [
+          /^\/api\//, // GitHub API 请求
+          /^\/icons\//, // 图标文件已在 precache 中
+        ],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
