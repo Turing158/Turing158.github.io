@@ -295,7 +295,7 @@ import '@/styles/gitalk-theme.css'
 
 // SEO
 usePageSeo(
-  computed(() => `${config.blog.title} | Blog`),
+  computed(() => config.blog.title),
   'Turing_ICE 的个人博客，分享技术文章、开发工具和学习笔记',
   '#/'
 )
