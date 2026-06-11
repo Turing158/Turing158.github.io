@@ -1,16 +1,20 @@
 <template>
   <div id="app-root">
     <ProgressBar />
-    <MainLayout />
+    <MainLayout v-if="!isStandalone" />
+    <StandaloneLayout v-else />
     <BlogTipContainer />
-    <PwaInstallPrompt />
-    <PwaUpdatePrompt />
-    <PwaOfflinePage v-if="!isOnline" />
+    <PwaInstallPrompt v-if="!isStandalone" />
+    <PwaUpdatePrompt v-if="!isStandalone" />
+    <PwaOfflinePage v-if="!isStandalone && !isOnline" />
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import MainLayout from '@/layouts/MainLayout.vue'
+import StandaloneLayout from '@/layouts/StandaloneLayout.vue'
 import ProgressBar from '@/components/common/ProgressBar.vue'
 import BlogTipContainer from '@/components/common/BlogTipContainer.vue'
 import PwaInstallPrompt from '@/components/common/PwaInstallPrompt.vue'
@@ -19,6 +23,9 @@ import PwaOfflinePage from '@/components/common/PwaOfflinePage.vue'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 
 const { isOnline } = useNetworkStatus()
+
+const route = useRoute()
+const isStandalone = computed(() => route.meta.layout === 'standalone')
 </script>
 
 <style lang="less">

@@ -82,6 +82,19 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pageTitle.error' },
     props: true,
   },
+  // ===== 独立页面（layout: 'standalone'，不渲染 MainLayout）=====
+  {
+    path: '/sfmc',
+    name: 'sfmc',
+    component: () => import('@/views/standalone/SfmcLandingView.vue'),
+    meta: { layout: 'standalone', titleKey: 'pageTitle.sfmc' },
+  },
+  {
+    path: '/starfall-forum',
+    name: 'starfall-forum',
+    component: () => import('@/views/standalone/StarFallForumView.vue'),
+    meta: { layout: 'standalone', titleKey: 'pageTitle.starfallForum' },
+  },
   // 404 通配符路由（必须放在最后）
   {
     path: '/:pathMatch(.*)*',
@@ -119,6 +132,12 @@ router.beforeEach((to) => {
   }
 
   const { titleTemplate, title: blogTitle } = config.blog
+  // 独立页面不套用博客标题模板，直接使用完整产品名
+  if (to.meta.layout === 'standalone') {
+    document.title = pageTitle
+    progressListeners.forEach(l => l.onStart())
+    return
+  }
   document.title = titleTemplate
     .replace('{current_page}', pageTitle)
     .replace('{blog_title}', blogTitle)
@@ -135,6 +154,9 @@ export function updateDocumentTitle(pageTitle: string) {
 
 router.afterEach((to) => {
   progressListeners.forEach(l => l.onDone())
+
+  // 独立页面跳过全局 SEO（useSeo 会套用博客标题模板和主题色），由页面自行 useHead
+  if (to.meta.layout === 'standalone') return
 
   // 为每个页面设置默认 SEO
   const titleKey = to.meta.titleKey as string | undefined

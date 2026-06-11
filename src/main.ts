@@ -27,4 +27,5 @@ app.use(head)
 const { initTheme } = useTheme()
 initTheme()
 
-app.mount('#app')
+// 等待初始路由解析完成再挂载，避免独立页面硬刷新时闪现 MainLayout
+router.isReady().then(() => app.mount('#app'))

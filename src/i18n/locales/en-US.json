@@ -406,7 +406,9 @@
     "commits": "Commits",
     "responsiveTimeDemo": "Responsive Time Component Demo",
     "notFound": "Page Not Found",
-    "error": "Server Error"
+    "error": "Server Error",
+    "sfmc": "StarFall Minecraft Launcher",
+    "starfallForum": "StarFall Minecraft Forum"
   },
   "pageReleases": {
     "title": "Release Detail",
@@ -448,5 +450,65 @@
       "noData": "No data",
       "loading": "Loading..."
     }
+  },
+  "sfmc": {
+    "tagline": "Light as a star, fast as the wind",
+    "subTagline": "A clean and fast Minecraft launcher for Windows",
+    "download": "Download Latest",
+    "viewOnGithub": "View on GitHub",
+    "allReleases": "All Releases",
+    "latestVersion": "Latest Version",
+    "loadingRelease": "Fetching latest release…",
+    "releaseError": "Failed to fetch release info, download from GitHub instead",
+    "featuresTitle": "Features",
+    "features": {
+      "versions": { "title": "Version Management", "desc": "Install, switch and isolate multiple Minecraft versions" },
+      "accounts": { "title": "Multiple Accounts", "desc": "Microsoft login and offline accounts, switch freely" },
+      "java": { "title": "Java Auto-Detection", "desc": "Automatically discovers and matches the right Java runtime" },
+      "speed": { "title": "Fast Downloads", "desc": "Multi-threaded downloads with mirror acceleration" },
+      "light": { "title": "Native & Lightweight", "desc": "Built natively in C#, low footprint, instant startup" },
+      "ui": { "title": "Clean Interface", "desc": "Fresh and intuitive UI, works out of the box" }
+    },
+    "screenshotTitle": "Screenshots",
+    "screenshotPlaceholder": "Screenshots coming soon",
+    "requirements": "Windows 7+ · .NET runtime required",
+    "backToBlog": "Back to Blog",
+    "footerNote": "Developed by Turing158"
+  },
+  "forum": {
+    "fullName": "StarFall-Minecraft-Forum",
+    "tagline": "A community forum for Minecraft players",
+    "subTagline": "A full-stack forum system built with Vue 3 + Spring Boot, a clean and efficient open-source community solution",
+    "viewFrontend": "View Frontend",
+    "viewBackend": "View Backend",
+    "viewRepo": "View Repo",
+    "viewCommits": "Commits",
+    "introTitle": "Introduction",
+    "introDesc": "StarFall-Minecraft-Forum is a community forum system designed specifically for Minecraft players. The frontend is built with Vue 3 + TypeScript, and the backend is developed with Spring Boot, implementing a modern frontend-backend separation architecture. The system provides core features such as forum post management, user system, comment interaction, message notifications, and search functionality, providing a quality platform for Minecraft players to exchange ideas and share experiences.",
+    "reposTitle": "Open Source Repositories",
+    "frontendDesc": "StarFall-vue is the frontend part of the project, built with Vue 3 + TypeScript, using Element Plus component library to provide a modern user interface and smooth interactive experience.",
+    "backendDesc": "StarFall-SpringBoot is the backend part of the project, developed with Spring Boot framework, using MySQL database for data storage, providing RESTful API interface services.",
+    "featuresTitle": "Features",
+    "features": {
+      "forum": { "title": "Forum Management", "desc": "Board classification, post publishing, sticky highlights, permission control and other complete forum features" },
+      "user": { "title": "User System", "desc": "User registration and login, personal profile, avatar and nickname, points and levels and other social features" },
+      "post": { "title": "Post System", "desc": "Rich text editor, image upload, Markdown support, draft saving and other content creation features" },
+      "comment": { "title": "Comment Interaction", "desc": "Comment replies, likes and favorites, @mentions and other interactive features to promote community communication" },
+      "notification": { "title": "Notifications", "desc": "System notifications, private messages, comment reply reminders and other real-time messaging features" },
+      "search": { "title": "Search", "desc": "Full-text search, keyword highlighting, filtering and sorting and other efficient content retrieval features" }
+    },
+    "techStackTitle": "Tech Stack",
+    "frontendStack": "Frontend",
+    "backendStack": "Backend",
+    "ackTitle": "Acknowledgements",
+    "ackMcbbs": "Thanks to MCBBS for the theme inspiration and resources. Please contact us if there are any copyright issues",
+    "ackRoommates": "Thanks to my roommates for helping test and providing valuable feedback during development",
+    "ackAdvisor": "Thanks to my thesis advisor for the guidance that helped me graduate and complete this project",
+    "ackMilktea": "Thanks to Lao Ji (rewarding him with a milk tea 🧋)",
+    "backToBlog": "Back to Blog",
+    "footerNote": "Developed by Turing158 · Minecraft Forum",
+    "notice": "This project was built while learning Java, Spring Boot, and Vue. My skills were limited at the time — it later became my graduation project. The functionality may not be fully polished. Feel free to open Issues on GitHub.",
+    "noticeDismiss": "Don't show again",
+    "noticeClose": "Close"
   }
 }
