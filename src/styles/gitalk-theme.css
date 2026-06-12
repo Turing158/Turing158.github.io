@@ -894,3 +894,1987 @@
     animation-duration: 0.01ms !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14. SFMC 页面主题 — 像素风 / Minecraft 洞穴绿风格
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* 根容器 — 像素字体 + 深色系 */
+.sfmc-page .gt-container {
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace !important;
+  font-size: 16px;
+  color: #E8E8E8;
+  letter-spacing: 0.5px;
+}
+
+/* 链接 */
+.sfmc-page .gt-container a {
+  color: #50C878;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.sfmc-page .gt-container a:hover {
+  color: #7dd890;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.1 头部区域
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-meta {
+  margin: 0 0 1em;
+  padding: 0 0 0.75em;
+  border-bottom: 3px solid #3d3d3d;
+  font-size: 0.95em;
+}
+
+.sfmc-page .gt-container .gt-counts {
+  color: #A0A0A0;
+  font-size: 0.9em;
+}
+
+.sfmc-page .gt-container .gt-counts .gt-link-counts {
+  color: #50C878;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* 用户信息 */
+.sfmc-page .gt-container .gt-user {
+  font-size: 0.85em;
+}
+
+.sfmc-page .gt-container .gt-user-inner {
+  color: #E8E8E8;
+  font-weight: 500;
+}
+
+.sfmc-page .gt-container .gt-user-inner:hover {
+  color: #50C878;
+}
+
+.sfmc-page .gt-container .gt-user-name {
+  color: #E8E8E8;
+}
+
+/* 用户下拉菜单 */
+.sfmc-page .gt-container .gt-popup {
+  background: #2a2a2a;
+  border: 3px solid #3d3d3d;
+  border-radius: 0;
+  padding: 0.25em 0;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  animation: gt-fade-in 0.15s ease;
+}
+
+.sfmc-page .gt-container .gt-popup .gt-action {
+  padding: 0.5em 1.25em;
+  color: #E8E8E8;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.sfmc-page .gt-container .gt-popup .gt-action:hover {
+  background: #1a1a1a;
+  color: #50C878;
+}
+
+.sfmc-page .gt-container .gt-popup .gt-action.is--active {
+  color: #50C878;
+}
+
+.sfmc-page .gt-container .gt-popup .gt-action-text {
+  color: #A0A0A0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.2 输入区域 — 像素风方块输入框
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.sfmc-page .gt-container .gt-header-comment {
+  flex: 1;
+  margin-left: 1em;
+}
+
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-header-comment {
+    margin-left: 0.75em;
+  }
+}
+
+/* 输入框 — 粗边框 + 方块风格 */
+.sfmc-page .gt-container .gt-header-textarea {
+  padding: 12px 16px;
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  max-height: 240px;
+  border-radius: 0;
+  border: 3px solid #3d3d3d;
+  border-bottom-width: 5px;
+  font-size: 1rem;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  font-weight: 400;
+  line-height: 1.6;
+  word-wrap: break-word;
+  resize: vertical;
+  background: #1a1a1a;
+  color: #E8E8E8;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.3), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-page .gt-container .gt-header-textarea::placeholder {
+  color: #707070;
+  opacity: 0.8;
+}
+
+.sfmc-page .gt-container .gt-header-textarea:hover {
+  border-color: #505050;
+}
+
+.sfmc-page .gt-container .gt-header-textarea:focus {
+  border-color: #50C878;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.03),
+    0 0 0 3px rgba(80, 200, 120, 0.15);
+}
+
+/* 预览区域 */
+.sfmc-page .gt-container .gt-header-preview {
+  padding: 12px 16px;
+  border-radius: 0;
+  border: 3px solid #3d3d3d;
+  background: #1a1a1a;
+  color: #E8E8E8;
+  font-size: 1rem;
+  line-height: 1.6;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.3), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.3 按钮 — Minecraft 物品栏风格
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-header-controls {
+  margin: 0.75em 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.sfmc-page .gt-container .gt-header-controls-tip {
+  font-size: 0.85rem;
+  color: #50C878;
+  opacity: 0.8;
+  margin-right: auto;
+}
+
+.sfmc-page .gt-container .gt-header-controls-tip:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-header-controls-tip {
+    display: none;
+  }
+}
+
+/* 基础按钮 — 粗边框 + 底部阴影 */
+.sfmc-page .gt-container .gt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+  border: 3px solid #3d3d3d;
+  border-bottom-width: 5px;
+  outline: none;
+  transition: all 0.1s ease;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
+/* Primary 按钮 — 发布 / 登录 */
+.sfmc-page .gt-container .gt-btn-public,
+.sfmc-page .gt-container .gt-btn-login {
+  background: linear-gradient(180deg, #50C878 0%, #3da860 100%);
+  color: #E8E8E8;
+  border-color: #2d7a48;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sfmc-page .gt-container .gt-btn-public:hover:not(:disabled),
+.sfmc-page .gt-container .gt-btn-login:hover:not(:disabled) {
+  background: linear-gradient(180deg, #60d888 0%, #50C878 100%);
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.sfmc-page .gt-container .gt-btn-public:active:not(:disabled),
+.sfmc-page .gt-container .gt-btn-login:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* Default 按钮 — 预览 */
+.sfmc-page .gt-container .gt-btn-preview {
+  background: #1a1a1a;
+  color: #E8E8E8;
+  border-color: #3d3d3d;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-page .gt-container .gt-btn-preview:hover:not(:disabled) {
+  background: #2a2a2a;
+  border-color: #505050;
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.sfmc-page .gt-container .gt-btn-preview:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* 按钮禁用 */
+.sfmc-page .gt-container .gt-btn.is--disable,
+.sfmc-page .gt-container .gt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+}
+
+/* 按钮加载 spinner */
+.sfmc-page .gt-container .gt-btn-loading {
+  margin-left: 0.5em;
+  width: 0.75em;
+  height: 1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.4 头像
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.sfmc-page .gt-container .gt-avatar img {
+  border-radius: 0;
+  border: 2px solid #3d3d3d;
+  transition: transform 0.2s ease, border-color 0.15s ease;
+  image-rendering: pixelated;
+}
+
+.sfmc-page .gt-container .gt-avatar img:hover {
+  transform: scale(1.08);
+  border-color: #50C878;
+}
+
+.sfmc-page .gt-container .gt-avatar-github {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-avatar-github {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.5 评论列表
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-comments {
+  padding-top: 0.5em;
+}
+
+.sfmc-page .gt-container .gt-comments-null {
+  text-align: center;
+  padding: 2em 0;
+  color: #707070;
+  font-size: 1em;
+}
+
+.sfmc-page .gt-container .gt-comments-controls {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+/* 单条评论 */
+.sfmc-page .gt-container .gt-comment {
+  padding: 0.75em 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 评论内容卡片 — 方块风格 */
+.sfmc-page .gt-container .gt-comment-content {
+  flex: 1;
+  margin-left: 1em;
+  padding: 14px 18px;
+  background: #2a2a2a;
+  border: 3px solid #3d3d3d;
+  border-bottom-width: 5px;
+  border-radius: 0;
+  overflow: auto;
+  transition: all 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-page .gt-container .gt-comment-content:hover {
+  border-color: #505050;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.03),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-comment-content {
+    margin-left: 0.75em;
+    padding: 10px 14px;
+  }
+}
+
+/* 管理员评论 — 左侧绿色竖线 */
+.sfmc-page .gt-container .gt-comment-admin .gt-comment-content {
+  border-left: 3px solid #50C878;
+}
+
+/* 评论头部 */
+.sfmc-page .gt-container .gt-comment-header {
+  margin-bottom: 0.5em;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sfmc-page .gt-container .gt-comment-username {
+  font-weight: 700;
+  color: #50C878;
+  text-decoration: none;
+  font-size: 0.95em;
+}
+
+.sfmc-page .gt-container .gt-comment-username:hover {
+  color: #7dd890;
+  text-decoration: underline;
+}
+
+.sfmc-page .gt-container .gt-comment-text {
+  color: #A0A0A0;
+  font-size: 0.85em;
+}
+
+.sfmc-page .gt-container .gt-comment-date {
+  color: #707070;
+  font-size: 0.8em;
+}
+
+/* 评论正文 */
+.sfmc-page .gt-container .gt-comment-body {
+  color: #E8E8E8 !important;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* 评论正文 markdown */
+.sfmc-page .gt-container .gt-comment-body .markdown-body {
+  background: transparent !important;
+  color: #E8E8E8 !important;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.sfmc-page .gt-container .gt-comment-body .markdown-body p {
+  margin-bottom: 0.5em;
+}
+
+.sfmc-page .gt-container .gt-comment-body .markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.sfmc-page .gt-container .gt-comment-body .markdown-body pre {
+  background: #1a1a1a !important;
+  border-radius: 0;
+  border: 2px solid #3d3d3d;
+}
+
+.sfmc-page .gt-container .gt-comment-body .markdown-body code {
+  background: #1a1a1a !important;
+  color: #E8E8E8;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+}
+
+.sfmc-page .gt-container .gt-comment-body .markdown-body blockquote {
+  border-left-color: #50C878 !important;
+  color: #A0A0A0;
+}
+
+/* 评论操作按钮 */
+.sfmc-page .gt-container .gt-comment-like,
+.sfmc-page .gt-container .gt-comment-edit,
+.sfmc-page .gt-container .gt-comment-reply {
+  height: 1.5em;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.sfmc-page .gt-container .gt-comment:hover .gt-comment-like,
+.sfmc-page .gt-container .gt-comment:hover .gt-comment-edit,
+.sfmc-page .gt-container .gt-comment:hover .gt-comment-reply {
+  opacity: 1;
+}
+
+.sfmc-page .gt-container .gt-comment-like:hover,
+.sfmc-page .gt-container .gt-comment-edit:hover,
+.sfmc-page .gt-container .gt-comment-reply:hover {
+  cursor: pointer;
+  color: #50C878;
+  transform: scale(1.15);
+}
+
+.sfmc-page .gt-container .gt-comment-like {
+  top: 14px;
+  right: 5em;
+}
+
+.sfmc-page .gt-container .gt-comment-edit {
+  top: 14px;
+  right: 3em;
+}
+
+.sfmc-page .gt-container .gt-comment-reply {
+  top: 14px;
+  right: 1em;
+}
+
+.sfmc-page .gt-container .gt-comment-like .gt-svg svg,
+.sfmc-page .gt-container .gt-comment-edit .gt-svg svg,
+.sfmc-page .gt-container .gt-comment-reply .gt-svg svg {
+  fill: #A0A0A0;
+  transition: fill 0.15s ease;
+}
+
+.sfmc-page .gt-container .gt-comment-like:hover .gt-svg svg,
+.sfmc-page .gt-container .gt-comment-edit:hover .gt-svg svg,
+.sfmc-page .gt-container .gt-comment-reply:hover .gt-svg svg {
+  fill: #50C878;
+}
+
+.sfmc-page .gt-container .gt-comment-like.is--active .gt-svg svg {
+  fill: #50C878;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.6 错误 & 加载状态
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-error {
+  text-align: center;
+  margin: 0.75em 0;
+  color: #DAA520;
+  font-size: 0.95em;
+  padding: 0.75em 1em;
+  background: rgba(218, 165, 32, 0.08);
+  border: 2px solid rgba(218, 165, 32, 0.25);
+  border-radius: 0;
+}
+
+.sfmc-page .gt-container .gt-initing {
+  padding: 2em 0;
+  text-align: center;
+  color: #A0A0A0;
+}
+
+.sfmc-page .gt-container .gt-initing-text {
+  margin: 0.75em auto;
+  font-size: 0.95em;
+  color: #A0A0A0;
+}
+
+.sfmc-page .gt-container .gt-no-init {
+  padding: 2em 0;
+  text-align: center;
+  color: #A0A0A0;
+  font-size: 0.95em;
+}
+
+/* 加载旋转动画 */
+.sfmc-page .gt-container .gt-spinner::before {
+  border: 2px solid #3d3d3d;
+  border-top-color: #50C878;
+}
+
+.sfmc-page .gt-container .gt-loader {
+  border: 2px solid #3d3d3d;
+}
+
+.sfmc-page .gt-container .gt-loader::before {
+  background-color: #50C878;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.7 聚焦遮罩
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container.gt-input-focused::after {
+  background: #1a1a1a;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.8 链接 & 版权
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-link {
+  border-bottom: 1px dotted #50C878;
+}
+
+.sfmc-page .gt-container .gt-copyright {
+  margin: 1.5em 0 0.5em;
+  border-top: 2px solid #3d3d3d;
+  padding-top: 0.75em;
+  font-size: 0.8em;
+  color: #707070;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.9 SVG 图标
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-svg svg {
+  fill: currentColor;
+}
+
+.sfmc-page .gt-container .gt-user .is--poping .gt-svg svg {
+  fill: #50C878;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.10 版本号
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-page .gt-container .gt-version {
+  color: #707070;
+  opacity: 0.5;
+  margin-left: 0.25em;
+  font-size: 0.85em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.11 响应式适配
+ * ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 479px) {
+  .sfmc-page .gt-container .gt-header-controls {
+    margin: 0.5em 0 0;
+    flex-wrap: wrap;
+  }
+
+  .sfmc-page .gt-container .gt-header-controls .gt-btn {
+    float: none;
+    flex: 1;
+    margin: 0;
+  }
+
+  .sfmc-page .gt-container .gt-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .sfmc-page .gt-container .gt-comment-like,
+  .sfmc-page .gt-container .gt-comment-edit,
+  .sfmc-page .gt-container .gt-comment-reply {
+    opacity: 0.6;
+  }
+
+  .sfmc-page .gt-container .gt-comment-like {
+    right: 4.5em;
+  }
+
+  .sfmc-page .gt-container .gt-comment-edit {
+    right: 2.5em;
+  }
+
+  .sfmc-page .gt-container .gt-comment-reply {
+    right: 0.5em;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 14.12 动画
+ * ═══════════════════════════════════════════════════════════════ */
+@keyframes gt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sfmc-page .gt-container .gt-comment {
+  animation: gt-fade-in 0.25s ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sfmc-page .gt-container .gt-comment,
+  .sfmc-page .gt-container .gt-popup {
+    animation: none;
+  }
+
+  .sfmc-page .gt-container *,
+  .sfmc-page .gt-container *::before,
+  .sfmc-page .gt-container *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15. StarFall Forum 页面主题 — 暖色像素风 / Minecraft 泥土风格
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* 根容器 — 暖色像素字体 */
+.forum-page .gt-container {
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace !important;
+  font-size: 16px;
+  color: #e8dcc8;
+  letter-spacing: 0.5px;
+}
+
+/* 链接 */
+.forum-page .gt-container a {
+  color: #c9a227;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.forum-page .gt-container a:hover {
+  color: #e0b830;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.1 头部区域
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-meta {
+  margin: 0 0 1em;
+  padding: 0 0 0.75em;
+  border-bottom: 3px solid #2a1c0e;
+  font-size: 0.95em;
+}
+
+.forum-page .gt-container .gt-counts {
+  color: #a89880;
+  font-size: 0.9em;
+}
+
+.forum-page .gt-container .gt-counts .gt-link-counts {
+  color: #c9a227;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* 用户信息 */
+.forum-page .gt-container .gt-user {
+  font-size: 0.85em;
+}
+
+.forum-page .gt-container .gt-user-inner {
+  color: #e8dcc8;
+  font-weight: 500;
+}
+
+.forum-page .gt-container .gt-user-inner:hover {
+  color: #c9a227;
+}
+
+.forum-page .gt-container .gt-user-name {
+  color: #e8dcc8;
+}
+
+/* 用户下拉菜单 */
+.forum-page .gt-container .gt-popup {
+  background: #3d3d3d;
+  border: 3px solid #2a1c0e;
+  border-radius: 0;
+  padding: 0.25em 0;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  animation: gt-fade-in 0.15s ease;
+}
+
+.forum-page .gt-container .gt-popup .gt-action {
+  padding: 0.5em 1.25em;
+  color: #e8dcc8;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.forum-page .gt-container .gt-popup .gt-action:hover {
+  background: #2a1c0e;
+  color: #c9a227;
+}
+
+.forum-page .gt-container .gt-popup .gt-action.is--active {
+  color: #c9a227;
+}
+
+.forum-page .gt-container .gt-popup .gt-action-text {
+  color: #a89880;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.2 输入区域 — 泥土色方块输入框
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.forum-page .gt-container .gt-header-comment {
+  flex: 1;
+  margin-left: 1em;
+}
+
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-header-comment {
+    margin-left: 0.75em;
+  }
+}
+
+/* 输入框 — 粗边框 + 泥土色 */
+.forum-page .gt-container .gt-header-textarea {
+  padding: 12px 16px;
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  max-height: 240px;
+  border-radius: 0;
+  border: 3px solid #2a1c0e;
+  border-bottom-width: 5px;
+  font-size: 1rem;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  font-weight: 400;
+  line-height: 1.6;
+  word-wrap: break-word;
+  resize: vertical;
+  background: #3d3d3d;
+  color: #e8dcc8;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+}
+
+.forum-page .gt-container .gt-header-textarea::placeholder {
+  color: #a89880;
+  opacity: 0.6;
+}
+
+.forum-page .gt-container .gt-header-textarea:hover {
+  border-color: #5a4a3a;
+}
+
+.forum-page .gt-container .gt-header-textarea:focus {
+  border-color: #c9a227;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 3px rgba(201, 162, 39, 0.15);
+}
+
+/* 预览区域 */
+.forum-page .gt-container .gt-header-preview {
+  padding: 12px 16px;
+  border-radius: 0;
+  border: 3px solid #2a1c0e;
+  background: #3d3d3d;
+  color: #e8dcc8;
+  font-size: 1rem;
+  line-height: 1.6;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.3 按钮 — Minecraft 草地/木头风格
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-header-controls {
+  margin: 0.75em 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.forum-page .gt-container .gt-header-controls-tip {
+  font-size: 0.85rem;
+  color: #c9a227;
+  opacity: 0.8;
+  margin-right: auto;
+}
+
+.forum-page .gt-container .gt-header-controls-tip:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-header-controls-tip {
+    display: none;
+  }
+}
+
+/* 基础按钮 — 粗边框 + 底部阴影 */
+.forum-page .gt-container .gt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+  border: 3px solid #2a1c0e;
+  border-bottom-width: 5px;
+  outline: none;
+  transition: all 0.1s ease;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
+/* Primary 按钮 — 草地绿 */
+.forum-page .gt-container .gt-btn-public,
+.forum-page .gt-container .gt-btn-login {
+  background: #4a7c3f;
+  color: #e8dcc8;
+  border-color: #3a5c2f;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.forum-page .gt-container .gt-btn-public:hover:not(:disabled),
+.forum-page .gt-container .gt-btn-login:hover:not(:disabled) {
+  background: #5a8c4f;
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.forum-page .gt-container .gt-btn-public:active:not(:disabled),
+.forum-page .gt-container .gt-btn-login:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* Default 按钮 — 石头色预览 */
+.forum-page .gt-container .gt-btn-preview {
+  background: #3d3d3d;
+  color: #e8dcc8;
+  border-color: #2a1c0e;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+}
+
+.forum-page .gt-container .gt-btn-preview:hover:not(:disabled) {
+  background: #5a5a5a;
+  border-color: #5a4a3a;
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.forum-page .gt-container .gt-btn-preview:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* 按钮禁用 */
+.forum-page .gt-container .gt-btn.is--disable,
+.forum-page .gt-container .gt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+}
+
+/* 按钮加载 spinner */
+.forum-page .gt-container .gt-btn-loading {
+  margin-left: 0.5em;
+  width: 0.75em;
+  height: 1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.4 头像
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.forum-page .gt-container .gt-avatar img {
+  border-radius: 0;
+  border: 2px solid #2a1c0e;
+  transition: transform 0.2s ease, border-color 0.15s ease;
+  image-rendering: pixelated;
+}
+
+.forum-page .gt-container .gt-avatar img:hover {
+  transform: scale(1.08);
+  border-color: #c9a227;
+}
+
+.forum-page .gt-container .gt-avatar-github {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-avatar-github {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.5 评论列表
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-comments {
+  padding-top: 0.5em;
+}
+
+.forum-page .gt-container .gt-comments-null {
+  text-align: center;
+  padding: 2em 0;
+  color: #a89880;
+  font-size: 1em;
+}
+
+.forum-page .gt-container .gt-comments-controls {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+/* 单条评论 */
+.forum-page .gt-container .gt-comment {
+  padding: 0.75em 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 评论内容卡片 — 石头色方块 */
+.forum-page .gt-container .gt-comment-content {
+  flex: 1;
+  margin-left: 1em;
+  padding: 14px 18px;
+  background: #3d3d3d;
+  border: 3px solid #2a1c0e;
+  border-bottom-width: 5px;
+  border-radius: 0;
+  overflow: auto;
+  transition: all 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+}
+
+.forum-page .gt-container .gt-comment-content:hover {
+  border-color: #5a4a3a;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-comment-content {
+    margin-left: 0.75em;
+    padding: 10px 14px;
+  }
+}
+
+/* 管理员评论 — 左侧金色竖线 */
+.forum-page .gt-container .gt-comment-admin .gt-comment-content {
+  border-left: 3px solid #c9a227;
+}
+
+/* 评论头部 */
+.forum-page .gt-container .gt-comment-header {
+  margin-bottom: 0.5em;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.forum-page .gt-container .gt-comment-username {
+  font-weight: 700;
+  color: #c9a227;
+  text-decoration: none;
+  font-size: 0.95em;
+}
+
+.forum-page .gt-container .gt-comment-username:hover {
+  color: #e0b830;
+  text-decoration: underline;
+}
+
+.forum-page .gt-container .gt-comment-text {
+  color: #a89880;
+  font-size: 0.85em;
+}
+
+.forum-page .gt-container .gt-comment-date {
+  color: #a89880;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+/* 评论正文 */
+.forum-page .gt-container .gt-comment-body {
+  color: #e8dcc8 !important;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* 评论正文 markdown */
+.forum-page .gt-container .gt-comment-body .markdown-body {
+  background: transparent !important;
+  color: #e8dcc8 !important;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.forum-page .gt-container .gt-comment-body .markdown-body p {
+  margin-bottom: 0.5em;
+}
+
+.forum-page .gt-container .gt-comment-body .markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.forum-page .gt-container .gt-comment-body .markdown-body pre {
+  background: #2a1c0e !important;
+  border-radius: 0;
+  border: 2px solid #2a1c0e;
+}
+
+.forum-page .gt-container .gt-comment-body .markdown-body code {
+  background: #2a1c0e !important;
+  color: #e8dcc8;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+}
+
+.forum-page .gt-container .gt-comment-body .markdown-body blockquote {
+  border-left-color: #c9a227 !important;
+  color: #a89880;
+}
+
+/* 评论操作按钮 */
+.forum-page .gt-container .gt-comment-like,
+.forum-page .gt-container .gt-comment-edit,
+.forum-page .gt-container .gt-comment-reply {
+  height: 1.5em;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.forum-page .gt-container .gt-comment:hover .gt-comment-like,
+.forum-page .gt-container .gt-comment:hover .gt-comment-edit,
+.forum-page .gt-container .gt-comment:hover .gt-comment-reply {
+  opacity: 1;
+}
+
+.forum-page .gt-container .gt-comment-like:hover,
+.forum-page .gt-container .gt-comment-edit:hover,
+.forum-page .gt-container .gt-comment-reply:hover {
+  cursor: pointer;
+  color: #c9a227;
+  transform: scale(1.15);
+}
+
+.forum-page .gt-container .gt-comment-like {
+  top: 14px;
+  right: 5em;
+}
+
+.forum-page .gt-container .gt-comment-edit {
+  top: 14px;
+  right: 3em;
+}
+
+.forum-page .gt-container .gt-comment-reply {
+  top: 14px;
+  right: 1em;
+}
+
+.forum-page .gt-container .gt-comment-like .gt-svg svg,
+.forum-page .gt-container .gt-comment-edit .gt-svg svg,
+.forum-page .gt-container .gt-comment-reply .gt-svg svg {
+  fill: #a89880;
+  transition: fill 0.15s ease;
+}
+
+.forum-page .gt-container .gt-comment-like:hover .gt-svg svg,
+.forum-page .gt-container .gt-comment-edit:hover .gt-svg svg,
+.forum-page .gt-container .gt-comment-reply:hover .gt-svg svg {
+  fill: #c9a227;
+}
+
+.forum-page .gt-container .gt-comment-like.is--active .gt-svg svg {
+  fill: #c9a227;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.6 错误 & 加载状态
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-error {
+  text-align: center;
+  margin: 0.75em 0;
+  color: #c9a227;
+  font-size: 0.95em;
+  padding: 0.75em 1em;
+  background: rgba(201, 162, 39, 0.08);
+  border: 2px solid rgba(201, 162, 39, 0.25);
+  border-radius: 0;
+}
+
+.forum-page .gt-container .gt-initing {
+  padding: 2em 0;
+  text-align: center;
+  color: #a89880;
+}
+
+.forum-page .gt-container .gt-initing-text {
+  margin: 0.75em auto;
+  font-size: 0.95em;
+  color: #a89880;
+}
+
+.forum-page .gt-container .gt-no-init {
+  padding: 2em 0;
+  text-align: center;
+  color: #a89880;
+  font-size: 0.95em;
+}
+
+/* 加载旋转动画 */
+.forum-page .gt-container .gt-spinner::before {
+  border: 2px solid #2a1c0e;
+  border-top-color: #c9a227;
+}
+
+.forum-page .gt-container .gt-loader {
+  border: 2px solid #2a1c0e;
+}
+
+.forum-page .gt-container .gt-loader::before {
+  background-color: #c9a227;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.7 聚焦遮罩
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container.gt-input-focused::after {
+  background: #3d2914;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.8 链接 & 版权
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-link {
+  border-bottom: 1px dotted #c9a227;
+}
+
+.forum-page .gt-container .gt-copyright {
+  margin: 1.5em 0 0.5em;
+  border-top: 2px solid #2a1c0e;
+  padding-top: 0.75em;
+  font-size: 0.8em;
+  color: #a89880;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.9 SVG 图标
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-svg svg {
+  fill: currentColor;
+}
+
+.forum-page .gt-container .gt-user .is--poping .gt-svg svg {
+  fill: #c9a227;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.10 版本号
+ * ═══════════════════════════════════════════════════════════════ */
+.forum-page .gt-container .gt-version {
+  color: #a89880;
+  opacity: 0.5;
+  margin-left: 0.25em;
+  font-size: 0.85em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.11 响应式适配
+ * ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 479px) {
+  .forum-page .gt-container .gt-header-controls {
+    margin: 0.5em 0 0;
+    flex-wrap: wrap;
+  }
+
+  .forum-page .gt-container .gt-header-controls .gt-btn {
+    float: none;
+    flex: 1;
+    margin: 0;
+  }
+
+  .forum-page .gt-container .gt-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .forum-page .gt-container .gt-comment-like,
+  .forum-page .gt-container .gt-comment-edit,
+  .forum-page .gt-container .gt-comment-reply {
+    opacity: 0.6;
+  }
+
+  .forum-page .gt-container .gt-comment-like {
+    right: 4.5em;
+  }
+
+  .forum-page .gt-container .gt-comment-edit {
+    right: 2.5em;
+  }
+
+  .forum-page .gt-container .gt-comment-reply {
+    right: 0.5em;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 15.12 动画
+ * ═══════════════════════════════════════════════════════════════ */
+@keyframes gt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.forum-page .gt-container .gt-comment {
+  animation: gt-fade-in 0.25s ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .forum-page .gt-container .gt-comment,
+  .forum-page .gt-container .gt-popup {
+    animation: none;
+  }
+
+  .forum-page .gt-container *,
+  .forum-page .gt-container *::before,
+  .forum-page .gt-container *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16. SFMC Jar 页面主题 — 像素风 / Minecraft 星空蓝风格
+ * ═══════════════════════════════════════════════════════════════ */
+
+/* 根容器 — 像素字体 + 深蓝星空色系 */
+.sfmc-jar-page .gt-container {
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace !important;
+  font-size: 16px;
+  color: #e6edf3;
+  letter-spacing: 0.5px;
+}
+
+/* 链接 */
+.sfmc-jar-page .gt-container a {
+  color: #4a9eff;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.sfmc-jar-page .gt-container a:hover {
+  color: #6bb3ff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.1 头部区域
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-meta {
+  margin: 0 0 1em;
+  padding: 0 0 0.75em;
+  border-bottom: 3px solid #2d333b;
+  font-size: 0.95em;
+}
+
+.sfmc-jar-page .gt-container .gt-counts {
+  color: #7d8590;
+  font-size: 0.9em;
+}
+
+.sfmc-jar-page .gt-container .gt-counts .gt-link-counts {
+  color: #4a9eff;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* 用户信息 */
+.sfmc-jar-page .gt-container .gt-user {
+  font-size: 0.85em;
+}
+
+.sfmc-jar-page .gt-container .gt-user-inner {
+  color: #e6edf3;
+  font-weight: 500;
+}
+
+.sfmc-jar-page .gt-container .gt-user-inner:hover {
+  color: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-user-name {
+  color: #e6edf3;
+}
+
+/* 用户下拉菜单 */
+.sfmc-jar-page .gt-container .gt-popup {
+  background: #1e2630;
+  border: 3px solid #2d333b;
+  border-radius: 0;
+  padding: 0.25em 0;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+  animation: gt-fade-in 0.15s ease;
+}
+
+.sfmc-jar-page .gt-container .gt-popup .gt-action {
+  padding: 0.5em 1.25em;
+  color: #e6edf3;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.sfmc-jar-page .gt-container .gt-popup .gt-action:hover {
+  background: #161b22;
+  color: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-popup .gt-action.is--active {
+  color: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-popup .gt-action-text {
+  color: #7d8590;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.2 输入区域 — 像素风方块输入框
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.sfmc-jar-page .gt-container .gt-header-comment {
+  flex: 1;
+  margin-left: 1em;
+}
+
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-header-comment {
+    margin-left: 0.75em;
+  }
+}
+
+/* 输入框 — 粗边框 + 方块风格 */
+.sfmc-jar-page .gt-container .gt-header-textarea {
+  padding: 12px 16px;
+  display: block;
+  width: 100%;
+  min-height: 100px;
+  max-height: 240px;
+  border-radius: 0;
+  border: 3px solid #2d333b;
+  border-bottom-width: 5px;
+  font-size: 1rem;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  font-weight: 400;
+  line-height: 1.6;
+  word-wrap: break-word;
+  resize: vertical;
+  background: #161b22;
+  color: #e6edf3;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.3), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-jar-page .gt-container .gt-header-textarea::placeholder {
+  color: #484f58;
+  opacity: 0.8;
+}
+
+.sfmc-jar-page .gt-container .gt-header-textarea:hover {
+  border-color: #3d444d;
+}
+
+.sfmc-jar-page .gt-container .gt-header-textarea:focus {
+  border-color: #4a9eff;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.03),
+    0 0 0 3px rgba(74, 158, 255, 0.15);
+}
+
+/* 预览区域 */
+.sfmc-jar-page .gt-container .gt-header-preview {
+  padding: 12px 16px;
+  border-radius: 0;
+  border: 3px solid #2d333b;
+  background: #161b22;
+  color: #e6edf3;
+  font-size: 1rem;
+  line-height: 1.6;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.3), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.3 按钮 — Minecraft 物品栏风格
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-header-controls {
+  margin: 0.75em 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.sfmc-jar-page .gt-container .gt-header-controls-tip {
+  font-size: 0.85rem;
+  color: #4a9eff;
+  opacity: 0.8;
+  margin-right: auto;
+}
+
+.sfmc-jar-page .gt-container .gt-header-controls-tip:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-header-controls-tip {
+    display: none;
+  }
+}
+
+/* 基础按钮 — 粗边框 + 底部阴影 */
+.sfmc-jar-page .gt-container .gt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: bold;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 0;
+  border: 3px solid #2d333b;
+  border-bottom-width: 5px;
+  outline: none;
+  transition: all 0.1s ease;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+
+/* Primary 按钮 — 发布 / 登录 */
+.sfmc-jar-page .gt-container .gt-btn-public,
+.sfmc-jar-page .gt-container .gt-btn-login {
+  background: linear-gradient(180deg, #4a9eff 0%, #3a7fd9 100%);
+  color: #e6edf3;
+  border-color: #2d5fa0;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.1);
+}
+
+.sfmc-jar-page .gt-container .gt-btn-public:hover:not(:disabled),
+.sfmc-jar-page .gt-container .gt-btn-login:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5aa8ff 0%, #4a9eff 100%);
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.sfmc-jar-page .gt-container .gt-btn-public:active:not(:disabled),
+.sfmc-jar-page .gt-container .gt-btn-login:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* Default 按钮 — 预览 */
+.sfmc-jar-page .gt-container .gt-btn-preview {
+  background: #161b22;
+  color: #e6edf3;
+  border-color: #2d333b;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-jar-page .gt-container .gt-btn-preview:hover:not(:disabled) {
+  background: #1c2333;
+  border-color: #3d444d;
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+.sfmc-jar-page .gt-container .gt-btn-preview:active:not(:disabled) {
+  transform: translateY(2px);
+  border-bottom-width: 3px;
+}
+
+/* 按钮禁用 */
+.sfmc-jar-page .gt-container .gt-btn.is--disable,
+.sfmc-jar-page .gt-container .gt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none !important;
+}
+
+/* 按钮加载 spinner */
+.sfmc-jar-page .gt-container .gt-btn-loading {
+  margin-left: 0.5em;
+  width: 0.75em;
+  height: 1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.4 头像
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-avatar {
+  width: 40px;
+  height: 40px;
+}
+
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-avatar {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+.sfmc-jar-page .gt-container .gt-avatar img {
+  border-radius: 0;
+  border: 2px solid #2d333b;
+  transition: transform 0.2s ease, border-color 0.15s ease;
+  image-rendering: pixelated;
+}
+
+.sfmc-jar-page .gt-container .gt-avatar img:hover {
+  transform: scale(1.08);
+  border-color: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-avatar-github {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-avatar-github {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.5 评论列表
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-comments {
+  padding-top: 0.5em;
+}
+
+.sfmc-jar-page .gt-container .gt-comments-null {
+  text-align: center;
+  padding: 2em 0;
+  color: #484f58;
+  font-size: 1em;
+}
+
+.sfmc-jar-page .gt-container .gt-comments-controls {
+  margin: 1.5em 0;
+  text-align: center;
+}
+
+/* 单条评论 */
+.sfmc-jar-page .gt-container .gt-comment {
+  padding: 0.75em 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 评论内容卡片 — 方块风格 */
+.sfmc-jar-page .gt-container .gt-comment-content {
+  flex: 1;
+  margin-left: 1em;
+  padding: 14px 18px;
+  background: #1e2630;
+  border: 3px solid #2d333b;
+  border-bottom-width: 5px;
+  border-radius: 0;
+  overflow: auto;
+  transition: all 0.15s ease;
+  box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.03);
+}
+
+.sfmc-jar-page .gt-container .gt-comment-content:hover {
+  border-color: #3d444d;
+  box-shadow:
+    inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+    inset 2px 2px 0 rgba(255, 255, 255, 0.03),
+    0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-comment-content {
+    margin-left: 0.75em;
+    padding: 10px 14px;
+  }
+}
+
+/* 管理员评论 — 左侧蓝色竖线 */
+.sfmc-jar-page .gt-container .gt-comment-admin .gt-comment-content {
+  border-left: 3px solid #4a9eff;
+}
+
+/* 评论头部 */
+.sfmc-jar-page .gt-container .gt-comment-header {
+  margin-bottom: 0.5em;
+  font-size: 0.9em;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-username {
+  font-weight: 700;
+  color: #4a9eff;
+  text-decoration: none;
+  font-size: 0.95em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-username:hover {
+  color: #6bb3ff;
+  text-decoration: underline;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-text {
+  color: #7d8590;
+  font-size: 0.85em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-date {
+  color: #484f58;
+  font-size: 0.8em;
+}
+
+/* 评论正文 */
+.sfmc-jar-page .gt-container .gt-comment-body {
+  color: #e6edf3 !important;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* 评论正文 markdown */
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body {
+  background: transparent !important;
+  color: #e6edf3 !important;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body p {
+  margin-bottom: 0.5em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body p:last-child {
+  margin-bottom: 0;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body pre {
+  background: #0f1419 !important;
+  border-radius: 0;
+  border: 2px solid #2d333b;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body code {
+  background: #0f1419 !important;
+  color: #e6edf3;
+  font-family: 'VT323', 'Courier New', 'Consolas', monospace;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-body .markdown-body blockquote {
+  border-left-color: #4a9eff !important;
+  color: #7d8590;
+}
+
+/* 评论操作按钮 */
+.sfmc-jar-page .gt-container .gt-comment-like,
+.sfmc-jar-page .gt-container .gt-comment-edit,
+.sfmc-jar-page .gt-container .gt-comment-reply {
+  height: 1.5em;
+  opacity: 0;
+  transition: opacity 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.sfmc-jar-page .gt-container .gt-comment:hover .gt-comment-like,
+.sfmc-jar-page .gt-container .gt-comment:hover .gt-comment-edit,
+.sfmc-jar-page .gt-container .gt-comment:hover .gt-comment-reply {
+  opacity: 1;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-like:hover,
+.sfmc-jar-page .gt-container .gt-comment-edit:hover,
+.sfmc-jar-page .gt-container .gt-comment-reply:hover {
+  cursor: pointer;
+  color: #4a9eff;
+  transform: scale(1.15);
+}
+
+.sfmc-jar-page .gt-container .gt-comment-like {
+  top: 14px;
+  right: 5em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-edit {
+  top: 14px;
+  right: 3em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-reply {
+  top: 14px;
+  right: 1em;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-like .gt-svg svg,
+.sfmc-jar-page .gt-container .gt-comment-edit .gt-svg svg,
+.sfmc-jar-page .gt-container .gt-comment-reply .gt-svg svg {
+  fill: #7d8590;
+  transition: fill 0.15s ease;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-like:hover .gt-svg svg,
+.sfmc-jar-page .gt-container .gt-comment-edit:hover .gt-svg svg,
+.sfmc-jar-page .gt-container .gt-comment-reply:hover .gt-svg svg {
+  fill: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-comment-like.is--active .gt-svg svg {
+  fill: #4a9eff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.6 错误 & 加载状态
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-error {
+  text-align: center;
+  margin: 0.75em 0;
+  color: #f0883e;
+  font-size: 0.95em;
+  padding: 0.75em 1em;
+  background: rgba(240, 136, 62, 0.08);
+  border: 2px solid rgba(240, 136, 62, 0.25);
+  border-radius: 0;
+}
+
+.sfmc-jar-page .gt-container .gt-initing {
+  padding: 2em 0;
+  text-align: center;
+  color: #7d8590;
+}
+
+.sfmc-jar-page .gt-container .gt-initing-text {
+  margin: 0.75em auto;
+  font-size: 0.95em;
+  color: #7d8590;
+}
+
+.sfmc-jar-page .gt-container .gt-no-init {
+  padding: 2em 0;
+  text-align: center;
+  color: #7d8590;
+  font-size: 0.95em;
+}
+
+/* 加载旋转动画 */
+.sfmc-jar-page .gt-container .gt-spinner::before {
+  border: 2px solid #2d333b;
+  border-top-color: #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-loader {
+  border: 2px solid #2d333b;
+}
+
+.sfmc-jar-page .gt-container .gt-loader::before {
+  background-color: #4a9eff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.7 聚焦遮罩
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container.gt-input-focused::after {
+  background: #0a0e14;
+  opacity: 0.6;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.8 链接 & 版权
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-link {
+  border-bottom: 1px dotted #4a9eff;
+}
+
+.sfmc-jar-page .gt-container .gt-copyright {
+  margin: 1.5em 0 0.5em;
+  border-top: 2px solid #2d333b;
+  padding-top: 0.75em;
+  font-size: 0.8em;
+  color: #484f58;
+  opacity: 0.7;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.9 SVG 图标
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-svg svg {
+  fill: currentColor;
+}
+
+.sfmc-jar-page .gt-container .gt-user .is--poping .gt-svg svg {
+  fill: #4a9eff;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.10 版本号
+ * ═══════════════════════════════════════════════════════════════ */
+.sfmc-jar-page .gt-container .gt-version {
+  color: #484f58;
+  opacity: 0.5;
+  margin-left: 0.25em;
+  font-size: 0.85em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.11 响应式适配
+ * ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 479px) {
+  .sfmc-jar-page .gt-container .gt-header-controls {
+    margin: 0.5em 0 0;
+    flex-wrap: wrap;
+  }
+
+  .sfmc-jar-page .gt-container .gt-header-controls .gt-btn {
+    float: none;
+    flex: 1;
+    margin: 0;
+  }
+
+  .sfmc-jar-page .gt-container .gt-btn {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+
+  .sfmc-jar-page .gt-container .gt-comment-like,
+  .sfmc-jar-page .gt-container .gt-comment-edit,
+  .sfmc-jar-page .gt-container .gt-comment-reply {
+    opacity: 0.6;
+  }
+
+  .sfmc-jar-page .gt-container .gt-comment-like {
+    right: 4.5em;
+  }
+
+  .sfmc-jar-page .gt-container .gt-comment-edit {
+    right: 2.5em;
+  }
+
+  .sfmc-jar-page .gt-container .gt-comment-reply {
+    right: 0.5em;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * 16.12 动画
+ * ═══════════════════════════════════════════════════════════════ */
+@keyframes gt-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sfmc-jar-page .gt-container .gt-comment {
+  animation: gt-fade-in 0.25s ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .sfmc-jar-page .gt-container .gt-comment,
+  .sfmc-jar-page .gt-container .gt-popup {
+    animation: none;
+  }
+
+  .sfmc-jar-page .gt-container *,
+  .sfmc-jar-page .gt-container *::before,
+  .sfmc-jar-page .gt-container *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

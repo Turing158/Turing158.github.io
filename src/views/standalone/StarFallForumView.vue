@@ -170,6 +170,55 @@
       </div>
     </section>
 
+    <!-- 下载 -->
+    <section class="forum-section forum-downloads">
+      <div class="section-header">
+        <span class="header-icon">⬇</span>
+        <h2 class="forum-section-title">{{ t('forum.downloadTitle') }}</h2>
+      </div>
+      <div v-if="downloadLoading" class="download-loading">
+        <span class="download-spinner"></span>
+        <span>{{ t('forum.downloadLoading') }}</span>
+      </div>
+      <div v-else-if="downloadError" class="download-error">
+        <span>{{ t('forum.downloadFailed') }}</span>
+      </div>
+      <div v-else class="download-list">
+        <div
+          v-for="(release, index) in latestReleases"
+          :key="release.repo"
+          class="download-card"
+          :class="release.repo === 'StarFall-Vue' ? 'download-vue' : 'download-spring'"
+          :style="{ '--delay': index * 100 + 'ms' }"
+        >
+          <div class="download-header">
+            <span class="download-repo-badge" :class="release.repo === 'StarFall-Vue' ? 'badge-vue' : 'badge-spring'">
+              {{ release.repo === 'StarFall-Vue' ? 'V' : 'S' }}
+            </span>
+            <div class="download-info">
+              <h3 class="download-repo-name">{{ release.repo }}</h3>
+              <span class="download-tag">{{ release.tag_name }}</span>
+            </div>
+          </div>
+          <div v-if="release.assets.length > 0" class="download-assets">
+            <a
+              v-for="asset in release.assets"
+              :key="asset.browser_download_url"
+              :href="asset.browser_download_url"
+              target="_blank"
+              rel="noopener"
+              class="forum-btn forum-btn-primary forum-btn--small"
+            >
+              {{ asset.name }}
+            </a>
+          </div>
+          <div v-else class="download-no-assets">
+            {{ t('forum.downloadNoAssets') }}
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 鸣谢 -->
     <section class="forum-section forum-acknowledgements">
       <div class="section-header">
@@ -194,6 +243,15 @@
           <p>{{ t('forum.ackMilktea') }}</p>
         </div>
       </div>
+    </section>
+
+    <!-- ==== 留言板 - Gitalk ==== -->
+    <section class="forum-section forum-comments">
+      <div class="section-header">
+        <span class="header-icon">💬</span>
+        <h2 class="forum-section-title">{{ t('forum.commentsTitle') }}</h2>
+      </div>
+      <div id="forum-gitalk-container" class="gitalk-container" style="max-height: 600px; overflow-y: auto;"></div>
     </section>
 
     <!-- 页脚 -->
@@ -247,14 +305,18 @@ import { useI18n } from 'vue-i18n'
 import { useHead } from '@vueuse/head'
 import { setLocale } from '@/i18n'
 import { config } from '@/config'
+import { useGitalk } from '@/composables/useGitalk'
+import axios from 'axios'
 
 const FRONTEND_REPO = 'StarFall-vue'
 const BACKEND_REPO = 'StarFall-SpringBoot'
+const GITALK_SLUG = `forum-StarFall-Forum-Message-Board`
 
 const { t, locale } = useI18n()
 
 const frontendUrl = computed(() => `https://github.com/${config.github.owner}/${FRONTEND_REPO}`)
 const backendUrl = computed(() => `https://github.com/${config.github.owner}/${BACKEND_REPO}`)
+const { init: initGitalk } = useGitalk('forum-gitalk-container', GITALK_SLUG, t('forum.fullName'))
 
 // 独立页面自行管理 SEO
 useHead({
@@ -265,6 +327,9 @@ useHead({
     { property: 'og:description', content: computed(() => t('forum.subTagline')) },
     { property: 'og:type', content: 'website' },
     { name: 'theme-color', content: '#3d2914' },
+  ],
+  link: [
+    { rel: 'icon', href: '/icons/ico.ico' },
   ],
 })
 
@@ -283,10 +348,62 @@ const NOTICE_STORAGE_KEY = 'starfall-forum-notice-dismissed'
 
 const showNotice = ref(false)
 
+// ===== 最新发行版 =====
+interface LatestRelease {
+  repo: string
+  tag_name: string
+  assets: { name: string; browser_download_url: string }[]
+}
+
+const latestReleases = ref<LatestRelease[]>([])
+const downloadLoading = ref(true)
+const downloadError = ref(false)
+
+async function fetchLatestReleases() {
+  downloadLoading.value = true
+  downloadError.value = false
+  try {
+    const results = await Promise.allSettled(
+      [FRONTEND_REPO, BACKEND_REPO].map(repo =>
+        axios
+          .get<any[]>(`https://api.github.com/repos/${config.github.owner}/${repo}/releases?per_page=1`)
+          .then(res => {
+            const data = res.data?.[0]
+            if (!data) return null
+            return {
+              repo,
+              tag_name: data.tag_name,
+              assets: (data.assets ?? []).map((a: any) => ({
+                name: a.name,
+                browser_download_url: a.browser_download_url,
+              })),
+            } as LatestRelease
+          })
+      )
+    )
+    const successful = results
+      .filter((r): r is PromiseFulfilledResult<LatestRelease | null> => r.status === 'fulfilled')
+      .map(r => r.value)
+      .filter((r): r is LatestRelease => r !== null)
+
+    if (successful.length === 0) {
+      downloadError.value = true
+    } else {
+      latestReleases.value = successful
+    }
+  } catch {
+    downloadError.value = true
+  } finally {
+    downloadLoading.value = false
+  }
+}
+
 onMounted(() => {
   if (!localStorage.getItem(NOTICE_STORAGE_KEY)) {
     showNotice.value = true
   }
+  initGitalk()
+  fetchLatestReleases()
 })
 
 function closeNotice() {
@@ -493,10 +610,29 @@ function toggleLang() {
   font-size: 14px;
   letter-spacing: 1px;
   margin-bottom: 24px;
+  animation: badgePopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .badge-icon {
   color: @bg-grass;
+  animation: iconSpin 3s ease-in-out infinite;
+}
+
+@keyframes badgePopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes iconSpin {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  75% { transform: rotate(-10deg); }
 }
 
 .forum-title {
@@ -515,6 +651,12 @@ function toggleLang() {
     1px -1px 0 @border-color,
     -1px 1px 0 @border-color;
   letter-spacing: 4px;
+  animation: titleMainIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.03);
+  }
 }
 
 .title-sub {
@@ -524,12 +666,38 @@ function toggleLang() {
   letter-spacing: 8px;
   margin-top: 8px;
   text-shadow: 2px 2px 0 @border-color;
+  animation: titleSubIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+}
+
+@keyframes titleMainIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes titleSubIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    letter-spacing: 20px;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    letter-spacing: 8px;
+  }
 }
 
 .forum-tagline {
   margin: 24px 0 8px;
   font-size: 20px;
   color: @text-primary;
+  animation: taglineIn 0.6s ease-out 0.4s backwards;
 }
 
 .forum-subtagline {
@@ -539,6 +707,18 @@ function toggleLang() {
   max-width: 500px;
   margin-left: auto;
   margin-right: auto;
+  animation: taglineIn 0.6s ease-out 0.55s backwards;
+}
+
+@keyframes taglineIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .hero-actions {
@@ -546,6 +726,18 @@ function toggleLang() {
   justify-content: center;
   gap: 16px;
   margin-top: 32px;
+  animation: actionsIn 0.6s ease-out 0.7s backwards;
+}
+
+@keyframes actionsIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ===== 按钮样式 =====
@@ -561,15 +753,37 @@ function toggleLang() {
   border-bottom-width: 5px;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.1s ease;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px) scale(1.02);
+
+    &::before {
+      left: 100%;
+    }
   }
 
   &:active {
-    transform: translateY(2px);
+    transform: translateY(2px) scale(0.98);
     border-bottom-width: 3px;
   }
 }
@@ -582,6 +796,10 @@ function toggleLang() {
 
   &:hover {
     background: lighten(@bg-grass, 5%);
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+      0 8px 20px fade(@bg-grass, 30%);
   }
 }
 
@@ -593,6 +811,10 @@ function toggleLang() {
 
   &:hover {
     background: lighten(@bg-wood, 5%);
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.1),
+      0 8px 20px fade(@bg-wood, 30%);
   }
 }
 
@@ -603,6 +825,7 @@ function toggleLang() {
 
   &:hover {
     background: @bg-stone;
+    border-color: @border-light;
   }
 }
 
@@ -715,12 +938,33 @@ function toggleLang() {
   border-bottom-width: 5px;
   padding: 24px;
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+  animation: boxFadeIn 0.6s ease-out;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: @border-light;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.3);
+  }
 
   p {
     margin: 0;
     font-size: 16px;
     line-height: 1.8;
     color: @text-secondary;
+  }
+}
+
+@keyframes boxFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -737,10 +981,52 @@ function toggleLang() {
   border-bottom-width: 5px;
   padding: 20px;
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
-  transition: transform 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: cardSlideIn 0.6s ease-out backwards;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+}
+
+.repo-vue {
+  animation-delay: 0s;
+
+  &:hover {
+    border-color: #3a6b30;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 32px rgba(0, 0, 0, 0.4),
+      0 0 20px fade(#3a6b30, 20%);
+  }
+}
+
+.repo-spring {
+  animation-delay: 0.15s;
+
+  &:hover {
+    border-color: #5a7a4a;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 32px rgba(0, 0, 0, 0.4),
+      0 0 20px fade(#5a7a4a, 20%);
+  }
+}
+
+@keyframes cardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -821,10 +1107,22 @@ function toggleLang() {
   padding: 18px;
   text-align: center;
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
-  transition: transform 0.15s ease;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: featureFadeIn 0.5s ease-out backwards;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-6px) scale(1.03);
+    border-color: @text-accent;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 28px rgba(0, 0, 0, 0.4),
+      0 0 16px fade(@text-accent, 15%);
+
+    .feature-icon {
+      transform: scale(1.15) rotate(5deg);
+      box-shadow: 0 0 16px fade(@text-accent, 30%);
+    }
   }
 
   h3 {
@@ -851,10 +1149,22 @@ function toggleLang() {
   background: @bg-wood;
   border: 2px solid @border-color;
   color: @text-accent;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   :deep(svg) {
     width: 24px;
     height: 24px;
+  }
+}
+
+@keyframes featureFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -871,6 +1181,24 @@ function toggleLang() {
   border-bottom-width: 5px;
   padding: 18px;
   box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+  animation: techGroupSlideIn 0.6s ease-out backwards;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: @border-light;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 8px 24px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.tech-group:first-child {
+  animation-delay: 0s;
+}
+
+.tech-group:last-child {
+  animation-delay: 0.15s;
 }
 
 .tech-group-title {
@@ -893,10 +1221,35 @@ function toggleLang() {
   border-bottom-width: 3px;
   background: @bg-dirt-dark;
   color: @text-primary;
-  transition: transform 0.1s ease;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: tagPopIn 0.4s ease-out backwards;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px) scale(1.08);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+}
+
+@keyframes techGroupSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes tagPopIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -913,6 +1266,152 @@ function toggleLang() {
 .tag-mybatis { background: #6a4a30; border-color: #5a3a20; }
 .tag-redis { background: #6a4040; border-color: #5a3030; }
 .tag-jwt { background: #5a5a40; border-color: #4a4a30; }
+
+// ===== 下载 =====
+.forum-downloads {
+  .download-loading,
+  .download-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 20px;
+    color: @text-secondary;
+    font-size: 14px;
+  }
+
+  .download-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid @border-light;
+    border-top-color: @text-accent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .download-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .download-card {
+    background: @bg-stone-dark;
+    border: 3px solid @border-color;
+    border-bottom-width: 5px;
+    padding: 20px;
+    box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: downloadCardIn 0.5s ease-out backwards;
+    animation-delay: var(--delay, 0ms);
+
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow:
+        inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+        inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+        0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  .download-vue:hover {
+    border-color: #3a6b30;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 28px rgba(0, 0, 0, 0.4),
+      0 0 20px fade(#3a6b30, 20%);
+  }
+
+  .download-spring:hover {
+    border-color: #5a7a4a;
+    box-shadow:
+      inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+      inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+      0 12px 28px rgba(0, 0, 0, 0.4),
+      0 0 20px fade(#5a7a4a, 20%);
+  }
+
+  .download-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+
+  .download-repo-badge {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+    border: 3px solid @border-color;
+    border-bottom-width: 5px;
+    flex-shrink: 0;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  .badge-vue {
+    background: #3a6b30;
+    color: #a8d898;
+  }
+
+  .badge-spring {
+    background: #5a7a4a;
+    color: #c8e6b8;
+  }
+
+  .download-info {
+    flex: 1;
+  }
+
+  .download-repo-name {
+    margin: 0;
+    font-size: 16px;
+    color: @text-primary;
+    text-shadow: 1px 1px 0 @border-color;
+  }
+
+  .download-tag {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 2px 10px;
+    font-size: 12px;
+    background: @bg-dirt-dark;
+    border: 2px solid @border-color;
+    color: @text-accent;
+    letter-spacing: 1px;
+  }
+
+  .download-assets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .download-no-assets {
+    font-size: 13px;
+    color: @text-secondary;
+    font-style: italic;
+  }
+}
+
+@keyframes downloadCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 // ===== 鸣谢 =====
 .forum-acknowledgements {
@@ -931,18 +1430,50 @@ function toggleLang() {
     border: 3px solid @border-color;
     border-bottom-width: 5px;
     box-shadow: inset -2px -2px 0 rgba(0, 0, 0, 0.2), inset 2px 2px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: ackItemFadeIn 0.5s ease-out backwards;
+
+    &:hover {
+      transform: translateY(-4px) scale(1.02);
+      border-color: @text-accent;
+      box-shadow:
+        inset -2px -2px 0 rgba(0, 0, 0, 0.2),
+        inset 2px 2px 0 rgba(255, 255, 255, 0.05),
+        0 8px 24px rgba(0, 0, 0, 0.3);
+
+      .ack-icon {
+        transform: scale(1.2) rotate(10deg);
+      }
+
+      p {
+        color: @text-primary;
+      }
+    }
 
     p {
       margin: 0;
       font-size: 14px;
       line-height: 1.6;
       color: @text-secondary;
+      transition: color 0.2s ease;
     }
   }
 
   .ack-icon {
     font-size: 20px;
     flex-shrink: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+}
+
+@keyframes ackItemFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -983,9 +1514,11 @@ function toggleLang() {
   a {
     color: @text-secondary;
     text-decoration: none;
+    transition: all 0.2s ease;
 
     &:hover {
       color: @text-accent;
+      transform: translateY(-2px);
     }
   }
 }
@@ -998,6 +1531,18 @@ function toggleLang() {
   margin: 0;
   font-size: 13px;
   color: @text-secondary;
+  animation: noteFadeIn 1s ease-out;
+}
+
+@keyframes noteFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // ===== 响应式 =====
@@ -1024,6 +1569,10 @@ function toggleLang() {
   }
 
   .forum-tech-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .forum-downloads .download-list {
     grid-template-columns: 1fr;
   }
 
@@ -1072,6 +1621,23 @@ function toggleLang() {
 // ===== 无障碍：减少动画 =====
 @media (prefers-reduced-motion: reduce) {
   .deco-block {
+    animation: none;
+  }
+
+  .hero-badge,
+  .title-main,
+  .title-sub,
+  .forum-tagline,
+  .forum-subtagline,
+  .hero-actions,
+  .intro-box,
+  .forum-repo-card,
+  .forum-feature-card,
+  .tech-group,
+  .tech-tag,
+  .download-card,
+  .ack-item,
+  .footer-note {
     animation: none;
   }
 

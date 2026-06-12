@@ -95,6 +95,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/standalone/StarFallForumView.vue'),
     meta: { layout: 'standalone', titleKey: 'pageTitle.starfallForum' },
   },
+  {
+    path: '/sfmc-jar',
+    name: 'sfmc-jar',
+    component: () => import('@/views/standalone/SfmcJarLandingView.vue'),
+    meta: { layout: 'standalone', titleKey: 'pageTitle.sfmcJar' },
+  },
   // 404 通配符路由（必须放在最后）
   {
     path: '/:pathMatch(.*)*',

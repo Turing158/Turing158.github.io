@@ -22,7 +22,8 @@
     "notFound": "页面未找到",
     "error": "服务器错误",
     "sfmc": "StarFall Minecraft Launcher",
-    "starfallForum": "StarFall Minecraft Forum"
+    "starfallForum": "StarFall Minecraft Forum",
+    "sfmcJar": "SFMC - Java Edition"
   },
   "home": {
     "recentCommits": "最新提交",
@@ -112,6 +113,7 @@
     "prerelease": "预发行",
     "publishedAt": "发布于",
     "download": "下载",
+    "page": "页面",
     "more": "更多",
     "loading": "加载中...",
     "loadFailed": "加载失败"
@@ -482,10 +484,11 @@
     }
   },
   "sfmc": {
-    "tagline": "轻盈如星，启动如风",
+    "tagline": "方块世界，一键启程",
     "subTagline": "一个简洁、快速的 Windows Minecraft 启动器",
     "download": "下载最新版",
     "viewOnGithub": "GitHub 仓库",
+    "github": "GitHub",
     "allReleases": "全部版本",
     "latestVersion": "最新版本",
     "loadingRelease": "正在获取最新版本…",
@@ -502,8 +505,46 @@
     "screenshotTitle": "界面预览",
     "screenshotPlaceholder": "截图即将到来",
     "requirements": "支持 Windows 7 及以上 · 需要 .NET 运行时",
-    "backToBlog": "返回博客",
-    "footerNote": "由 Turing158 开发"
+    "backToBlog": "前往博客",
+    "footerNote": "由 Turing158 开发",
+    "notice": {
+      "title": "项目说明",
+      "content": "该项目用于学习C#和WPF框架的应用项目，部分样式和功能参照了PCL，相关的功能可能不是非常的完善，有任何问题和侵权问题可以去issues来提出，我会立马修复！",
+      "close": "关闭",
+      "dismiss": "不再提醒"
+    },
+    "appName": "StarFall Minecraft Launcher",
+    "techSpecsTitle": "技术规格",
+    "commentsTitle": "留言板",
+    "releases": "发行版本",
+    "specs": {
+      "speed": "极速启动",
+      "versions": "多版本",
+      "accounts": "账户管理",
+      "java": "Java检测",
+      "ui": "界面定制",
+      "resources": "资源管理",
+      "os": "支持系统",
+      "javaVersion": "Java版本",
+      "mcVersions": "支持版本",
+      "loaders": "加载器支持",
+      "autoUpdate": "自动更新",
+      "supported": "支持",
+      "requirements": "Windows 10/11 · .NET 运行时 · Java 8-21",
+      "osValue": "Windows",
+      "javaValue": "全版本",
+      "mcValue": "全版本",
+      "loadersValue": "Forge / Fabric / Quilt"
+    },
+    "downloads": {
+      "x64": "Windows x64",
+      "x86": "Windows x86"
+    },
+    "acknowledgements": {
+      "title": "鸣谢",
+      "pcl": "感谢PCL的主要主题素材和灵感（如有侵权，请联系）",
+      "laoji": "感谢老己（奖励他一杯奶茶）"
+    }
   },
   "forum": {
     "fullName": "StarFall-Minecraft-Forum",
@@ -530,15 +571,68 @@
     "techStackTitle": "技术栈",
     "frontendStack": "前端技术",
     "backendStack": "后端技术",
-    "ackTitle": "鸣谢",
+    "downloadTitle": "下载",
+  "downloadLatest": "最新版本",
+  "downloadAssets": "下载资源",
+  "downloadLoading": "加载中...",
+  "downloadFailed": "加载失败",
+  "downloadNoAssets": "暂无下载资源",
+  "ackTitle": "鸣谢",
+    "commentsTitle": "留言板",
     "ackMcbbs": "感谢 MCBBS 提供的主题素材和灵感，如有侵权请联系删除",
     "ackRoommates": "感谢我的舍友们在开发过程中帮忙测试，提出了许多宝贵的建议",
     "ackAdvisor": "感谢论文导师的悉心指导，让我能够顺利毕业并完成本项目",
     "ackMilktea": "感谢老己（奖励他一杯奶茶 🧋）",
-    "backToBlog": "返回博客",
+    "backToBlog": "前往博客",
     "footerNote": "由 Turing158 开发 · Minecraft Forum",
     "notice": "该项目为当时学习 Java、Spring Boot、Vue 的项目，技术不精，后来毕业时将该项目作为毕业设计，相关的功能可能不是非常的完善，有任何问题可以去 Issues 来提出。",
     "noticeDismiss": "不再提醒",
     "noticeClose": "关闭"
+  },
+  "sfmcJar": {
+    "tag": "Java Edition",
+    "tagline": "高效、可靠的 Minecraft 服务端框架",
+    "description": "基于 Java 开发的轻量级 Minecraft 服务端控制框架，提供简洁的 API 和丰富的扩展接口",
+    "download": "下载 JAR",
+    "github": "GitHub",
+    "back": "前往博客",
+    "goToBlog": "前往博客",
+    "footerNote": "由 Turing158 开发 · SFMC Java Edition",
+    "demoText": "演示即将推出",
+    "featuresTitle": "核心特性",
+    "features": {
+      "performance": { "title": "高性能", "desc": "优化的代码结构，低内存占用，高并发处理" },
+      "crossPlatform": { "title": "跨平台", "desc": "支持 Windows、Linux、macOS 多平台运行" },
+      "api": { "title": "JMCCC", "desc": "基于 JMCCC 项目的 API 和启动代码" }
+    },
+    "specsTitle": "技术规格",
+    "specs": {
+      "language": { "label": "开发语言", "value": "Java 8+" },
+      "jdk": { "label": "JDK 版本", "value": "JDK 8/11/17" },
+      "platform": { "label": "支持平台", "value": "全平台" },
+      "license": { "label": "开源协议", "value": "MIT" }
+    },
+    "requirements": "需要 Java 8 或更高版本 · 支持跨平台部署",
+    "allReleases": "查看全部版本",
+    "releases": "发行版本",
+    "comments": "留言板",
+    "loading": "正在获取最新版本…",
+    "error": "获取版本信息失败，请前往 GitHub 下载",
+    "stars": "1.2k",
+    "starsLabel": "Stars",
+    "commits": "350+",
+    "commitsLabel": "提交",
+    "issues": "12",
+    "issuesLabel": "议题",
+    "notice": {
+      "title": "免责声明",
+      "content": "该项目用于学习java和JavaFx框架的应用项目，部分样式和功能参照了HCML的布局，使用的是JMCCC项目中的api和启动代码，该项目为半成品，相关的功能可能不是非常的完善，有任何问题和侵权问题可以去issues来提出（已经停止维护了）",
+      "close": "关闭",
+      "dismiss": "不再提醒"
+    },
+    "ack": {
+      "hmcl": "感谢 <strong>HMCL</strong> 的主题素材和灵感（如有侵权，请联系）",
+      "laoji": "感谢 <strong>老己</strong> 奖励他一杯奶茶 🧋"
+    }
   }
 }

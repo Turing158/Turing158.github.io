@@ -12,6 +12,7 @@ import 'animal-island-vue/style'
 import './styles/variables.css'
 import './styles/animal-island-theme.css'
 import './styles/global.css'
+import './styles/gitalk-theme.css'
 
 const app = createApp(App)
 const pinia = createPinia()

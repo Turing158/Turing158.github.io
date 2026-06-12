@@ -81,7 +81,8 @@
     "readMore": "Read More",
     "noArticles": "No articles yet",
     "publishedAt": "Published at",
-    "back": "Back",
+    "back": "前往博客",
+    "goToBlog": "前往博客",
     "tagReset": "Reset",
     "noMatch": "No matching articles",
     "prev": "Previous",
@@ -96,6 +97,7 @@
     "prerelease": "Prerelease",
     "publishedAt": "Published on",
     "download": "Download",
+    "page": "Page",
     "more": "More",
     "loading": "Loading...",
     "loadFailed": "Load failed"
@@ -408,7 +410,8 @@
     "notFound": "Page Not Found",
     "error": "Server Error",
     "sfmc": "StarFall Minecraft Launcher",
-    "starfallForum": "StarFall Minecraft Forum"
+    "starfallForum": "StarFall Minecraft Forum",
+    "sfmcJar": "SFMC - Java Edition"
   },
   "pageReleases": {
     "title": "Release Detail",
@@ -452,10 +455,11 @@
     }
   },
   "sfmc": {
-    "tagline": "Light as a star, fast as the wind",
+    "tagline": "Block world, one-click launch",
     "subTagline": "A clean and fast Minecraft launcher for Windows",
     "download": "Download Latest",
     "viewOnGithub": "View on GitHub",
+    "github": "GitHub",
     "allReleases": "All Releases",
     "latestVersion": "Latest Version",
     "loadingRelease": "Fetching latest release…",
@@ -472,8 +476,46 @@
     "screenshotTitle": "Screenshots",
     "screenshotPlaceholder": "Screenshots coming soon",
     "requirements": "Windows 7+ · .NET runtime required",
-    "backToBlog": "Back to Blog",
-    "footerNote": "Developed by Turing158"
+    "backToBlog": "Go to Blog",
+    "footerNote": "Developed by Turing158",
+    "notice": {
+      "title": "Project Notice",
+      "content": "This project was built to learn C# and WPF frameworks. Some styles and features are referenced from PCL. The functionality may not be fully polished. For any issues or copyright concerns, please open an issue on GitHub and I will fix it promptly!",
+      "close": "Close",
+      "dismiss": "Don't show again"
+    },
+    "appName": "StarFall Minecraft Launcher",
+    "techSpecsTitle": "Tech Specs",
+    "commentsTitle": "Message Board",
+    "releases": "Releases",
+    "specs": {
+      "speed": "Fast Startup",
+      "versions": "Multi-Version",
+      "accounts": "Account Management",
+      "java": "Java Detection",
+      "ui": "UI Customization",
+      "resources": "Resource Management",
+      "os": "Supported OS",
+      "javaVersion": "Java Version",
+      "mcVersions": "Minecraft Versions",
+      "loaders": "Loader Support",
+      "autoUpdate": "Auto Update",
+      "supported": "Supported",
+      "requirements": "Windows 10/11 · .NET Runtime · Java 8-21",
+      "osValue": "Windows",
+      "javaValue": "All Versions",
+      "mcValue": "All Versions",
+      "loadersValue": "Forge / Fabric / Quilt"
+    },
+    "downloads": {
+      "x64": "Windows x64",
+      "x86": "Windows x86"
+    },
+    "acknowledgements": {
+      "title": "Acknowledgements",
+      "pcl": "Thanks to PCL for the main theme inspiration and resources (please contact if any copyright issues)",
+      "laoji": "Thanks to Lao Ji (rewarding him with a milk tea)"
+    }
   },
   "forum": {
     "fullName": "StarFall-Minecraft-Forum",
@@ -500,15 +542,67 @@
     "techStackTitle": "Tech Stack",
     "frontendStack": "Frontend",
     "backendStack": "Backend",
-    "ackTitle": "Acknowledgements",
+    "downloadTitle": "Downloads",
+  "downloadLatest": "Latest Release",
+  "downloadAssets": "Download Assets",
+  "downloadLoading": "Loading...",
+  "downloadFailed": "Failed to load",
+  "downloadNoAssets": "No download assets available",
+  "ackTitle": "Acknowledgements",
+    "commentsTitle": "Message Board",
     "ackMcbbs": "Thanks to MCBBS for the theme inspiration and resources. Please contact us if there are any copyright issues",
     "ackRoommates": "Thanks to my roommates for helping test and providing valuable feedback during development",
     "ackAdvisor": "Thanks to my thesis advisor for the guidance that helped me graduate and complete this project",
     "ackMilktea": "Thanks to Lao Ji (rewarding him with a milk tea 🧋)",
-    "backToBlog": "Back to Blog",
+    "backToBlog": "Go to Blog",
     "footerNote": "Developed by Turing158 · Minecraft Forum",
     "notice": "This project was built while learning Java, Spring Boot, and Vue. My skills were limited at the time — it later became my graduation project. The functionality may not be fully polished. Feel free to open Issues on GitHub.",
     "noticeDismiss": "Don't show again",
     "noticeClose": "Close"
+  },
+  "sfmcJar": {
+    "tag": "Java Edition",
+    "tagline": "Efficient & Reliable Minecraft Server Framework",
+    "description": "A lightweight Minecraft server control framework built with Java, providing clean APIs and rich extension interfaces",
+    "download": "Download JAR",
+    "github": "GitHub",
+    "back": "Go to Blog",
+    "footerNote": "Developed by Turing158 · SFMC Java Edition",
+    "demoText": "Demo Coming Soon",
+    "featuresTitle": "Core Features",
+    "features": {
+      "performance": { "title": "High Performance", "desc": "Optimized code structure with low memory footprint and high concurrency" },
+      "crossPlatform": { "title": "Cross-Platform", "desc": "Supports Windows, Linux, and macOS" },
+      "api": { "title": "JMCCC", "desc": "Based on JMCCC project's API and launch code" }
+    },
+    "specsTitle": "Tech Specs",
+    "specs": {
+      "language": { "label": "Language", "value": "Java 8+" },
+      "jdk": { "label": "JDK Version", "value": "JDK 8/11/17" },
+      "platform": { "label": "Platform", "value": "Cross-Platform" },
+      "license": { "label": "License", "value": "MIT" }
+    },
+    "requirements": "Requires Java 8 or higher · Cross-platform deployment supported",
+    "allReleases": "View All Releases",
+    "releases": "Releases",
+    "comments": "Message Board",
+    "loading": "Fetching latest release…",
+    "error": "Failed to fetch release info. Visit GitHub to download",
+    "stars": "1.2k",
+    "starsLabel": "Stars",
+    "commits": "350+",
+    "commitsLabel": "Commits",
+    "issues": "12",
+    "issuesLabel": "Issues",
+    "notice": {
+      "title": "Disclaimer",
+      "content": "This project was built to learn Java and JavaFX frameworks. Some styles and features are referenced from HMCL. It uses the API and launch code from the JMCCC project. This is a work-in-progress and may not be fully polished. For any issues or copyright concerns, please open an issue on GitHub (no longer maintained).",
+      "close": "Close",
+      "dismiss": "Don't show again"
+    },
+    "ack": {
+      "hmcl": "Thanks to <strong>HMCL</strong> for the theme inspiration and resources (please contact if any copyright issues)",
+      "laoji": "Thanks to <strong>Lao Ji</strong> for rewarding him with a milk tea 🧋"
+    }
   }
 }

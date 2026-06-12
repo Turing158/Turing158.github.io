@@ -10,7 +10,7 @@ import type { Release } from '@/types/search'
 import { config } from '@/config'
 
 const GITHUB_OWNER = config.github.owner
-const RELEASE_REPOS = ['StarFall-Minecraft-Launcher', 'SFMC']
+const RELEASE_REPOS = ['StarFall-Minecraft-Launcher', 'SFMC', 'StarFall-Vue', 'StarFall-SpringBoot']
 const CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 // 模块级缓存

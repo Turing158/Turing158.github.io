@@ -70,6 +70,13 @@
                 {{ $t('releases.download') }}
               </Button>
               <Button
+                v-if="getStandalonePage(release.repo)"
+                size="small"
+                @click="goToStandalone(getStandalonePage(release.repo)!)"
+              >
+                {{ $t('releases.page') }}
+              </Button>
+              <Button
                 size="small"
                 @click="goToDetail(release.repo)"
               >
@@ -104,6 +111,20 @@ function open(url: string) {
 
 function goToDetail(repo: string) {
   router.push(`/release/${repo}`)
+}
+
+function getStandalonePage(repo: string): string | null {
+  const map: Record<string, string> = {
+    'StarFall-Minecraft-Launcher': '/sfmc',
+    'SFMC': '/sfmc-jar',
+    'StarFall-Vue': '/starfall-forum',
+    'StarFall-SpringBoot': '/starfall-forum',
+  }
+  return map[repo] ?? null
+}
+
+function goToStandalone(path: string) {
+  router.push(path)
 }
 
 onMounted(() => {
