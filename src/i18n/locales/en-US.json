@@ -535,7 +535,7 @@
       "forum": { "title": "Forum Management", "desc": "Board classification, post publishing, sticky highlights, permission control and other complete forum features" },
       "user": { "title": "User System", "desc": "User registration and login, personal profile, avatar and nickname, points and levels and other social features" },
       "post": { "title": "Post System", "desc": "Rich text editor, image upload, Markdown support, draft saving and other content creation features" },
-      "comment": { "title": "Comment Interaction", "desc": "Comment replies, likes and favorites, @mentions and other interactive features to promote community communication" },
+      "comment": { "title": "Comment Interaction", "desc": "Comment replies, likes and favorites and other interactive features to promote community communication" },
       "notification": { "title": "Notifications", "desc": "System notifications, private messages, comment reply reminders and other real-time messaging features" },
       "search": { "title": "Search", "desc": "Full-text search, keyword highlighting, filtering and sorting and other efficient content retrieval features" }
     },
