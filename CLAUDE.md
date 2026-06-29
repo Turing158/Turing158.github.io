@@ -23,13 +23,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 命令
 
 ```bash
-npm run dev       # 开发服务器 (端口 3000)
-npm run build     # 生产构建
-npm run preview   # 预览构建结果
-npm run typecheck # TypeScript 类型检查 (vue-tsc --noEmit)
+npm run dev          # 开发服务器 (端口 3000, 自动打开浏览器)
+npm run build        # 生产构建
+npm run preview      # 预览构建结果
+npm run typecheck    # TypeScript 类型检查 (vue-tsc --noEmit)
+npm run build:icons  # 生成 PWA 图标（从头像 URL 下载并生成多尺寸）
 ```
 
 **注意:** 本项目使用 `python` 命令（非 `python3`）。
+
+### 站点地图（手动运行）
+构建前需手动运行站点地图生成（未在 prebuild 中自动触发）：
+```bash
+node scripts/generate-sitemap.mjs
+```
+生成 `dist/sitemap.xml`，包含所有静态页面和文章页面的 URL。
 
 ## 目录结构
 
@@ -73,17 +81,17 @@ src/
   composables/
     useArticles.ts          # 文章加载（本地 + GitHub API 双源）
     useGitalk.ts            # gitalk 评论初始化
-    useHolidays.ts          # 节假日倒计时（nager.at API）
-    useGitalk.ts            # gitalk 评论初始化
     useGitalkCount.ts       # Gitalk 评论计数
+    useHolidays.ts          # 节假日倒计时（nager.at API）
     useNetworkStatus.ts     # 网络状态检测
     usePwaUpdate.ts         # PWA 版本更新管理
+    useReadingTime.ts       # 文章阅读时间估算
     useReleases.ts          # 发行版本获取
-    useSearch.ts            # 搜索功能
+    useSearch.ts            # 搜索功能（基于 fuse.js 全文搜索）
+    useSeo.ts               # SEO meta 标签管理（基于 @vueuse/head）
     useTheme.ts             # 主题切换 (forest / ocean / sunset)
     useTime.ts              # 时间格式化（相对时间 + 完整时间）
     useViewCount.ts         # 文章浏览量（LeanCloud 存储）
-    useReadingTime.ts       # 文章阅读时间估算
   config.ts                 # 全局配置（从 .env 读取，含默认值）
   data/
     projects.ts             # 项目数据（开发中/已完成/教程/搁置）
@@ -130,6 +138,16 @@ src/
 
 使用 `createWebHashHistory('/')` 哈希路由。
 
+### 独立页面（Standalone Layout）
+
+| 路径 | 名称 | 说明 |
+|------|------|------|
+| `/sfmc` | sfmc | StarFall MC 启动器落地页（Minecraft 像素风） |
+| `/starfall-forum` | starfall-forum | StarFall 论坛页面 |
+| `/sfmc-jar` | sfmc-jar | SFMC JAR 下载落地页 |
+
+路由通过 `meta: { layout: 'standalone' }` 标记，在主布局 (MainLayout) 的 `App.vue` 中判断：**独立页面不渲染 MainLayout**，独立设置页面标题，跳过博客标题模板和全局 SEO。页面代码位于 `src/views/standalone/`。
+
 ## 关键组件说明
 
 ### MainLayout.vue (`src/layouts/MainLayout.vue`)
@@ -164,6 +182,30 @@ src/
 - 支持 info / success / warning / error 四种类型
 - 支持合并相同消息、暂停计时、安全移除（兜底定时器）
 - 默认 3 秒后自动消失，duration=0 则不自动消失
+
+## 内容目录
+
+- Markdown 文章源文件位于 `content/` 目录，构建时由 `articles-plugin` Vite 插件扫描
+
+## Markdown 渲染
+
+- **markdown-it** 配合 **markdown-it-anchor** 渲染 HTML（anchor ID 用于 TOC 跳转）
+- **highlight.js** 构建时预渲染代码高亮
+- **github-markdown-css** 提供基础 Markdown 排版样式
+- 代码块复制功能：通过 base64 编码传递代码，事件委托监听 `.copy-btn` 点击
+
+## 搜索系统
+
+基于 **fuse.js** 全文搜索（组件入口 `src/components/search/SearchDialog.vue`）：
+- 搜索字段：标题、标签、描述、文章内容
+- 在 `useSearch.ts` 中初始化 fuse 实例，文章加载完成后建立索引
+
+## SEO 系统
+
+使用 `@vueuse/head` 的 `useHead`（包装在 `src/composables/useSeo.ts`）：
+- 路由 `afterEach` 钩子中设置 `og:title` / `og:description` / `og:url` / `og:type`
+- 独立页面（standalone layout）跳过全局 SEO，由页面自行调用 `useHead`
+- 站点地图：`node scripts/generate-sitemap.mjs` 构建后手动生成
 
 ## 文章系统
 
@@ -215,6 +257,8 @@ config.cache.articlesTTL // 文章缓存 TTL (5分钟)
 - 使用 `import.meta.env.VITE_*` 读取环境变量
 - 提供本地开发默认值（GitHub 配置默认指向 `Turing158/Turing158.github.io`）
 - Gitalk 配置内置默认 OAuth 凭据
+- Gitalk 通过 Netlify 代理转发 OAuth token 请求：`config.gitalk.proxy`
+- 同时支持 Gitee 配置：`config.gitee.owner`
 - 标题模板: `{current_page} | Blog - {blog_title}`
 
 ## 主题系统
@@ -347,6 +391,18 @@ VITE_LEAN_CLOUD_SERVER_URL=https://your-domain.lc-cn-n1-shared.com
 - 使用内存缓存减少 API 请求
 - 支持国际化显示（中文："次浏览"，英文："views"）
 
+### 浏览量数字格式化
+根据浏览量大小自动调整显示格式：
+
+| 范围 | 显示格式 | 示例 |
+|------|---------|------|
+| < 1万 | 原始数字 | 9,999 |
+| 1万 - 10万 | 万 + 4位小数 | 1.2345 万 |
+| 10万 - 100万 | 万 + 3位小数 | 12.345 万 |
+| 100万 - 1000万 | 万 + 2位小数 | 123.45 万 |
+| 1000万 - 1亿 | 万 + 1位小数 | 1234.5 万 |
+| ≥ 1亿 | 亿 + 1位小数 | 1.2 亿 |
+
 ## 文章阅读时间估算
 
 根据文章字数计算预计阅读时间：
@@ -362,21 +418,6 @@ VITE_LEAN_CLOUD_SERVER_URL=https://your-domain.lc-cn-n1-shared.com
 ### 显示位置
 - 文章列表页：每张文章卡片显示时钟图标 + "X 分钟阅读"
 - 文章详情页：标题下方显示
-
-## 注意事项
-
-## 浏览量数字格式化
-
-根据浏览量大小自动调整显示格式：
-
-| 范围 | 显示格式 | 示例 |
-|------|---------|------|
-| < 1万 | 原始数字 | 9,999 |
-| 1万 - 10万 | 万 + 4位小数 | 1.2345 万 |
-| 10万 - 100万 | 万 + 3位小数 | 12.345 万 |
-| 100万 - 1000万 | 万 + 2位小数 | 123.45 万 |
-| 1000万 - 1亿 | 万 + 1位小数 | 1234.5 万 |
-| ≥ 1亿 | 亿 + 1位小数 | 1.2 亿 |
 
 ## 注意事项
 

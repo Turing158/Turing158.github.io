@@ -1618,33 +1618,33 @@ function toggleLang() {
   }
 }
 
-// ===== 无障碍：减少动画 =====
-@media (prefers-reduced-motion: reduce) {
-  .deco-block {
-    animation: none;
-  }
+// ===== 无障碍：减少动画（与Windows系统中的“窗口内的动画控件和元素”有冲突） =====
+// @media (prefers-reduced-motion: reduce) {
+//   .deco-block {
+//     animation: none;
+//   }
 
-  .hero-badge,
-  .title-main,
-  .title-sub,
-  .forum-tagline,
-  .forum-subtagline,
-  .hero-actions,
-  .intro-box,
-  .forum-repo-card,
-  .forum-feature-card,
-  .tech-group,
-  .tech-tag,
-  .download-card,
-  .ack-item,
-  .footer-note {
-    animation: none;
-  }
+//   .hero-badge,
+//   .title-main,
+//   .title-sub,
+//   .forum-tagline,
+//   .forum-subtagline,
+//   .hero-actions,
+//   .intro-box,
+//   .forum-repo-card,
+//   .forum-feature-card,
+//   .tech-group,
+//   .tech-tag,
+//   .download-card,
+//   .ack-item,
+//   .footer-note {
+//     animation: none;
+//   }
 
-  * {
-    transition: none !important;
-  }
-}
+//   * {
+//     transition: none !important;
+//   }
+// }
 
 // ===== 首次访问提示弹窗（像素风） =====
 .notice-overlay {

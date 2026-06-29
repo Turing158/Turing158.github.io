@@ -1707,16 +1707,16 @@ onMounted(() => {
   }
 }
 
-// ===== 无障碍 =====
-@media (prefers-reduced-motion: reduce) {
-  .cave-sparkles,
-  .ore-decoration,
-  .particle {
-    animation: none;
-  }
+// ===== 无障碍（与Windows系统中的“窗口内的动画控件和元素”有冲突） =====
+// @media (prefers-reduced-motion: reduce) {
+//   .cave-sparkles,
+//   .ore-decoration,
+//   .particle {
+//     animation: none;
+//   }
 
-  * {
-    transition: none !important;
-  }
-}
+//   * {
+//     transition: none !important;
+//   }
+// }
 </style>

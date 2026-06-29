@@ -277,7 +277,7 @@
               <p v-if="loading" class="download-status">
                 <span class="loading-dots">{{ t('sfmc.loadingRelease') }}</span>
               </p>
-              <template v-else-if="release">
+              <template v-if="release">
                 <div class="version-info">
                   <span class="version-badge">{{ release.tag_name }}</span>
                   <span class="version-date">{{ formatDate(release.published_at) }}</span>
@@ -2142,40 +2142,40 @@ onMounted(() => {
   }
 }
 
-// ===== 无障碍：减少动画 =====
-@media (prefers-reduced-motion: reduce) {
-  .title-icon,
-  .title-word {
-    animation: none;
-  }
+// ===== 无障碍：减少动画（与Windows系统中的“窗口内的动画控件和元素”有冲突） =====
+// @media (prefers-reduced-motion: reduce) {
+//   .title-icon,
+//   .title-word {
+//     animation: none;
+//   }
 
-  .mc-block {
-    animation: none;
-  }
+//   .mc-block {
+//     animation: none;
+//   }
 
-  .ore-block,
-  .torch,
-  .pickaxe,
-  .crafting-table {
-    animation: none;
-  }
+//   .ore-block,
+//   .torch,
+//   .pickaxe,
+//   .crafting-table {
+//     animation: none;
+//   }
 
-  .sf-bento-card,
-  .hotbar-slot,
-  .info-row,
-  .version-badge,
-  .acknowledgements,
-  .ack-icon,
-  .footer-divider {
-    animation: none;
-  }
+//   .sf-bento-card,
+//   .hotbar-slot,
+//   .info-row,
+//   .version-badge,
+//   .acknowledgements,
+//   .ack-icon,
+//   .footer-divider {
+//     animation: none;
+//   }
 
-  .notice-dialog {
-    animation: none;
-  }
+//   .notice-dialog {
+//     animation: none;
+//   }
 
-  * {
-    transition: none !important;
-  }
-}
+//   * {
+//     transition: none !important;
+//   }
+// }
 </style>
