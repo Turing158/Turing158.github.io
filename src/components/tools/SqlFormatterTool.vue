@@ -325,6 +325,9 @@ function formatSqlString(sql: string, opts: {
     if (prevType === 'comma') return true
     if (prevType === 'operator' || currType === 'operator') return true
     if (prevType === 'identifier' && currType === 'identifier') return true
+    if (prevType === 'clause') return true
+    if (prevType === 'keyword') return true
+    if (currType === 'keyword') return true
     return false
   }
 

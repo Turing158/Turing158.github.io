@@ -6,7 +6,8 @@
     "releases": "Releases",
     "tools": "Tools",
     "about": "About",
-    "commits": "Commits"
+    "commits": "Commits",
+    "achievements": "Achievements"
   },
   "home": {
     "recentCommits": "Recent Commits",
@@ -171,9 +172,9 @@
     "base64Name": "Base64 Encoder/Decoder",
     "base64Desc": "Convert text to and from Base64 encoding.",
     "base64Tags": ["Base64", "Encode", "Decode"],
-    "regexName": "Regex Tester",
-    "regexDesc": "Test regular expressions online and see matches in real time.",
-    "regexTags": ["Regex", "Pattern", "Match"],
+    "regexName": "Regex",
+    "regexDesc": "Test regular expressions with real-time matching and interactive railroad diagram visualization.",
+    "regexTags": ["Regex", "Pattern", "Match", "Visualize"],
     "colorName": "Color Converter",
     "colorDesc": "Convert between HEX, RGB, and HSL color formats.",
     "colorTags": ["Color", "HEX", "RGB", "HSL"],
@@ -213,9 +214,12 @@
     "cronEditorName": "Cron Expression Editor",
     "cronEditorDesc": "Visual cron expression editor with next execution preview.",
     "cronEditorTags": ["Cron", "Schedule", "Timer"],
-    "regexVisName": "Regex Visualizer",
-    "regexVisDesc": "Visualize regular expressions with railroad diagrams and component breakdowns.",
-    "regexVisTags": ["Regex", "Visual", "Diagram"],
+    "passwordStrengthName": "Password Strength",
+    "passwordStrengthDesc": "Analyze password strength in real-time with security checklist and crack time estimate.",
+    "passwordStrengthTags": ["Password", "Security", "Strength"],
+    "loremIpsumName": "Lorem Ipsum Generator",
+    "loremIpsumDesc": "Generate Lorem Ipsum or Chinese placeholder text in paragraphs, sentences, or words.",
+    "loremIpsumTags": ["Lorem", "Placeholder", "Text"],
     "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
@@ -243,10 +247,10 @@
     "regex": {
       "patternLabel": "Regular Expression",
       "patternPlaceholder": "Enter regex pattern...",
-      "flagsLabel": "Flags",
       "testLabel": "Test String",
       "testPlaceholder": "Enter test string...",
       "test": "Test",
+      "visualize": "Visualize",
       "clear": "Clear",
       "resultLabel": "Matches",
       "noMatch": "No matches found"
@@ -498,6 +502,51 @@
       "zeroOrOneDesc": "0 or 1 time",
       "repeatDesc": "Repeat"
     },
+    "passwordStrength": {
+      "inputLabel": "Enter Password",
+      "placeholder": "Type your password...",
+      "strength": "Password Strength",
+      "weak": "Weak",
+      "fair": "Fair",
+      "strong": "Strong",
+      "veryStrong": "Very Strong",
+      "crackTime": "Estimated Crack Time",
+      "instant": "Instant",
+      "seconds": "~{n} seconds",
+      "minutes": "~{n} minutes",
+      "hours": "~{n} hours",
+      "days": "~{n} days",
+      "months": "~{n} months",
+      "years": "~{n} years",
+      "centuries": "Centuries",
+      "requirements": "Security Checklist",
+      "checkLength": "At least 8 characters",
+      "checkLowercase": "Contains lowercase letter",
+      "checkUppercase": "Contains uppercase letter",
+      "checkNumber": "Contains number",
+      "checkSymbol": "Contains special character",
+      "emptyHint": "Type a password to check its strength...",
+      "toggleVisibility": "Toggle visibility"
+    },
+    "loremIpsum": {
+      "modeLabel": "Mode",
+      "modeParagraphs": "Paragraphs",
+      "modeSentences": "Sentences",
+      "modeWords": "Words",
+      "amountLabel": "Amount",
+      "paragraphs": "paragraphs",
+      "sentences": "sentences",
+      "words": "words",
+      "languageLabel": "Language",
+      "langLatin": "Latin",
+      "langZh": "Chinese",
+      "langMixed": "Mixed",
+      "generate": "Generate",
+      "copy": "Copy",
+      "clear": "Clear",
+      "outputLabel": "Result",
+      "nothingToCopy": "Nothing to copy"
+    },
     "holidayQuery": {
       "year": "Year",
       "country": "Country",
@@ -541,7 +590,15 @@
     "suggestions": "You can try the following:",
     "viewArticles": "Browse Articles",
     "viewProjects": "View Projects",
-    "aboutMe": "About Me"
+    "aboutMe": "About Me",
+    "snakeGame": "Snake Game",
+    "score": "Score",
+    "best": "Best",
+    "clickToStart": "Click to Start",
+    "snakeHint": "Arrow keys / WASD to control",
+    "gameOver": "Game Over",
+    "finalScore": "Score: {n}",
+    "clickToRestart": "Click to Restart"
   },
   "error": {
     "title": "Server Error",
@@ -570,7 +627,8 @@
     "error": "Server Error",
     "sfmc": "StarFall Minecraft Launcher",
     "starfallForum": "StarFall Minecraft Forum",
-    "sfmcJar": "SFMC - Java Edition"
+    "sfmcJar": "SFMC - Java Edition",
+    "achievements": "Achievements"
   },
   "pageReleases": {
     "title": "Release Detail",
@@ -762,6 +820,37 @@
     "ack": {
       "hmcl": "Thanks to <strong>HMCL</strong> for the theme inspiration and resources (please contact if any copyright issues)",
       "laoji": "Thanks to <strong>Lao Ji</strong> for rewarding him with a milk tea 🧋"
+    }
+  },
+  "achievements": {
+    "title": "Achievements",
+    "description": "Complete various tasks to unlock hidden achievements and collect badges.",
+    "progress": "{unlocked} / {total} Unlocked",
+    "latestUnlock": "🏆 Achievement Unlocked: {name}",
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "empty": "No achievements in this category yet.",
+    "categories": {
+      "all": "All",
+      "exploration": "Exploration",
+      "special": "Special",
+      "secret": "Secret"
+    },
+    "conditions": {
+      "firstSteps": "First visit to this site",
+      "bookworm": "Visit 5 different articles",
+      "toolMaster": "Use all 17 tools",
+      "projectExplorer": "Visit 3 different project commit pages",
+      "releaseTwoVisit": "View 2 release pages",
+      "installPwa": "Successfully install PWA",
+      "findSperateOption": "Open the separator settings",
+      "eggHunter": "Trigger the Konami Code (↑↑↓↓←→←→BA)",
+      "nightOwl": "Visit after midnight (0:00–5:59)",
+      "earlyBird": "Visit between 6 AM (6:00–6:59)",
+      "darkKnight": "Switch to dark theme",
+      "themeHopper": "Switch through all themes (forest / ocean / sunset / dark)",
+      "speedDemon": "Click the avatar 10 times to trigger the easter egg",
+      "achievementCollector": "Automatically unlock after unlocking all other achievements"
     }
   }
 }

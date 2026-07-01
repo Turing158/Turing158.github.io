@@ -34,7 +34,7 @@
       <!-- Profile Widget -->
       <div class="widget profile-widget">
         <div class="profile-avatar-wrap">
-          <img :src="avatarUrl" alt="avatar" class="profile-avatar" />
+          <img :src="avatarUrl" alt="avatar" class="profile-avatar" @click="onAvatarClick" />
         </div>
         <div class="profile-name">{{ blogName }}</div>
         <div class="profile-bio">{{ profileBio }}</div>
@@ -291,6 +291,8 @@ import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useHolidays } from '@/composables/useHolidays'
 import { useGitalk } from '@/composables/useGitalk'
 import { config } from '@/config'
+import BlogTip from '@/plugins/blog-tip'
+import { useAchievements } from '@/composables/useAchievements'
 import '@/styles/gitalk-theme.css'
 
 // SEO
@@ -315,6 +317,30 @@ const githubUser = config.github.owner
 const githubProfileUrl = `https://github.com/${githubUser}`
 const giteeUser = config.gitee.owner
 const giteeProfileUrl = `https://gitee.com/${giteeUser}`
+
+// Avatar click easter egg — count 10 clicks to trigger warning
+const avatarClickCount = ref(0)
+let avatarClickTimer: ReturnType<typeof setTimeout> | null = null
+
+function onAvatarClick() {
+  avatarClickCount.value++
+  if (avatarClickTimer) {
+    clearTimeout(avatarClickTimer)
+  }
+  avatarClickTimer = setTimeout(() => {
+    avatarClickCount.value = 0
+  }, 3000)
+
+  if (avatarClickCount.value >= 10) {
+    avatarClickCount.value = 0
+    if (avatarClickTimer) {
+      clearTimeout(avatarClickTimer)
+      avatarClickTimer = null
+    }
+    BlogTip.show('不要到處亂摸咯！', { type: 'warning', duration: 3000 })
+    useAchievements().unlock('speed-demon')
+  }
+}
 
 // GitHub Profile
 interface GitHubProfile {

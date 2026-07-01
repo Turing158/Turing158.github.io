@@ -646,7 +646,7 @@ defineExpose({
   transform: translateY(-4px);
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* @media (prefers-reduced-motion: reduce) {
   .blog-select-suffix {
     transition: none;
   }
@@ -664,5 +664,5 @@ defineExpose({
   .blog-select-dropdown-leave-to {
     transform: none;
   }
-}
+} */
 </style>

@@ -182,6 +182,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { useAchievements } from '@/composables/useAchievements'
 
 const router = useRouter()
 
@@ -370,7 +371,11 @@ async function fetchCommits() {
 }
 
 watch(() => props.repo, fetchCommits, { immediate: false })
-onMounted(fetchCommits)
+onMounted(() => {
+  fetchCommits()
+  // 成就系统：记录项目提交页访问（用于 project-explorer 成就：访问 3 个不同项目提交页）
+  useAchievements().addVisitedProjectRepo(repoName.value)
+})
 </script>
 
 <style lang="less" scoped>

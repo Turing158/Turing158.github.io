@@ -144,6 +144,13 @@ const icons: Record<string, Shape[]> = {
     { type: 'line', x1: 8, y1: 21, x2: 16, y2: 21 },
     { type: 'line', x1: 12, y1: 17, x2: 12, y2: 21 },
   ],
+  trophy: [
+    { type: 'path', d: 'M6 2h12v2c0 3-2 7-6 9-4-2-6-6-6-9V2Z' },
+    { type: 'path', d: 'M12 13v5' },
+    { type: 'path', d: 'M8 22h8' },
+    { type: 'path', d: 'M6 8a4 4 0 0 1-4-4V4h2a4 4 0 0 1 4 4' },
+    { type: 'path', d: 'M18 8a4 4 0 0 0 4-4V4h-2a4 4 0 0 0-4 4' },
+  ],
 }
 
 const paths = computed<Shape[]>(() => icons[props.name] ?? [])

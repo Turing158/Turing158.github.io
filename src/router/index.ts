@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { config } from '@/config'
 import i18n from '@/i18n'
 import { useSeo } from '@/composables/useSeo'
+import { useAchievements } from '@/composables/useAchievements'
 
 const routes: RouteRecordRaw[] = [
   {
@@ -47,6 +48,12 @@ const routes: RouteRecordRaw[] = [
     name: 'tools',
     component: () => import('@/views/ToolsView.vue'),
     meta: { titleKey: 'pageTitle.tools' },
+  },
+  {
+    path: '/achievements',
+    name: 'achievements',
+    component: () => import('@/views/AchievementsView.vue'),
+    meta: { titleKey: 'pageTitle.achievements' },
   },
   {
     path: '/about',
@@ -160,6 +167,12 @@ export function updateDocumentTitle(pageTitle: string) {
 
 router.afterEach((to) => {
   progressListeners.forEach(l => l.onDone())
+
+  // 记录路由访问（成就系统）
+  if (to.name && typeof to.name === 'string') {
+    const achievements = useAchievements()
+    achievements.handleRouteVisit(to.name)
+  }
 
   // 独立页面跳过全局 SEO（useSeo 会套用博客标题模板和主题色），由页面自行 useHead
   if (to.meta.layout === 'standalone') return

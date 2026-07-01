@@ -79,6 +79,7 @@ import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 import { config } from '@/config'
 import { updateDocumentTitle } from '@/router'
+import { useAchievements } from '@/composables/useAchievements'
 
 const route = useRoute()
 const router = useRouter()
@@ -163,6 +164,11 @@ onMounted(async () => {
 
   // 增加浏览量
   incrementViewCount()
+
+  // 成就系统：记录文章访问（用于 bookworm 成就：访问 5 篇不同文章）
+  if (slug.value) {
+    useAchievements().addVisitedArticle(slug.value)
+  }
 
   nextTick(() => {
     updateHeadings()

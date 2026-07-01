@@ -287,8 +287,8 @@ a:hover {
   }
 }
 
-/* Reduced motion */
-@media (prefers-reduced-motion: reduce) {
+/* Reduced motion（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画） */
+/* @media (prefers-reduced-motion: reduce) {
   .markdown-body hr::after,
   .loading-dot,
   .skeleton,
@@ -302,6 +302,6 @@ a:hover {
     opacity: 1;
     transform: scale(1);
   }
-}
+} */
 
 

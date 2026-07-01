@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useAchievements } from '@/composables/useAchievements'
 
 const deferredPrompt = ref<Event | null>(null)
 const showPrompt = ref(false)
@@ -53,6 +54,8 @@ onMounted(() => {
   window.addEventListener('appinstalled', () => {
     isInstalled.value = true
     showPrompt.value = false
+    // 成就系统：PWA 安装完成
+    useAchievements().unlock('install-pwa')
   })
 })
 </script>

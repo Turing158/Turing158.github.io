@@ -6,7 +6,8 @@
     "releases": "发行",
     "tools": "工具",
     "about": "关于",
-    "commits": "提交"
+    "commits": "提交",
+    "achievements": "成就"
   },
   "pageTitle": {
     "home": "主页",
@@ -23,7 +24,8 @@
     "error": "服务器错误",
     "sfmc": "StarFall Minecraft Launcher",
     "starfallForum": "StarFall Minecraft Forum",
-    "sfmcJar": "SFMC - Java Edition"
+    "sfmcJar": "SFMC - Java Edition",
+    "achievements": "成就"
   },
   "home": {
     "recentCommits": "最新提交",
@@ -198,9 +200,9 @@
     "base64Name": "Base64 编解码",
     "base64Desc": "文本与 Base64 编码之间的互相转换。",
     "base64Tags": ["Base64", "编码", "解码"],
-    "regexName": "正则表达式测试",
-    "regexDesc": "在线测试正则表达式，实时查看匹配结果。",
-    "regexTags": ["Regex", "正则", "匹配"],
+    "regexName": "正则表达式",
+    "regexDesc": "在线测试正则表达式并可视化匹配路径，支持铁路图展示。",
+    "regexTags": ["Regex", "正则", "匹配", "可视化"],
     "colorName": "颜色转换器",
     "colorDesc": "HEX、RGB、HSL 颜色格式互相转换。",
     "colorTags": ["颜色", "HEX", "RGB", "HSL"],
@@ -240,9 +242,12 @@
     "cronEditorName": "Cron 表达式编辑器",
     "cronEditorDesc": "可视化的 Cron 表达式编辑和预览工具，支持下次执行时间计算。",
     "cronEditorTags": ["Cron", "定时", "调度"],
-    "regexVisName": "正则可视化",
-    "regexVisDesc": "将正则表达式渲染为可视化图形，展示匹配路径和解释说明。",
-    "regexVisTags": ["Regex", "正则", "可视化"],
+    "passwordStrengthName": "密码强度检测",
+    "passwordStrengthDesc": "实时分析密码强度，显示安全检查清单和破解时间估算。",
+    "passwordStrengthTags": ["密码", "强度", "安全"],
+    "loremIpsumName": "Lorem Ipsum 生成器",
+    "loremIpsumDesc": "生成 Lorem Ipsum 或中文占位文本，支持段落、句子、单词三种模式。",
+    "loremIpsumTags": ["Lorem", "占位", "文本"],
     "copy": "复制",
     "jsonFormatter": {
       "inputLabel": "输入 JSON",
@@ -270,10 +275,10 @@
     "regex": {
       "patternLabel": "正则表达式",
       "patternPlaceholder": "输入正则表达式...",
-      "flagsLabel": "标志",
       "testLabel": "测试文本",
       "testPlaceholder": "输入测试文本...",
       "test": "测试",
+      "visualize": "可视化",
       "clear": "清空",
       "resultLabel": "匹配结果",
       "noMatch": "无匹配结果"
@@ -525,6 +530,51 @@
       "zeroOrOneDesc": "0 次或 1 次",
       "repeatDesc": "重复"
     },
+    "passwordStrength": {
+      "inputLabel": "输入密码",
+      "placeholder": "在此输入密码...",
+      "strength": "密码强度",
+      "weak": "弱",
+      "fair": "中等",
+      "strong": "强",
+      "veryStrong": "极强",
+      "crackTime": "破解时间估算",
+      "instant": "瞬间破解",
+      "seconds": "约 {n} 秒",
+      "minutes": "约 {n} 分钟",
+      "hours": "约 {n} 小时",
+      "days": "约 {n} 天",
+      "months": "约 {n} 个月",
+      "years": "约 {n} 年",
+      "centuries": "几个世纪",
+      "requirements": "安全检查清单",
+      "checkLength": "至少 8 个字符",
+      "checkLowercase": "包含小写字母",
+      "checkUppercase": "包含大写字母",
+      "checkNumber": "包含数字",
+      "checkSymbol": "包含特殊符号",
+      "emptyHint": "输入密码即可实时检测强度...",
+      "toggleVisibility": "切换可见性"
+    },
+    "loremIpsum": {
+      "modeLabel": "生成模式",
+      "modeParagraphs": "段落",
+      "modeSentences": "句子",
+      "modeWords": "单词",
+      "amountLabel": "数量",
+      "paragraphs": "段",
+      "sentences": "句",
+      "words": "个",
+      "languageLabel": "语言",
+      "langLatin": "拉丁语",
+      "langZh": "中文",
+      "langMixed": "中英混合",
+      "generate": "生成",
+      "copy": "复制",
+      "clear": "清空",
+      "outputLabel": "生成结果",
+      "nothingToCopy": "没有可复制的内容"
+    },
     "holidayQuery": {
       "year": "年份",
       "country": "国家",
@@ -590,7 +640,15 @@
     "suggestions": "您可以尝试以下操作：",
     "viewArticles": "浏览文章",
     "viewProjects": "查看项目",
-    "aboutMe": "关于我"
+    "aboutMe": "关于我",
+    "snakeGame": "贪吃蛇",
+    "score": "分数",
+    "best": "最高",
+    "clickToStart": "点击开始游戏",
+    "snakeHint": "方向键 / WASD 控制方向",
+    "gameOver": "游戏结束",
+    "finalScore": "得分：{n}",
+    "clickToRestart": "点击重新开始"
   },
   "error": {
     "title": "服务器错误",
@@ -792,6 +850,37 @@
     "ack": {
       "hmcl": "感谢 <strong>HMCL</strong> 的主题素材和灵感（如有侵权，请联系）",
       "laoji": "感谢 <strong>老己</strong> 奖励他一杯奶茶 🧋"
+    }
+  },
+  "achievements": {
+    "title": "成就",
+    "description": "完成各种任务，解锁隐藏成就，收集徽章。",
+    "progress": "已解锁 {unlocked} / {total}",
+    "latestUnlock": "🏆 解锁成就：{name}",
+    "locked": "未解锁",
+    "unlocked": "已解锁",
+    "empty": "此分类下暂无成就。",
+    "categories": {
+      "all": "全部",
+      "exploration": "探索",
+      "special": "特殊",
+      "secret": "秘密"
+    },
+    "conditions": {
+      "firstSteps": "首次访问博客",
+      "bookworm": "访问5篇不同文章",
+      "toolMaster": "使用过全部 17 个工具",
+      "projectExplorer": "访问3個不同项目提交页",
+      "releaseTwoVisit": "查看2個發行頁",
+      "installPwa": "成功安装pwa",
+      "findSperateOption": "成功打开分隔符的设置",
+      "eggHunter": "触发 Konami Code（↑↑↓↓←→←→BA）",
+      "nightOwl": "在午夜后访问（0:00–5:59）",
+      "earlyBird": "在清晨 6 点之间访问（6:00–6:59）",
+      "darkKnight": "切换到暗色主题",
+      "themeHopper": "切换过所有主题（forest / ocean / sunset / dark）",
+      "speedDemon": "点击 10 次头像触发彩蛋",
+      "achievementCollector": "解锁所有其他成就后自动解锁"
     }
   }
 }

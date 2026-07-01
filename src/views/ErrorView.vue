@@ -373,12 +373,12 @@ function goHome() {
   }
 }
 
-// 减少动画偏好
-@media (prefers-reduced-motion: reduce) {
+// 减少动画偏好（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画）
+/* @media (prefers-reduced-motion: reduce) {
   .error-icon,
   .gear,
   .floating-shape {
     animation: none;
   }
-}
+} */
 </style>

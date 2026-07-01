@@ -124,6 +124,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTheme, type ThemeName } from '@/composables/useTheme'
+import { useAchievements } from '@/composables/useAchievements'
 import { setLocale } from '@/i18n'
 import ArticleTOCDrawer from '@/components/article/ArticleTOCDrawer.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
@@ -146,6 +147,8 @@ const {
 
 const searchDialogRef = ref<InstanceType<typeof SearchDialog> | null>(null)
 const openSearch = () => searchDialogRef.value?.open()
+
+const { isNavUnlocked } = useAchievements()
 
 const isMobile = ref(window.innerWidth < 768)
 const isCollapsed = ref(window.innerWidth < 768)
@@ -325,14 +328,28 @@ onUnmounted(() => {
 })
 // =============================================
 
-const navItems = [
-  { path: '/', icon: 'home', labelKey: 'nav.home', activeNames: ['home'] },
-  { path: '/articles', icon: 'articles', labelKey: 'nav.articles', activeNames: ['articles', 'article-detail'] },
-  { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
-  { path: '/releases', icon: 'releases', labelKey: 'nav.releases', activeNames: ['releases', 'release-detail'] },
-  { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools'] },
-  { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
-]
+const navItems = computed(() => {
+  const items = [
+    { path: '/', icon: 'home', labelKey: 'nav.home', activeNames: ['home'] },
+    { path: '/articles', icon: 'articles', labelKey: 'nav.articles', activeNames: ['articles', 'article-detail'] },
+    { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
+    { path: '/releases', icon: 'releases', labelKey: 'nav.releases', activeNames: ['releases', 'release-detail'] },
+    { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools'] },
+    { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
+  ]
+
+  // 彩蛋导航：通过 Konami Code 解锁后显示
+  if (isNavUnlocked.value) {
+    items.push({
+      path: '/achievements',
+      icon: 'trophy',
+      labelKey: 'nav.achievements',
+      activeNames: ['achievements'],
+    })
+  }
+
+  return items
+})
 
 const lightThemes: { value: ThemeName; icon: string; labelKey: string }[] = [
   { value: 'forest' as ThemeName, icon: 'forest', labelKey: 'theme.forest' },
@@ -352,6 +369,16 @@ function handleThemeClick(t: ThemeName) {
     // 普通模式：直接切换
     setTheme(t)
   }
+
+  // 成就系统：记录主题使用
+  const achievements = useAchievements()
+  achievements.addUsedTheme(t)
+  // 暗夜骑士：第一次使用暗色主题时解锁
+  if (t === 'dark') {
+    achievements.unlock('dark-knight')
+  }
+  // 主题跳跳虎：在 addUsedTheme 中自动检查
+  achievements.checkConditionalAchievements()
 }
 
 const toggleLang = () => {

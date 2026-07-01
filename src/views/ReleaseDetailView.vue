@@ -200,6 +200,7 @@ import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import MarkdownIt from 'markdown-it'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
+import { useAchievements } from '@/composables/useAchievements'
 
 const router = useRouter()
 const GITHUB_OWNER = 'Turing158'
@@ -406,7 +407,11 @@ async function fetchReleases() {
   }
 }
 
-onMounted(fetchReleases)
+onMounted(() => {
+  fetchReleases()
+  // 成就系统：记录发行页访问（用于 release-two-visit 成就：查看 2 个不同发行页）
+  useAchievements().addVisitedRelease(repoName.value)
+})
 </script>
 
 <style lang="less" scoped>

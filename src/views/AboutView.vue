@@ -643,9 +643,8 @@ const contactLinks = computed<ContactLink[]>(() => [
   transition: all 0.25s ease;
 }
 
-// ── Reduced Motion ──
-// 仅关闭大幅度的入场/循环动画，保留 hover 的小幅过渡反馈
-@media (prefers-reduced-motion: reduce) {
+// ── Reduced Motion（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画） ──
+/* @media (prefers-reduced-motion: reduce) {
   .avatar-wrapper::before {
     animation: none;
   }
@@ -659,7 +658,7 @@ const contactLinks = computed<ContactLink[]>(() => [
   .timeline-pulse {
     animation: none;
   }
-}
+} */
 
 // ── Responsive ──
 @media (max-width: 480px) {

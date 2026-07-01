@@ -67,7 +67,7 @@ import BlogDialog from '@/components/common/BlogDialog.vue'
 import {
   JsonFormatterTool,
   Base64Tool,
-  RegexTesterTool,
+  RegexTool,
   ColorConverterTool,
   TimestampConverterTool,
   TextCounterTool,
@@ -81,10 +81,12 @@ import {
   ApiTestTool,
   SqlFormatterTool,
   CronEditorTool,
-  RegexVisualizerTool,
+  PasswordStrengthTool,
+  LoremIpsumTool,
   SeparatorEditorDialog,
 } from '@/components/tools'
 import { usePageSeo } from '@/composables/useSeo'
+import { useAchievements } from '@/composables/useAchievements'
 
 // SEO
 usePageSeo('工具', '开发者工具集：JSON格式化、Base64编解码、正则测试、颜色转换等', '#/tools')
@@ -103,7 +105,7 @@ const { t, tm } = useI18n()
 const componentMap: Record<string, any> = {
   JsonFormatter: JsonFormatterTool,
   Base64Tool,
-  RegexTester: RegexTesterTool,
+  RegexTool,
   ColorConverter: ColorConverterTool,
   TimestampConverter: TimestampConverterTool,
   TextCounter: TextCounterTool,
@@ -117,14 +119,15 @@ const componentMap: Record<string, any> = {
   ApiTestTool,
   SqlFormatterTool,
   CronEditorTool,
-  RegexVisualizerTool,
+  PasswordStrengthTool,
+  LoremIpsumTool,
 }
 
 // 工具元数据
 const toolKeys = [
   { key: 'jsonFormatter', component: 'JsonFormatter', icon: '📋' },
   { key: 'base64', component: 'Base64Tool', icon: '🔐' },
-  { key: 'regex', component: 'RegexTester', icon: '🔍' },
+  { key: 'regex', component: 'RegexTool', icon: '🔍' },
   { key: 'color', component: 'ColorConverter', icon: '🎨' },
   { key: 'timestamp', component: 'TimestampConverter', icon: '⏰' },
   { key: 'textCounter', component: 'TextCounter', icon: '📊' },
@@ -138,7 +141,8 @@ const toolKeys = [
   { key: 'apiTest', component: 'ApiTestTool', icon: '🌐' },
   { key: 'sqlFormatter', component: 'SqlFormatterTool', icon: '🗃️' },
   { key: 'cronEditor', component: 'CronEditorTool', icon: '⏱️' },
-  { key: 'regexVis', component: 'RegexVisualizerTool', icon: '🔬' },
+  { key: 'passwordStrength', component: 'PasswordStrengthTool', icon: '🔒' },
+  { key: 'loremIpsum', component: 'LoremIpsumTool', icon: '📝' },
 ] as const
 
 const tools = computed<Tool[]>(() =>
@@ -182,6 +186,8 @@ function onRequestSeparatorEdit(source: 'number' | 'string') {
   separatorSource.value = source
   separatorPreviewSamples.value = []
   showSeparatorEditor.value = true
+  // 成就系统：第一次打开分隔符设置即解锁
+  useAchievements().unlock('find-sperate-option')
 }
 
 function onSeparatorConfirm(separator: string) {
@@ -197,6 +203,9 @@ function onSeparatorCancel() {
 function openTool(tool: Tool) {
   activeTool.value = tool
   dialogOpen.value = true
+
+  // 成就系统：记录工具使用（用于 tool-master 成就：使用全部 17 个工具）
+  useAchievements().handleToolUse(tool.component)
 }
 
 function onDialogOpen() {
