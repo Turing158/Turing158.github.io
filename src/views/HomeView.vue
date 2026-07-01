@@ -36,7 +36,10 @@
         <div class="profile-avatar-wrap">
           <img :src="avatarUrl" alt="avatar" class="profile-avatar" @click="onAvatarClick" />
         </div>
-        <div class="profile-name">{{ blogName }}</div>
+        <div class="profile-name typewriter">
+          <span class="typewriter-text">{{ blogName }}</span>
+          <span v-if="showBlogCursor" class="typewriter-cursor"></span>
+        </div>
         <div class="profile-bio">{{ profileBio }}</div>
         <div v-if="profile?.location" class="profile-location">
           <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
@@ -293,6 +296,7 @@ import { useGitalk } from '@/composables/useGitalk'
 import { config } from '@/config'
 import BlogTip from '@/plugins/blog-tip'
 import { useAchievements } from '@/composables/useAchievements'
+import { useTypewriter } from '@/composables/useTypewriter'
 import '@/styles/gitalk-theme.css'
 
 // SEO
@@ -310,7 +314,8 @@ const { t, locale } = useI18n()
 const { init: initGitalk } = useGitalk('gitalk-container-home', 'home-comments', '留声机评论')
 const gramophoneInitialized = ref(false)
 
-const blogName = config.blog.title
+const fullBlogName = config.blog.title
+const { displayedText: blogName, showCursor: showBlogCursor } = useTypewriter(fullBlogName, 120, 60, 2000, 800)
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
 const hasGitHubConfig = !!(config.github.owner && config.github.repo)
 const githubUser = config.github.owner
@@ -916,6 +921,39 @@ onMounted(async () => {
   font-size: 1.1rem;
   margin-bottom: 4px;
   color: var(--text-primary);
+}
+
+// Typewriter effect — JS-driven loop with blinking cursor
+.typewriter {
+  display: inline-flex;
+  align-items: center;
+}
+
+.typewriter-text {
+  white-space: nowrap;
+  min-height: 1.2em;
+  line-height: 1.2em;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
+  margin-left: 2px;
+  animation: typewriter-blink 0.8s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes typewriter-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter-cursor {
+    animation: none;
+  }
 }
 
 .profile-bio {

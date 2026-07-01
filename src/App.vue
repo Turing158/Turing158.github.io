@@ -7,6 +7,7 @@
     <PwaInstallPrompt v-if="!isStandalone" />
     <PwaUpdatePrompt v-if="!isStandalone" />
     <PwaOfflinePage v-if="!isStandalone && !isOnline" />
+    <ContextMenu />
   </div>
 </template>
 
@@ -20,6 +21,7 @@ import BlogTipContainer from '@/components/common/BlogTipContainer.vue'
 import PwaInstallPrompt from '@/components/common/PwaInstallPrompt.vue'
 import PwaUpdatePrompt from '@/components/common/PwaUpdatePrompt.vue'
 import PwaOfflinePage from '@/components/common/PwaOfflinePage.vue'
+import ContextMenu from '@/components/common/ContextMenu.vue'
 import { useNetworkStatus } from '@/composables/useNetworkStatus'
 import { useKonamiCode } from '@/composables/useKonamiCode'
 import { useAchievements } from '@/composables/useAchievements'

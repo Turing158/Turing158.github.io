@@ -61,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import {
@@ -87,6 +87,7 @@ import {
 } from '@/components/tools'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
+import { registerContextProvider } from '@/composables/contextMenuRegistry'
 
 // SEO
 usePageSeo('工具', '开发者工具集：JSON格式化、Base64编解码、正则测试、颜色转换等', '#/tools')
@@ -227,6 +228,36 @@ onMounted(async () => {
       cardVisibleStates.value[tool.component] = true
     }, index * 80)
   })
+})
+
+// ── 右键菜单上下文提供者 ──
+const unregisterContextMenu = registerContextProvider((target) => {
+  // 仅在工具卡片上右键时提供
+  const card = target.closest('.tool-card') as HTMLElement | null
+  if (!card) return []
+
+  // 从卡片中查找对应的工具
+  const toolName = card.querySelector('.tool-name')?.textContent || ''
+  const tool = tools.value.find(t => t.name === toolName)
+  if (!tool) return []
+
+  const items = []
+
+  // 打开工具
+  items.push({
+    id: 'open-tool',
+    label: t('contextMenu.openTool'),
+    icon: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+    action: () => {
+      openTool(tool)
+    },
+  })
+
+  return items
+})
+
+onUnmounted(() => {
+  unregisterContextMenu()
 })
 </script>
 

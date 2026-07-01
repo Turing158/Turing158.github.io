@@ -632,6 +632,18 @@
     "collapse": "收起",
     "expand": "展开菜单"
   },
+  "contextMenu": {
+    "goBack": "返回上一页",
+    "copyText": "复制文本",
+    "copyFailed": "复制失败",
+    "scrollToTop": "返回顶部",
+    "randomArticle": "随机文章",
+    "copyLink": "复制链接",
+    "openTool": "打开工具",
+    "visitProject": "前往项目",
+    "projectCommits": "项目提交",
+    "copyProjectLink": "复制项目链接"
+  },
   "notFound": {
     "title": "页面未找到",
     "description": "抱歉，您访问的页面不存在或已被移除。",
@@ -851,6 +863,16 @@
       "hmcl": "感谢 <strong>HMCL</strong> 的主题素材和灵感（如有侵权，请联系）",
       "laoji": "感谢 <strong>老己</strong> 奖励他一杯奶茶 🧋"
     }
+  },
+  "footerStats": {
+    "runningDays": "已运行",
+    "articles": "篇文章",
+    "words": "总字数",
+    "views": "被阅读",
+    "coffee": "杯咖啡",
+    "bookHeight": "本书摞起",
+    "laps": "圈操场",
+    "copyright": "© {year} Turing_ICE · 用代码和咖啡因驱动"
   },
   "achievements": {
     "title": "成就",

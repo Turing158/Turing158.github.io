@@ -62,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/common/MarkdownRenderer.vue'
 import ShareButtons from '@/components/article/ShareButtons.vue'
@@ -80,10 +80,12 @@ import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 import { config } from '@/config'
 import { updateDocumentTitle } from '@/router'
 import { useAchievements } from '@/composables/useAchievements'
+import { registerContextProvider } from '@/composables/contextMenuRegistry'
+import BlogTip from '@/plugins/blog-tip'
 
 const route = useRoute()
 const router = useRouter()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 const { fetchArticles, loading } = useArticles()
 const store = useAppStore()
 
@@ -178,6 +180,58 @@ onMounted(async () => {
 
 watch(locale, () => {
   nextTick(initGitalk)
+})
+
+// ── 右键菜单上下文提供者 ──
+const unregisterContextMenu = registerContextProvider((target) => {
+  // 仅在文章详情区域右键时提供
+  if (!target.closest('.article-detail')) return []
+
+  const items = []
+
+  // 返回顶部
+  items.push({
+    id: 'scroll-to-top',
+    label: t('contextMenu.scrollToTop'),
+    icon: '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>',
+    action: () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+  })
+
+  // 随机文章
+  items.push({
+    id: 'random-article',
+    label: t('contextMenu.randomArticle'),
+    icon: '<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M8 12h8M8 8h8M8 16h5"/>',
+    action: () => {
+      const slugs = store.articles.map(a => a.slug)
+      if (slugs.length === 0) return
+      const randomSlug = slugs[Math.floor(Math.random() * slugs.length)]
+      router.push(`/article/${randomSlug}`)
+    },
+  })
+
+  // 复制文章链接
+  items.push({
+    id: 'copy-article-link',
+    label: t('contextMenu.copyLink'),
+    icon: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    action: () => {
+      const url = `${window.location.origin}${window.location.pathname}#/article/${slug.value}`
+      navigator.clipboard.writeText(url).then(() => {
+        BlogTip.show(t('tools.copied'), { type: 'success', duration: 2000 })
+      }).catch(() => {
+        BlogTip.show(t('contextMenu.copyFailed'), { type: 'error', duration: 2000 })
+      })
+    },
+  })
+
+  return items
+})
+
+onUnmounted(() => {
+  unregisterContextMenu()
 })
 </script>
 

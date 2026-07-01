@@ -574,6 +574,18 @@
     "collapse": "Collapse",
     "expand": "Open menu"
   },
+  "contextMenu": {
+    "goBack": "Go Back",
+    "copyText": "Copy Text",
+    "copyFailed": "Copy failed",
+    "scrollToTop": "Scroll to Top",
+    "randomArticle": "Random Article",
+    "copyLink": "Copy Link",
+    "openTool": "Open Tool",
+    "visitProject": "Visit Project",
+    "projectCommits": "Project Commits",
+    "copyProjectLink": "Copy Project Link"
+  },
   "time": {
     "secondsAgo": "{n} seconds ago",
     "minutesAgo": "{n} minutes ago",
@@ -821,6 +833,16 @@
       "hmcl": "Thanks to <strong>HMCL</strong> for the theme inspiration and resources (please contact if any copyright issues)",
       "laoji": "Thanks to <strong>Lao Ji</strong> for rewarding him with a milk tea 🧋"
     }
+  },
+  "footerStats": {
+    "runningDays": "Days Running",
+    "articles": "Articles",
+    "words": "Total Words",
+    "views": "Views",
+    "coffee": "Cups of Coffee",
+    "bookHeight": "Books Stacked",
+    "laps": "Playground Laps",
+    "copyright": "© {year} Turing_ICE · Powered by code and caffeine"
   },
   "achievements": {
     "title": "Achievements",

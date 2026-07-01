@@ -14,7 +14,10 @@
         <div class="avatar-wrap">
           <img :src="avatarUrl" alt="avatar" class="avatar" />
         </div>
-        <h1 class="blog-name">{{ blogName }}</h1>
+        <h1 class="blog-name">
+          <span class="typewriter-text">{{ blogName }}</span>
+          <span v-if="showBlogCursor" class="typewriter-cursor"></span>
+        </h1>
       </div>
 
       <nav class="sidebar-nav">
@@ -107,12 +110,15 @@
     </button>
 
     <main class="content" :class="{ 'content-expanded': isCollapsed, 'content-with-toc': isArticleDetail && isTocOpen }">
-      <router-view v-slot="{ Component }">
-        <transition name="page" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
-      <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" @update:openState="isTocOpen = $event" />
+      <div class="content-scroll">
+        <router-view v-slot="{ Component }">
+          <transition name="page" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+        <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" @update:openState="isTocOpen = $event" />
+      </div>
+      <FooterStats />
     </main>
 
     <SearchDialog ref="searchDialogRef" />
@@ -127,8 +133,10 @@ import { useTheme, type ThemeName } from '@/composables/useTheme'
 import { useAchievements } from '@/composables/useAchievements'
 import { setLocale } from '@/i18n'
 import ArticleTOCDrawer from '@/components/article/ArticleTOCDrawer.vue'
+import FooterStats from '@/components/common/FooterStats.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import SearchDialog from '@/components/search/SearchDialog.vue'
+import { useTypewriter } from '@/composables/useTypewriter'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 export type { TocHeading }
 
@@ -152,7 +160,8 @@ const { isNavUnlocked } = useAchievements()
 
 const isMobile = ref(window.innerWidth < 768)
 const isCollapsed = ref(window.innerWidth < 768)
-const blogName = 'Turing_ICE'
+const fullBlogName = 'Turing_ICE'
+const { displayedText: blogName, showCursor: showBlogCursor } = useTypewriter(fullBlogName, 120, 60, 2000, 800)
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
 
 // 监听窗口变化，同步 isMobile 状态
@@ -450,6 +459,30 @@ const toggleLang = () => {
   margin-top: 12px;
   font-weight: 600;
   letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.typewriter-text {
+  white-space: nowrap;
+  min-height: 1.2em;
+  line-height: 1.2em;
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--text-sidebar-active);
+  margin-left: 2px;
+  animation: blink-cursor 0.8s step-end infinite;
+  vertical-align: text-bottom;
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 .sidebar-nav {
@@ -845,6 +878,7 @@ const toggleLang = () => {
   min-height: 100vh;
   transition: margin-left 0.3s ease, padding-right 0.3s ease;
   display: flex;
+  flex-direction: column;
   position: relative;
   overflow-x: hidden;
   min-width: 0;
@@ -853,9 +887,16 @@ const toggleLang = () => {
     margin-left: 0;
   }
 
-  > :first-child {
+  // 页面内容区：占据剩余空间，允许内部滚动
+  .content-scroll {
     flex: 1;
     min-width: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    > :first-child {
+      min-height: 100%;
+    }
   }
 }
 
@@ -914,6 +955,7 @@ const toggleLang = () => {
 
   .content {
     margin-left: 0;
+    flex-direction: column;
     &.content-expanded {
       margin-left: 0;
     }

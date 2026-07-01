@@ -194,13 +194,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import MarkdownIt from 'markdown-it'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useAchievements } from '@/composables/useAchievements'
+import { registerContextProvider } from '@/composables/contextMenuRegistry'
+import { useI18n } from 'vue-i18n'
+import BlogTip from '@/plugins/blog-tip'
 
 const router = useRouter()
 const GITHUB_OWNER = 'Turing158'
@@ -411,6 +414,57 @@ onMounted(() => {
   fetchReleases()
   // 成就系统：记录发行页访问（用于 release-two-visit 成就：查看 2 个不同发行页）
   useAchievements().addVisitedRelease(repoName.value)
+})
+
+// ── 右键菜单上下文提供者 ──
+const { t } = useI18n()
+
+const unregisterContextMenu = registerContextProvider((target) => {
+  // 仅在发行详情区域右键时提供
+  if (!target.closest('.release-detail-view')) return []
+
+  const githubUrl = `https://github.com/${GITHUB_OWNER}/${repoName.value}`
+  const items = []
+
+  // 前往项目
+  items.push({
+    id: 'visit-project',
+    label: t('contextMenu.visitProject'),
+    icon: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
+    action: () => {
+      window.open(githubUrl, '_blank')
+    },
+  })
+
+  // 项目提交
+  items.push({
+    id: 'project-commits',
+    label: t('contextMenu.projectCommits'),
+    icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
+    action: () => {
+      router.push({ name: 'commits', params: { repo: repoName.value } })
+    },
+  })
+
+  // 复制项目链接
+  items.push({
+    id: 'copy-project-link',
+    label: t('contextMenu.copyProjectLink'),
+    icon: '<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+    action: () => {
+      navigator.clipboard.writeText(githubUrl).then(() => {
+        BlogTip.show(t('tools.copied'), { type: 'success', duration: 2000 })
+      }).catch(() => {
+        BlogTip.show(t('contextMenu.copyFailed'), { type: 'error', duration: 2000 })
+      })
+    },
+  })
+
+  return items
+})
+
+onUnmounted(() => {
+  unregisterContextMenu()
 })
 </script>
 
