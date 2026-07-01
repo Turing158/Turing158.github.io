@@ -10,6 +10,7 @@ export default defineConfig({
     articlesPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Turing_ICE Blog',
@@ -56,6 +57,8 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB，允许大文件缓存
+        skipWaiting: true,
+        clientsClaim: true,
         // SPA 离线回退：导航请求失败时返回 index.html
         navigateFallback: 'index.html',
         // 排除不需要回退的路径（如 API 请求）
