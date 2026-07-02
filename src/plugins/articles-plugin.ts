@@ -2,85 +2,12 @@ import type { Plugin } from 'vite'
 import { readdirSync, readFileSync, existsSync, writeFileSync, mkdirSync } from 'fs'
 import { resolve, join } from 'path'
 import matter from 'gray-matter'
-import MarkdownIt from 'markdown-it'
-import anchor from 'markdown-it-anchor'
-import hljs from 'highlight.js'
-
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  highlight(str: string, lang: string) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(str, { language: lang }).value
-      } catch {
-        // ignore
-      }
-    }
-    return ''
-  },
-}).use(anchor, {
-  // 保持标题原文作为 id，确保与文章中的手动锚点链接一致
-  slugify: (s: string) => s.toString().trim(),
-  permalink: false,
-})
-
-// 所有链接在新标签页打开（跳过页内锚点链接）
-md.renderer.rules.link_open = function (tokens, idx, options, _env, self) {
-  const token = tokens[idx]
-  const href = token.attrGet('href') || ''
-  // 页内锚点链接（#xxx）不添加 target="_blank"
-  if (href.startsWith('#')) {
-    return self.renderToken(tokens, idx, options)
-  }
-  const aIndex = token.attrIndex('target')
-  if (aIndex < 0) {
-    token.attrPush(['target', '_blank'])
-  } else if (token.attrs) {
-    token.attrs[aIndex][1] = '_blank'
-  }
-  const relIndex = token.attrIndex('rel')
-  if (relIndex < 0) {
-    token.attrPush(['rel', 'noopener noreferrer'])
-  }
-  return self.renderToken(tokens, idx, options)
-}
-
-function addBlankTargetToLinks(html: string): string {
-  return html.replace(/<a\s+([^>]*)>/g, (_m: string, attrs: string) => {
-    if (/target=/.test(attrs)) {
-      return `<a ${attrs}>`
-    }
-    // 跳过锚点链接（href 以 # 开头），不添加 target="_blank"
-    if (/href\s*=\s*["']#/.test(attrs)) {
-      return `<a ${attrs}>`
-    }
-    return `<a ${attrs} target="_blank" rel="noopener noreferrer">`
-  })
-}
-
-function decodeHtmlEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-}
-
-function enhanceCodeBlocks(html: string): string {
-  return html.replace(
-    /<pre><code([^>]*)>([\s\S]*?)<\/code><\/pre>/g,
-    (_m: string, attrs: string, code: string) => {
-      const langMatch = attrs.match(/language-(\w+)/)
-      const lang = langMatch ? langMatch[1] : ''
-      const decoded = decodeHtmlEntities(code)
-      const b64 = Buffer.from(decoded, 'utf-8').toString('base64')
-      return `<div class="code-block-wrapper">${lang ? `<span class="code-lang">${lang}</span>` : ''}<button class="code-copy-btn" data-code-b64="${b64}" title="复制代码">复制</button><pre><code${attrs}>${code}</code></pre></div>`
-    }
-  )
-}
+import { md5 } from '../utils/md5'
+import { md, registerLanguages } from '../utils/highlight'
+import {
+  addBlankTargetToLinks,
+  enhanceCodeBlocks,
+} from '../utils/htmlPostProcess'
 
 interface ArticleData {
   slug: string
@@ -91,9 +18,10 @@ interface ArticleData {
   tags: string[]
   description: string
   cover?: string
+  htmlFile?: string   // md5(slug) + '.html'，写文件后填充
 }
 
-function loadArticles(rootDir: string): ArticleData[] {
+async function loadArticles(rootDir: string): Promise<ArticleData[]> {
   const contentDir = resolve(rootDir, 'content')
 
   if (!existsSync(contentDir)) {
@@ -109,6 +37,9 @@ function loadArticles(rootDir: string): ArticleData[] {
       const raw = readFileSync(join(contentDir, file), 'utf-8')
       const { data, content } = matter(raw)
       const slug = file.replace(/\.md$/, '')
+
+      // 按需注册文章使用的语言，再渲染 markdown
+      await registerLanguages(content)
       let html = md.render(content)
       html = addBlankTargetToLinks(html)
       html = enhanceCodeBlocks(html)
@@ -131,6 +62,21 @@ function loadArticles(rootDir: string): ArticleData[] {
   articles.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
   console.log(`[articles-plugin] Loaded ${articles.length} articles`)
   return articles
+}
+
+function writeArticleHtmlFiles(rootDir: string, articles: ArticleData[]) {
+  const htmlDir = resolve(rootDir, 'public', 'articles')
+  if (!existsSync(htmlDir)) {
+    mkdirSync(htmlDir, { recursive: true })
+  }
+
+  for (const a of articles) {
+    const file = `${md5(a.slug)}.html`
+    writeFileSync(join(htmlDir, file), a.html, 'utf-8')
+    a.htmlFile = file
+  }
+
+  console.log(`[articles-plugin] Wrote ${articles.length} article HTML files to public/articles/`)
 }
 
 function generateSitemap(rootDir: string, articles: ArticleData[]) {
@@ -189,20 +135,37 @@ export function articlesPlugin(): Plugin {
     name: 'vite-plugin-articles',
     enforce: 'pre',
 
-    configResolved(config) {
+    async configResolved(config) {
       if (generated) return
       generated = true
 
-      const articles = loadArticles(config.root)
+      const articles = await loadArticles(config.root)
 
-      const outputPath = resolve(config.root, 'src', 'generated', '_articles.ts')
+      // 每篇文章生成独立的 HTML 文件，放入 public/articles/
+      writeArticleHtmlFiles(config.root, articles)
+
+      const outputPath = resolve(config.root, 'src', 'generated', '_articles-index.ts')
       const dir = resolve(config.root, 'src', 'generated')
       if (!existsSync(dir)) {
         mkdirSync(dir, { recursive: true })
       }
 
-      const code = `// Auto-generated by vite-plugin-articles — DO NOT EDIT\nimport type { Article } from '../types/article'\n\nconst articles: Article[] = ${JSON.stringify(articles, null, 2)}\n\nexport default articles\n`
+      // 构建轻量索引：保留 content（给搜索/阅读时间/页脚统计用），
+      // 移除 html（已存入独立 HTML 文件），新增 htmlFile 引用
+      const indexArticles = articles.map((a) => ({
+        slug: a.slug,
+        content: a.content,
+        title: a.title,
+        date: a.date,
+        tags: a.tags,
+        description: a.description,
+        cover: a.cover,
+        htmlFile: a.htmlFile,
+      }))
+
+      const code = `// Auto-generated by vite-plugin-articles — DO NOT EDIT\nimport type { ArticleMeta } from '../types/article'\n\nconst articles: ArticleMeta[] = ${JSON.stringify(indexArticles, null, 2)}\n\nexport default articles\n\nexport const htmlFileBySlug: Record<string, string> = Object.fromEntries(articles.map(a => [a.slug, a.htmlFile || '']))\n`
       writeFileSync(outputPath, code, 'utf-8')
+      console.log(`[articles-plugin] Generated _articles-index.ts (${articles.length} articles)`)
 
       // 生成 sitemap.xml
       generateSitemap(config.root, articles)

@@ -191,19 +191,21 @@ export function useSeo(options: SeoOptions = {}) {
 
 /**
  * 为文章页设置 SEO
+ *
+ * `article` 可为 null（文章尚未加载时），所有字段安全降级为默认值。
  */
-export function useArticleSeo(article: MaybeRef<{ title: string; description: string; date: string; tags: string[]; cover?: string; slug: string }>) {
+export function useArticleSeo(article: MaybeRef<{ title: string; description: string; date: string; tags: string[]; cover?: string; slug: string } | null>) {
   const a = computed(() => unref(article))
 
   return useSeo({
-    title: computed(() => a.value.title),
-    description: computed(() => a.value.description),
-    image: computed(() => a.value.cover),
-    url: computed(() => `#/article/${a.value.slug}`),
+    title: computed(() => a.value?.title || ''),
+    description: computed(() => a.value?.description || ''),
+    image: computed(() => a.value?.cover),
+    url: computed(() => `#/article/${a.value?.slug || ''}`),
     type: 'article',
-    publishedTime: computed(() => a.value.date),
-    modifiedTime: computed(() => a.value.date),
-    tags: computed(() => a.value.tags),
+    publishedTime: computed(() => a.value?.date || ''),
+    modifiedTime: computed(() => a.value?.date || ''),
+    tags: computed(() => a.value?.tags || []),
   })
 }
 

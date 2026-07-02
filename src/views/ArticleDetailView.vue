@@ -34,7 +34,21 @@
         </div>
       </header>
 
-      <MarkdownRenderer ref="mdRef" :html="article.html" />
+      <MarkdownRenderer v-if="article.html" ref="mdRef" :html="article.html" />
+      <div v-else-if="htmlLoading" class="status loading-text">
+        <span class="loading-dots">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </span>
+        <span>{{ $t('common.loading') }}</span>
+      </div>
+      <div v-else class="status">
+        {{ htmlError || $t('common.error') }}
+        <div style="margin-top: 12px;">
+          <Button size="small" @click="ensureArticleHtml">{{ $t('common.retry') }}</Button>
+        </div>
+      </div>
 
       <!-- 分享按钮 -->
       <ShareButtons
@@ -66,7 +80,7 @@ import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/common/MarkdownRenderer.vue'
 import ShareButtons from '@/components/article/ShareButtons.vue'
-import { useArticles } from '@/composables/useArticles'
+import { useArticles, loadArticleHtml } from '@/composables/useArticles'
 import { useArticleSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
@@ -120,6 +134,8 @@ const goBack = () => {
 
 const mdRef = ref<InstanceType<typeof MarkdownRenderer> | null>(null)
 const headings = ref<TocHeading[]>([])
+const htmlLoading = ref(false)
+const htmlError = ref<string | null>(null)
 
 // 浏览量
 const { viewCount, incrementViewCount } = useViewCount(slug.value)
@@ -156,7 +172,23 @@ const initGitalk = () => {
   gitalk.render('gitalk-container')
 }
 
-onMounted(async () => {
+// 两阶段加载：fetchArticles 仅加载元数据（轻量），ensureArticleHtml 按需获取渲染 HTML
+async function ensureArticleHtml() {
+  if (!article.value) return
+  if (article.value.html) return  // 已由 loadArticleHtml 填充或预存在 store
+
+  htmlLoading.value = true
+  htmlError.value = null
+  try {
+    await loadArticleHtml(slug.value)
+  } catch (e: any) {
+    htmlError.value = e?.message || 'Failed to load article content'
+  } finally {
+    htmlLoading.value = false
+  }
+}
+
+async function loadArticle() {
   await fetchArticles()
 
   // 文章标题加载完成后更新浏览器标题
@@ -172,11 +204,18 @@ onMounted(async () => {
     useAchievements().addVisitedArticle(slug.value)
   }
 
+  // 按需加载 HTML（local 走 fetch 预渲染文件，GitHub 走运行时渲染兜底）
+  await ensureArticleHtml()
+
   nextTick(() => {
     updateHeadings()
     initGitalk()
   })
-})
+}
+
+onMounted(loadArticle)
+
+watch(() => slug.value, loadArticle)
 
 watch(locale, () => {
   nextTick(initGitalk)

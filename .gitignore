@@ -7,3 +7,6 @@ src/generated
 scripts
 dev-dist
 dev-docs
+
+# 构建时由 vite-plugin-articles 预渲染生成的文章 HTML（按需加载）
+/public/articles/

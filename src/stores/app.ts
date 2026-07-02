@@ -23,6 +23,14 @@ export const useAppStore = defineStore('app', () => {
     recentCommits.value = data
   }
 
+  // 按需加载 HTML 后回填到 store，触发下游组件更新
+  const setArticleHtml = (slug: string, html: string) => {
+    const target = articles.value.find((a) => a.slug === slug)
+    if (target) {
+      target.html = html
+    }
+  }
+
   return {
     articles,
     articlesLoadedAt,
@@ -30,5 +38,6 @@ export const useAppStore = defineStore('app', () => {
     isArticlesCacheValid,
     setArticles,
     setRecentCommits,
+    setArticleHtml,
   }
 })

@@ -1,33 +1,33 @@
 import { ref } from 'vue'
 import matter from 'gray-matter'
-import MarkdownIt from 'markdown-it'
-import hljs from 'highlight.js'
+import { renderMarkdownAsync } from '@/utils/highlight'
 import { useAppStore } from '@/stores/app'
 import type { Article } from '@/types/article'
-import localArticles from '@/generated/_articles'
+import localArticles from '@/generated/_articles-index'
 import { developingProjects } from '@/data/projects'
 import { config } from '@/config'
 import { calculateReadingTime } from '@/composables/useReadingTime'
+import {
+  addBlankTargetToLinks,
+  enhanceCodeBlocks,
+} from '@/utils/htmlPostProcess'
 
 const GITHUB_OWNER = config.github.owner
 const GITHUB_REPO = config.github.repo
 
-const md = new MarkdownIt({
-  html: true,
-  linkify: true,
-  typographer: true,
-  highlight(str: string, lang: string) {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return hljs.highlight(str, { language: lang }).value
-      } catch {}
-    }
-    return ''
-  },
-})
+// 运行时 markdown 渲染的后处理（与构建时插件保持一致）
+async function renderMarkdown(content: string): Promise<string> {
+  let html = await renderMarkdownAsync(content)
+  html = addBlankTargetToLinks(html)
+  html = enhanceCodeBlocks(html)
+  return html
+}
+
+// 内存缓存：会话级，避免重复 fetch
+const htmlCache = new Map<string, string>()
 
 function loadLocalArticles(): Article[] {
-  // 为每篇文章计算阅读时间
+  // 为每篇文章计算阅读时间（html 不再预填，按需加载）
   return localArticles.map((article) => ({
     ...article,
     readingTime: calculateReadingTime(article.content),
@@ -49,12 +49,13 @@ async function loadGitHubArticles(): Promise<Article[]> {
     const raw = await fetch(file.download_url).then((r) => r.text())
     const { data, content } = matter(raw)
     const slug = file.name.replace(/\.md$/, '')
-    const html = md.render(content)
 
+    // GitHub 文章没有预渲染 HTML，htmlFile 留空，
+    // 首次阅读时由 loadArticleHtml 兜底渲染
     articles.push({
       slug,
-      html,
       content,
+      htmlFile: '',
       title: data.title || slug,
       date: typeof data.date === 'object' ? String(data.date) : (data.date || ''),
       tags: data.tags || [],
@@ -66,6 +67,48 @@ async function loadGitHubArticles(): Promise<Article[]> {
 
   articles.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
   return articles
+}
+
+/**
+ * 按需加载单篇文章的渲染 HTML。
+ *
+ * 1. 优先从内存缓存返回
+ * 2. 尝试 fetch 预渲染 HTML 文件（public/articles/<md5>.html）
+ * 3. 兜底：从 content 运行时渲染（GitHub 文章或文件缺失）
+ *
+ * 加载成功后写入 Pinia store，触发下游组件更新。
+ */
+export async function loadArticleHtml(slug: string): Promise<string> {
+  if (htmlCache.has(slug)) return htmlCache.get(slug)!
+
+  const store = useAppStore()
+  const article = store.articles.find((a) => a.slug === slug)
+  if (!article) return ''
+
+  // 1. 尝试 fetch 预渲染 HTML（本地文章）
+  if (article.htmlFile) {
+    try {
+      const res = await fetch(`/articles/${article.htmlFile}`)
+      if (res.ok) {
+        const html = await res.text()
+        htmlCache.set(slug, html)
+        store.setArticleHtml(slug, html)
+        return html
+      }
+    } catch {
+      // 离线或网络错误，继续兜底
+    }
+  }
+
+  // 2. 兜底：从 content 运行时渲染（GitHub 文章或文件缺失）
+  if (article.content) {
+    const html = await renderMarkdown(article.content)
+    htmlCache.set(slug, html)
+    store.setArticleHtml(slug, html)
+    return html
+  }
+
+  return ''
 }
 
 export function useArticles() {

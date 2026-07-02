@@ -114,6 +114,19 @@ export default defineConfig({
               networkTimeoutSeconds: 10,
             },
           },
+          {
+            // 按需加载的文章 HTML 文件（public/articles/<md5>.html）
+            urlPattern: /\/articles\/[0-9a-f]{32}\.html$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'article-html-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 30,
+              },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
       devOptions: {
