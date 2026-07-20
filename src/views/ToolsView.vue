@@ -3,6 +3,10 @@
  *
  * 卡片网格 + 弹窗 + 动态组件渲染
  * 每个工具的具体逻辑分散到 src/components/tools/*.vue
+ *
+ * 性能策略：
+ * 1. 工具组件 defineAsyncComponent 按需加载，避免进入页面时全量同步 import
+ * 2. Dialog 先出壳，内容延后到下一帧再挂载，避免挂载与进场动画抢主线程
  */
 <template>
   <div class="tools-view">
@@ -41,9 +45,13 @@
         <span class="modal-title-text">{{ activeTool.name }}</span>
       </template>
 
+      <!-- 延迟挂载：先让 Dialog 壳完成首帧，再加载工具内容 -->
+      <div v-if="activeTool && !contentReady" class="tool-content-placeholder" aria-hidden="true">
+        <div class="tool-content-spinner" />
+      </div>
       <component
         :is="currentComponent"
-        v-if="activeTool"
+        v-else-if="activeTool && contentReady"
         :separator="randomSeparator"
         @request-separator-edit="onToolRequestSeparatorEdit"
       />
@@ -61,33 +69,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, defineAsyncComponent, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
-import {
-  JsonFormatterTool,
-  Base64Tool,
-  RegexTool,
-  ColorConverterTool,
-  TimestampConverterTool,
-  TextCounterTool,
-  RandomGeneratorTool,
-  RandomStringGeneratorTool,
-  HolidayQueryTool,
-  Md5Tool,
-  ShaTool,
-  DiffCheckerTool,
-  CodeRunnerTool,
-  ApiTestTool,
-  SqlFormatterTool,
-  CronEditorTool,
-  PasswordStrengthTool,
-  LoremIpsumTool,
-  SeparatorEditorDialog,
-} from '@/components/tools'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
+
+// 分隔符编辑弹窗：低频使用，异步加载
+const SeparatorEditorDialog = defineAsyncComponent(
+  () => import('@/components/tools/SeparatorEditorDialog.vue')
+)
 
 // SEO
 usePageSeo('工具', '开发者工具集：JSON格式化、Base64编解码、正则测试、颜色转换等', '#/tools')
@@ -102,26 +94,27 @@ interface Tool {
 
 const { t, tm } = useI18n()
 
-// 组件映射：字符串名 → Vue 组件
-const componentMap: Record<string, any> = {
-  JsonFormatter: JsonFormatterTool,
-  Base64Tool,
-  RegexTool,
-  ColorConverter: ColorConverterTool,
-  TimestampConverter: TimestampConverterTool,
-  TextCounter: TextCounterTool,
-  RandomGenerator: RandomGeneratorTool,
-  RandomStringGenerator: RandomStringGeneratorTool,
-  HolidayQueryTool,
-  Md5Tool,
-  ShaTool,
-  DiffCheckerTool,
-  CodeRunnerTool,
-  ApiTestTool,
-  SqlFormatterTool,
-  CronEditorTool,
-  PasswordStrengthTool,
-  LoremIpsumTool,
+// 组件映射：字符串名 → 异步组件（按需加载，避免 Tools 页全量同步导入）
+const componentMap: Record<string, Component> = {
+  JsonFormatter: defineAsyncComponent(() => import('@/components/tools/JsonFormatterTool.vue')),
+  Base64Tool: defineAsyncComponent(() => import('@/components/tools/Base64Tool.vue')),
+  RegexTool: defineAsyncComponent(() => import('@/components/tools/RegexTool.vue')),
+  ColorConverter: defineAsyncComponent(() => import('@/components/tools/ColorConverterTool.vue')),
+  TimestampConverter: defineAsyncComponent(() => import('@/components/tools/TimestampConverterTool.vue')),
+  TextCounter: defineAsyncComponent(() => import('@/components/tools/TextCounterTool.vue')),
+  RandomGenerator: defineAsyncComponent(() => import('@/components/tools/RandomGeneratorTool.vue')),
+  RandomStringGenerator: defineAsyncComponent(() => import('@/components/tools/RandomStringGeneratorTool.vue')),
+  HolidayQueryTool: defineAsyncComponent(() => import('@/components/tools/HolidayQueryTool.vue')),
+  Md5Tool: defineAsyncComponent(() => import('@/components/tools/Md5Tool.vue')),
+  ShaTool: defineAsyncComponent(() => import('@/components/tools/ShaTool.vue')),
+  DiffCheckerTool: defineAsyncComponent(() => import('@/components/tools/DiffCheckerTool.vue')),
+  CodeRunnerTool: defineAsyncComponent(() => import('@/components/tools/CodeRunnerTool.vue')),
+  ApiTestTool: defineAsyncComponent(() => import('@/components/tools/ApiTestTool.vue')),
+  SqlFormatterTool: defineAsyncComponent(() => import('@/components/tools/SqlFormatterTool.vue')),
+  CronEditorTool: defineAsyncComponent(() => import('@/components/tools/CronEditorTool.vue')),
+  TokenUsageChartTool: defineAsyncComponent(() => import('@/components/tools/TokenUsageChartTool.vue')),
+  PasswordStrengthTool: defineAsyncComponent(() => import('@/components/tools/PasswordStrengthTool.vue')),
+  LoremIpsumTool: defineAsyncComponent(() => import('@/components/tools/LoremIpsumTool.vue')),
 }
 
 // 工具元数据
@@ -142,6 +135,7 @@ const toolKeys = [
   { key: 'apiTest', component: 'ApiTestTool', icon: '🌐' },
   { key: 'sqlFormatter', component: 'SqlFormatterTool', icon: '🗃️' },
   { key: 'cronEditor', component: 'CronEditorTool', icon: '⏱️' },
+  { key: 'tokenUsageChart', component: 'TokenUsageChartTool', icon: '📈' },
   { key: 'passwordStrength', component: 'PasswordStrengthTool', icon: '🔒' },
   { key: 'loremIpsum', component: 'LoremIpsumTool', icon: '📝' },
 ] as const
@@ -158,13 +152,49 @@ const tools = computed<Tool[]>(() =>
 
 const activeTool = ref<Tool | null>(null)
 const dialogOpen = ref(false)
+const contentReady = ref(false)
 const showCards = ref(false)
 const cardVisibleStates = ref<Record<string, boolean>>({})
+
+// 成就系统：setup 中取一次，避免每次 openTool 重复调用 composable
+const achievements = useAchievements()
+
+let contentReadyRaf = 0
+let contentReadyTimer: ReturnType<typeof setTimeout> | null = null
 
 const currentComponent = computed(() => {
   if (!activeTool.value) return null
   return componentMap[activeTool.value.component] || null
 })
+
+function cancelDeferredContent() {
+  if (contentReadyRaf) {
+    cancelAnimationFrame(contentReadyRaf)
+    contentReadyRaf = 0
+  }
+  if (contentReadyTimer !== null) {
+    clearTimeout(contentReadyTimer)
+    contentReadyTimer = null
+  }
+}
+
+function scheduleContentMount() {
+  cancelDeferredContent()
+  contentReady.value = false
+  // 双 rAF：等 Dialog 壳完成布局/进场启动后再挂工具，避免同帧长任务
+  contentReadyRaf = requestAnimationFrame(() => {
+    contentReadyRaf = requestAnimationFrame(() => {
+      contentReadyRaf = 0
+      // 再让出一次事件循环，给 Transition 启动留出空隙
+      contentReadyTimer = setTimeout(() => {
+        contentReadyTimer = null
+        if (dialogOpen.value && activeTool.value) {
+          contentReady.value = true
+        }
+      }, 0)
+    })
+  })
+}
 
 // 分隔符编辑（随机数 / 随机字符串 共用）
 const SEPARATOR_KEY = 'blog-random-separator'
@@ -188,7 +218,7 @@ function onRequestSeparatorEdit(source: 'number' | 'string') {
   separatorPreviewSamples.value = []
   showSeparatorEditor.value = true
   // 成就系统：第一次打开分隔符设置即解锁
-  useAchievements().unlock('find-sperate-option')
+  achievements.unlock('find-sperate-option')
 }
 
 function onSeparatorConfirm(separator: string) {
@@ -203,19 +233,27 @@ function onSeparatorCancel() {
 // 打开工具
 function openTool(tool: Tool) {
   activeTool.value = tool
+  contentReady.value = false
   dialogOpen.value = true
+  scheduleContentMount()
 
   // 成就系统：记录工具使用（用于 tool-master 成就：使用全部 17 个工具）
-  useAchievements().handleToolUse(tool.component)
+  // 延后到下一宏任务，避免与 Dialog 打开同帧竞争
+  setTimeout(() => {
+    achievements.handleToolUse(tool.component)
+  }, 0)
 }
 
 function onDialogOpen() {
-  nextTick(() => {
-    // dialog opened
-  })
+  // BlogDialog 打开回调：若内容尚未调度，补一次
+  if (activeTool.value && !contentReady.value) {
+    scheduleContentMount()
+  }
 }
 
 function onDialogClose() {
+  cancelDeferredContent()
+  contentReady.value = false
   activeTool.value = null
   // 分隔符编辑在关闭时已被销毁，无需手动清理
 }
@@ -257,6 +295,7 @@ const unregisterContextMenu = registerContextProvider((target) => {
 })
 
 onUnmounted(() => {
+  cancelDeferredContent()
   unregisterContextMenu()
 })
 </script>
@@ -351,6 +390,27 @@ onUnmounted(() => {
   color: var(--bg-card);
   border-color: var(--accent);
   transform: scale(1.08);
+}
+
+/* 工具内容延迟挂载占位 */
+.tool-content-placeholder {
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tool-content-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  animation: tool-spin 0.7s linear infinite;
+}
+
+@keyframes tool-spin {
+  to { transform: rotate(360deg); }
 }
 
 /* Modal title */

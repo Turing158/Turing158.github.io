@@ -1,12 +1,12 @@
-node_modules
-dist
-.DS_Store
+/node_modules
+/dist
+/.DS_Store
 *.local
-src/generated
-.playwright-mcp
-scripts
-dev-dist
-dev-docs
-
+/src/generated
+/.playwright-mcp
+/scripts
+/dev-dist
+/dev-docs
+/tests
 # 构建时由 vite-plugin-articles 预渲染生成的文章 HTML（按需加载）
 /public/articles/
