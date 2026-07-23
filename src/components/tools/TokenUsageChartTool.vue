@@ -41,7 +41,6 @@
       <input
         ref="fileInputRef"
         type="file"
-        multiple
         accept=".json,.sql"
         class="upload-input"
         @change="handleFileSelect"
@@ -157,96 +156,752 @@
     :title="$t('tools.tokenUsageChart.styleDialogTitle')"
   >
     <div class="style-form">
-      <!-- 颜色 -->
-      <div class="style-row">
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.primaryColor') }}</label>
-          <input type="color" v-model="styleOptions.primaryColor" class="color-input" />
-        </div>
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.bgColor') }}</label>
-          <input type="color" v-model="styleOptions.bgColor" class="color-input" />
-        </div>
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.fontColor') }}</label>
-          <input type="color" v-model="styleOptions.fontColor" class="color-input" />
-        </div>
-      </div>
 
-      <!-- 卡片背景色 / 透明度 -->
-      <div class="style-row style-row--2">
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.cardBgColor') }}</label>
-          <input type="color" v-model="styleOptions.cardBgColor" class="color-input" />
+      <!-- ════ 主要设置 ════ -->
+      <fieldset class="style-section">
+        <legend>{{ $t('tools.tokenUsageChart.mainSection') }}</legend>
+        <div class="style-row">
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.primaryColor') }}</label>
+            <input type="color" v-model="styleOptions.primaryColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.bgColor') }}</label>
+            <input type="color" v-model="styleOptions.bgColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.fontColor') }}</label>
+            <input type="color" v-model="styleOptions.fontColor" class="color-input" />
+          </div>
         </div>
+        <div class="style-row style-row--2">
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.cardBgColor') }}</label>
+            <input type="color" v-model="styleOptions.cardBgColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.cardOpacity') }}</label>
+            <BlogInput
+              v-model="styleCardOpacity"
+              type="number"
+              :min="0"
+              :max="100"
+              :step="1"
+            />
+          </div>
+        </div>
+
+        <!-- 画布宽度 -->
         <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.cardOpacity') }}</label>
-          <BlogInput
-            v-model="styleCardOpacity"
-            type="number"
-            :min="0"
-            :max="100"
-            :step="1"
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.orientation') }}</label>
+          <div class="style-orientation">
+            <button
+              type="button"
+              class="style-orientation-btn"
+              :class="{ active: styleOptions.orientation === 'landscape' }"
+              @click="styleOptions.orientation = 'landscape'"
+            >
+              <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                <rect x="1" y="2" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <rect x="5" y="4.5" width="7" height="5" rx="1" fill="currentColor" opacity="0.7" />
+              </svg>
+              <span>{{ $t('tools.tokenUsageChart.orientationLandscape') }}</span>
+            </button>
+            <button
+              type="button"
+              class="style-orientation-btn"
+              :class="{ active: styleOptions.orientation === 'portrait' }"
+              @click="styleOptions.orientation = 'portrait'"
+            >
+              <svg viewBox="0 0 14 20" width="14" height="20" aria-hidden="true">
+                <rect x="2" y="1" width="10" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+                <rect x="4.5" y="5" width="5" height="7" rx="1" fill="currentColor" opacity="0.7" />
+              </svg>
+              <span>{{ $t('tools.tokenUsageChart.orientationPortrait') }}</span>
+            </button>
+            <button
+              type="button"
+              class="style-orientation-btn style-orientation-btn--custom"
+              :class="{ active: styleOptions.orientation === 'custom' }"
+              @click="styleOptions.orientation = 'custom'"
+            >
+              <span class="style-orientation-btn-content">
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <rect x="1" y="2" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.5" />
+                  <path d="M5 7h10M5 5v4M15 5v4" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.orientationCustom') }}</span>
+              </span>
+              <div v-if="styleOptions.orientation === 'custom'" class="style-orientation-btn-overlay">
+                <BlogInput
+                  v-model="styleOptions.width"
+                  type="number"
+                  :min="320"
+                  :max="3840"
+                  :step="10"
+                />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- 三模块互斥开关 -->
+        <div class="style-field">
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.moduleSection') }}</label>
+          <div class="style-module-toggles">
+            <button
+              type="button"
+              class="style-module-btn"
+              :class="{ active: styleOptions.showUsageModule }"
+              @click="toggleModule('usage', !styleOptions.showUsageModule)"
+            >{{ $t('tools.tokenUsageChart.moduleUsage') }}</button>
+            <button
+              type="button"
+              class="style-module-btn"
+              :class="{ active: styleOptions.showContributionModule }"
+              @click="toggleModule('contribution', !styleOptions.showContributionModule)"
+            >{{ $t('tools.tokenUsageChart.moduleContribution') }}</button>
+            <button
+              type="button"
+              class="style-module-btn"
+              :class="{ active: styleOptions.showChartModule }"
+              @click="toggleModule('chart', !styleOptions.showChartModule)"
+            >{{ $t('tools.tokenUsageChart.moduleChart') }}</button>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ════ 用量数据设置 ════ -->
+      <fieldset v-if="styleOptions.showUsageModule" class="style-section">
+        <legend>{{ $t('tools.tokenUsageChart.usageSection') }}</legend>
+
+        <!-- 标题设置 -->
+        <div class="style-field">
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.usageCardTitle') }}</label>
+          <div class="style-row style-row--title">
+            <div class="style-field style-field--grow">
+              <BlogInput
+                v-model="styleOptions.usageCardTitleText"
+                type="text"
+                :placeholder="$t('tools.tokenUsageChart.usageCardTitleText')"
+              />
+            </div>
+            <div class="style-align-toggles">
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageCardTitleAlign === 'left' }"
+                @click="styleOptions.usageCardTitleAlign = 'left'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="2" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="7" x2="10" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignLeft') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageCardTitleAlign === 'center' }"
+                @click="styleOptions.usageCardTitleAlign = 'center'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="3" y1="3" x2="17" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="5" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="4" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignCenter') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageCardTitleAlign === 'right' }"
+                @click="styleOptions.usageCardTitleAlign = 'right'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="6" y1="3" x2="18" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="10" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="8" y1="11" x2="18" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignRight') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="style-row style-row--2">
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.usageTitleAlign') }}</label>
+            <div class="style-align-toggles">
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageTitleAlign === 'left' }"
+                @click="styleOptions.usageTitleAlign = 'left'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="2" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="7" x2="10" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignLeft') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageTitleAlign === 'center' }"
+                @click="styleOptions.usageTitleAlign = 'center'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="3" y1="3" x2="17" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="5" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="4" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignCenter') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageTitleAlign === 'right' }"
+                @click="styleOptions.usageTitleAlign = 'right'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="6" y1="3" x2="18" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="10" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="8" y1="11" x2="18" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignRight') }}</span>
+              </button>
+            </div>
+            <BlogInput
+              v-model="styleOptions.widthLargeTotal"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidthLargeTotal')"
+              class="badge-width-input"
+            />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.usageDataAlign') }}</label>
+            <div class="style-align-toggles">
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageDataAlign === 'left' }"
+                @click="styleOptions.usageDataAlign = 'left'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <rect x="2" y="2" width="16" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                  <rect x="2" y="7" width="11" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignLeft') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageDataAlign === 'center' }"
+                @click="styleOptions.usageDataAlign = 'center'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <rect x="3" y="2" width="14" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                  <rect x="5.5" y="7" width="9" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignCenter') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.usageDataAlign === 'right' }"
+                @click="styleOptions.usageDataAlign = 'right'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <rect x="2" y="2" width="16" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                  <rect x="7" y="7" width="11" height="3" rx="1" fill="currentColor" opacity="0.85" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignRight') }}</span>
+              </button>
+            </div>
+            <BlogInput
+              v-model="styleOptions.widthLargeVibe"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidthLargeVibe')"
+              class="badge-width-input"
+            />
+          </div>
+        </div>
+        <div class="style-badge-fields">
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showTotal" />
+              <span>{{ $t('tools.tokenUsageChart.showTotal') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthTotal"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showInput" />
+              <span>{{ $t('tools.tokenUsageChart.showInput') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthInput"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showOutput" />
+              <span>{{ $t('tools.tokenUsageChart.showOutput') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthOutput"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showTotalCost" />
+              <span>{{ $t('tools.tokenUsageChart.showTotalCost') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthTotalCost"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showCacheInput" />
+              <span>{{ $t('tools.tokenUsageChart.showCacheInput') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthCacheInput"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+          <div class="style-badge-field">
+            <label class="style-checkbox">
+              <input type="checkbox" v-model="styleOptions.showCacheCreation" />
+              <span>{{ $t('tools.tokenUsageChart.showCacheCreation') }}</span>
+            </label>
+            <BlogInput
+              v-model="styleOptions.widthCacheCreation"
+              type="number"
+              :min="0"
+              :step="10"
+              :placeholder="$t('tools.tokenUsageChart.badgeWidth')"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- ════ 贡献图设置 ════ -->
+      <fieldset v-if="styleOptions.showContributionModule" class="style-section">
+        <legend>{{ $t('tools.tokenUsageChart.contributionSection') }}</legend>
+
+        <!-- 标题设置 -->
+        <div class="style-field">
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.contributionTitle') }}</label>
+          <div class="style-row style-row--title">
+            <div class="style-field style-field--grow">
+              <BlogInput
+                v-model="styleOptions.contributionCardTitleText"
+                type="text"
+                :placeholder="$t('tools.tokenUsageChart.contributionTitleText')"
+              />
+            </div>
+            <div class="style-align-toggles">
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.contributionCardTitleAlign === 'left' }"
+                @click="styleOptions.contributionCardTitleAlign = 'left'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="2" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="7" x2="10" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignLeft') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.contributionCardTitleAlign === 'center' }"
+                @click="styleOptions.contributionCardTitleAlign = 'center'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="3" y1="3" x2="17" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="5" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="4" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignCenter') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.contributionCardTitleAlign === 'right' }"
+                @click="styleOptions.contributionCardTitleAlign = 'right'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="6" y1="3" x2="18" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="10" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="8" y1="11" x2="18" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignRight') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="style-row">
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.monthLabelColor') }}</label>
+            <input type="color" v-model="styleOptions.monthLabelColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.weekdayLabelColor') }}</label>
+            <input type="color" v-model="styleOptions.weekdayLabelColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.gridEmptyColor') }}</label>
+            <input type="color" v-model="styleOptions.gridEmptyColor" class="color-input" />
+          </div>
+        </div>
+        <div class="style-field style-field--row">
+          <label class="style-checkbox style-checkbox--inline">
+            <input type="checkbox" v-model="styleOptions.showDateRange" />
+            <span>{{ $t('tools.tokenUsageChart.showDateRange') }}</span>
+          </label>
+          <template v-if="styleOptions.showDateRange">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.dateRangeFontColor') }}</label>
+            <input type="color" v-model="styleOptions.dateRangeFontColor" class="color-input color-input--inline-row" />
+          </template>
+        </div>
+        <div class="style-field style-field--row">
+          <label class="style-checkbox style-checkbox--inline">
+            <input type="checkbox" v-model="styleOptions.showContributionLegend" />
+            <span>{{ $t('tools.tokenUsageChart.showContributionLegend') }}</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- ════ 图表设置 ════ -->
+      <fieldset v-if="styleOptions.showChartModule" class="style-section">
+        <legend>{{ $t('tools.tokenUsageChart.chartSection') }}</legend>
+
+        <!-- 标题设置 -->
+        <div class="style-field">
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.chartTitle') }}</label>
+          <div class="style-row style-row--title">
+            <div class="style-field style-field--grow">
+              <BlogInput
+                v-model="styleOptions.chartCardTitleText"
+                type="text"
+                :placeholder="$t('tools.tokenUsageChart.chartTitleText')"
+              />
+            </div>
+            <div class="style-align-toggles">
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.chartCardTitleAlign === 'left' }"
+                @click="styleOptions.chartCardTitleAlign = 'left'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="2" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="7" x2="10" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="2" y1="11" x2="12" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignLeft') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.chartCardTitleAlign === 'center' }"
+                @click="styleOptions.chartCardTitleAlign = 'center'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="3" y1="3" x2="17" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="5" y1="7" x2="15" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="4" y1="11" x2="16" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignCenter') }}</span>
+              </button>
+              <button
+                type="button"
+                class="style-align-btn"
+                :class="{ active: styleOptions.chartCardTitleAlign === 'right' }"
+                @click="styleOptions.chartCardTitleAlign = 'right'"
+              >
+                <svg viewBox="0 0 20 14" width="20" height="14" aria-hidden="true">
+                  <line x1="6" y1="3" x2="18" y2="3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="10" y1="7" x2="18" y2="7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="8" y1="11" x2="18" y2="11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                </svg>
+                <span>{{ $t('tools.tokenUsageChart.alignRight') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="style-field">
+          <label class="tool-label">{{ $t('tools.tokenUsageChart.statsChartType') }}</label>
+          <BlogSelect
+            v-model="statsChartTypeOption"
+            :options="statsChartTypeOptions"
+            :placeholder="$t('tools.tokenUsageChart.statsChartType')"
+            :clearable="false"
           />
         </div>
-      </div>
-
-      <!-- 统计图样式 -->
-      <div class="style-field">
-        <label class="tool-label">{{ $t('tools.tokenUsageChart.statsChartType') }}</label>
-        <BlogSelect
-          v-model="statsChartTypeOption"
-          :options="statsChartTypeOptions"
-          :placeholder="$t('tools.tokenUsageChart.statsChartType')"
-          :clearable="false"
-        />
-      </div>
-
-      <!-- 显示项开关 + 标注颜色 -->
-      <div class="style-switches">
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showTotal" />
-          <span>{{ $t('tools.tokenUsageChart.showTotal') }}</span>
-          <input v-if="styleOptions.showTotal" type="color" v-model="styleOptions.colorTotal" class="color-input color-input--inline" />
-        </label>
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showInput" />
-          <span>{{ $t('tools.tokenUsageChart.showInput') }}</span>
-          <input v-if="styleOptions.showInput" type="color" v-model="styleOptions.colorInput" class="color-input color-input--inline" />
-        </label>
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showOutput" />
-          <span>{{ $t('tools.tokenUsageChart.showOutput') }}</span>
-          <input v-if="styleOptions.showOutput" type="color" v-model="styleOptions.colorOutput" class="color-input color-input--inline" />
-        </label>
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showTotalCost" />
-          <span>{{ $t('tools.tokenUsageChart.showTotalCost') }}</span>
-          <input v-if="styleOptions.showTotalCost" type="color" v-model="styleOptions.colorTotalCost" class="color-input color-input--inline" />
-        </label>
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showCacheInput" />
-          <span>{{ $t('tools.tokenUsageChart.showCacheInput') }}</span>
-          <input v-if="styleOptions.showCacheInput" type="color" v-model="styleOptions.colorCacheInput" class="color-input color-input--inline" />
-        </label>
-        <label class="style-switch">
-          <input type="checkbox" v-model="styleOptions.showCacheCreation" />
-          <span>{{ $t('tools.tokenUsageChart.showCacheCreation') }}</span>
-          <input v-if="styleOptions.showCacheCreation" type="color" v-model="styleOptions.colorCacheCreation" class="color-input color-input--inline" />
-        </label>
-      </div>
-
-      <!-- 轴标签色 / 网格空白色 -->
-      <div class="style-row style-row--2">
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.axisLabelColor') }}</label>
-          <input type="color" v-model="styleOptions.axisLabelColor" class="color-input" />
+        <div class="style-switches">
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorTotal }"
+            @mousedown="startLongPress('colorTotal', $event)"
+            @touchstart.prevent="startLongPress('colorTotal', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowTotal')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowTotal"
+                :class="{ 'is-pressed': pressedColorKey === 'colorTotal' }"
+                @click.stop
+              />
+              <input
+                ref="colorTotalRef"
+                type="color"
+                v-model="styleOptions.colorTotal"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowTotal && visibleColorPickerKey === 'colorTotal' }"
+                :disabled="!styleOptions.chartShowTotal"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showTotal') }}</span>
+          </label>
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorInput }"
+            @mousedown="startLongPress('colorInput', $event)"
+            @touchstart.prevent="startLongPress('colorInput', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowInput')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowInput"
+                :class="{ 'is-pressed': pressedColorKey === 'colorInput' }"
+                @click.stop
+              />
+              <input
+                ref="colorInputRef"
+                type="color"
+                v-model="styleOptions.colorInput"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowInput && visibleColorPickerKey === 'colorInput' }"
+                :disabled="!styleOptions.chartShowInput"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showInput') }}</span>
+          </label>
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorOutput }"
+            @mousedown="startLongPress('colorOutput', $event)"
+            @touchstart.prevent="startLongPress('colorOutput', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowOutput')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowOutput"
+                :class="{ 'is-pressed': pressedColorKey === 'colorOutput' }"
+                @click.stop
+              />
+              <input
+                ref="colorOutputRef"
+                type="color"
+                v-model="styleOptions.colorOutput"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowOutput && visibleColorPickerKey === 'colorOutput' }"
+                :disabled="!styleOptions.chartShowOutput"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showOutput') }}</span>
+          </label>
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorTotalCost }"
+            @mousedown="startLongPress('colorTotalCost', $event)"
+            @touchstart.prevent="startLongPress('colorTotalCost', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowTotalCost')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowTotalCost"
+                :class="{ 'is-pressed': pressedColorKey === 'colorTotalCost' }"
+                @click.stop
+              />
+              <input
+                ref="colorTotalCostRef"
+                type="color"
+                v-model="styleOptions.colorTotalCost"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowTotalCost && visibleColorPickerKey === 'colorTotalCost' }"
+                :disabled="!styleOptions.chartShowTotalCost"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showTotalCost') }}</span>
+          </label>
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorCacheInput }"
+            @mousedown="startLongPress('colorCacheInput', $event)"
+            @touchstart.prevent="startLongPress('colorCacheInput', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowCacheInput')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowCacheInput"
+                :class="{ 'is-pressed': pressedColorKey === 'colorCacheInput' }"
+                @click.stop
+              />
+              <input
+                ref="colorCacheInputRef"
+                type="color"
+                v-model="styleOptions.colorCacheInput"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowCacheInput && visibleColorPickerKey === 'colorCacheInput' }"
+                :disabled="!styleOptions.chartShowCacheInput"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showCacheInput') }}</span>
+          </label>
+          <label
+            class="style-switch"
+            :style="{ '--swatch': styleOptions.colorCacheCreation }"
+            @mousedown="startLongPress('colorCacheCreation', $event)"
+            @touchstart.prevent="startLongPress('colorCacheCreation', $event)"
+            @mouseup="endLongPress($event)"
+            @mouseleave="endLongPress()"
+            @touchend.prevent="endLongPress($event)"
+            @click.prevent="onSwitchClick($event, 'chartShowCacheCreation')"
+          >
+            <span class="style-switch-control">
+              <input
+                type="checkbox"
+                :checked="styleOptions.chartShowCacheCreation"
+                :class="{ 'is-pressed': pressedColorKey === 'colorCacheCreation' }"
+                @click.stop
+              />
+              <input
+                ref="colorCacheCreationRef"
+                type="color"
+                v-model="styleOptions.colorCacheCreation"
+                class="color-input-hidden"
+                :class="{ 'is-visible': styleOptions.chartShowCacheCreation && visibleColorPickerKey === 'colorCacheCreation' }"
+                :disabled="!styleOptions.chartShowCacheCreation"
+                tabindex="-1"
+                aria-hidden="true"
+                @click.stop
+                @input="hideColorPicker"
+                @change="hideColorPicker"
+                @blur="hideColorPicker"
+              />
+            </span>
+            <span>{{ $t('tools.tokenUsageChart.showCacheCreation') }}</span>
+          </label>
         </div>
-        <div class="style-field">
-          <label class="tool-label">{{ $t('tools.tokenUsageChart.gridEmptyColor') }}</label>
-          <input type="color" v-model="styleOptions.gridEmptyColor" class="color-input" />
+        <div class="style-row style-row--2">
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.chartDateFontColor') }}</label>
+            <input type="color" v-model="styleOptions.chartDateFontColor" class="color-input" />
+          </div>
+          <div class="style-field">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.chartValueFontColor') }}</label>
+            <input type="color" v-model="styleOptions.chartValueFontColor" class="color-input" />
+          </div>
         </div>
-      </div>
+        <div class="style-field style-field--row">
+          <label class="style-checkbox style-checkbox--inline">
+            <input type="checkbox" v-model="styleOptions.showLegend" />
+            <span>{{ $t('tools.tokenUsageChart.showLegend') }}</span>
+          </label>
+          <template v-if="styleOptions.showLegend">
+            <label class="tool-label">{{ $t('tools.tokenUsageChart.legendFontColor') }}</label>
+            <input type="color" v-model="styleOptions.legendFontColor" class="color-input color-input--inline-row" />
+          </template>
+        </div>
+      </fieldset>
+
     </div>
 
     <template #footer>
@@ -322,8 +977,8 @@ const styleOptions = reactive<TokenUsageStyleOptions>({
   fontColor: '#2c2c2c',
   cardBgColor: '#ffffff',
   cardOpacity: '48',
-  width: '720',
-  height: '1200',
+  width: '1280',
+  height: '720',
   padding: '40',
   showTotal: true,
   showInput: true,
@@ -331,6 +986,20 @@ const styleOptions = reactive<TokenUsageStyleOptions>({
   showCacheInput: true,
   showCacheCreation: true,
   showTotalCost: true,
+  widthTotal: '180',
+  widthInput: '180',
+  widthOutput: '180',
+  widthTotalCost: '180',
+  widthCacheInput: '180',
+  widthCacheCreation: '180',
+  widthLargeTotal: '276',
+  widthLargeVibe: '276',
+  chartShowTotal: true,
+  chartShowInput: true,
+  chartShowOutput: true,
+  chartShowCacheInput: true,
+  chartShowCacheCreation: true,
+  chartShowTotalCost: true,
   statsChartType: 'line',
   colorTotal: '#4a7c59',
   colorInput: '#3b82f6',
@@ -340,6 +1009,27 @@ const styleOptions = reactive<TokenUsageStyleOptions>({
   colorCacheCreation: '#14b8a6',
   axisLabelColor: '#9ca3af',
   gridEmptyColor: '#f3f4f6',
+  orientation: 'portrait',
+  showUsageModule: true,
+  showContributionModule: true,
+  showChartModule: true,
+  usageCardTitleText: 'Token用量',
+  usageCardTitleAlign: 'left',
+  contributionCardTitleText: 'Token 贡献图',
+  contributionCardTitleAlign: 'left',
+  chartCardTitleText: 'Token 图表',
+  chartCardTitleAlign: 'left',
+  usageTitleAlign: 'left',
+  usageDataAlign: 'right',
+  monthLabelColor: '#6b7280',
+  weekdayLabelColor: '#9ca3af',
+  showDateRange: true,
+  showContributionLegend: true,
+  dateRangeFontColor: '#6b7280',
+  chartDateFontColor: '#9ca3af',
+  chartValueFontColor: '#6b7280',
+  showLegend: true,
+  legendFontColor: '#2c2c2c',
 })
 
 // 主题变化时同步主色与按比例生成的背景色
@@ -356,6 +1046,191 @@ watch(
   () => styleOptions.primaryColor,
   (primary) => {
     styleOptions.bgColor = deriveThemeBgColor(primary)
+  },
+)
+
+// 横/竖版仅表示布局方向偏好；实际宽高由内容 + 边距自适应，不再强制固定尺寸
+// styleOptions.width / height 仅作兜底，真正尺寸以 SVG 组件计算结果为准
+
+// 三模块互斥：始终至少一个开启
+function toggleModule(key: 'usage' | 'contribution' | 'chart', value: boolean) {
+  if (!value) {
+    const others: Record<string, boolean> = {
+      usage: styleOptions.showContributionModule || styleOptions.showChartModule,
+      contribution: styleOptions.showUsageModule || styleOptions.showChartModule,
+      chart: styleOptions.showUsageModule || styleOptions.showContributionModule,
+    }
+    if (!others[key]) return
+  }
+  if (key === 'usage') styleOptions.showUsageModule = value
+  if (key === 'contribution') styleOptions.showContributionModule = value
+  if (key === 'chart') styleOptions.showChartModule = value
+}
+
+// 图表设置：长按打开颜色选择器
+const colorTotalRef = ref<HTMLInputElement | null>(null)
+const colorInputRef = ref<HTMLInputElement | null>(null)
+const colorOutputRef = ref<HTMLInputElement | null>(null)
+const colorTotalCostRef = ref<HTMLInputElement | null>(null)
+const colorCacheInputRef = ref<HTMLInputElement | null>(null)
+const colorCacheCreationRef = ref<HTMLInputElement | null>(null)
+
+const colorInputMap: Record<string, HTMLInputElement | null> = {
+  get colorTotal() { return colorTotalRef.value },
+  get colorInput() { return colorInputRef.value },
+  get colorOutput() { return colorOutputRef.value },
+  get colorTotalCost() { return colorTotalCostRef.value },
+  get colorCacheInput() { return colorCacheInputRef.value },
+  get colorCacheCreation() { return colorCacheCreationRef.value },
+}
+
+const colorEnabledMap: Record<string, () => boolean> = {
+  colorTotal: () => styleOptions.chartShowTotal,
+  colorInput: () => styleOptions.chartShowInput,
+  colorOutput: () => styleOptions.chartShowOutput,
+  colorTotalCost: () => styleOptions.chartShowTotalCost,
+  colorCacheInput: () => styleOptions.chartShowCacheInput,
+  colorCacheCreation: () => styleOptions.chartShowCacheCreation,
+}
+
+const colorKeyByShowKey: Record<string, string> = {
+  chartShowTotal: 'colorTotal',
+  chartShowInput: 'colorInput',
+  chartShowOutput: 'colorOutput',
+  chartShowTotalCost: 'colorTotalCost',
+  chartShowCacheInput: 'colorCacheInput',
+  chartShowCacheCreation: 'colorCacheCreation',
+}
+
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+let longPressFired = false
+const visibleColorPickerKey = ref<string | null>(null)
+// 当前被按住的选项：用于按下时放大 checkbox 内颜色块
+const pressedColorKey = ref<string | null>(null)
+
+function isColorPickerEnabled(colorKey: string): boolean {
+  return !!colorEnabledMap[colorKey]?.()
+}
+
+function hideColorPicker() {
+  visibleColorPickerKey.value = null
+}
+
+async function openColorPicker(colorKey: string) {
+  // 未勾选时不允许打开颜色选择框
+  if (!isColorPickerEnabled(colorKey)) {
+    hideColorPicker()
+    return
+  }
+
+  visibleColorPickerKey.value = colorKey
+  await nextTick()
+
+  // nextTick 后再确认一次，避免异步期间被取消勾选
+  if (!isColorPickerEnabled(colorKey)) {
+    hideColorPicker()
+    return
+  }
+
+  const input = colorInputMap[colorKey]
+  if (!input) return
+
+  try {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker()
+    } else {
+      input.click()
+    }
+  } catch {
+    try {
+      input.click()
+    } catch {
+      // 打开失败时仍保留可见的颜色框，供用户直接点击
+    }
+  }
+}
+
+function startLongPress(colorKey: string, _e: Event) {
+  // 按下即放大 checkbox 内颜色块（无论是否勾选）
+  pressedColorKey.value = colorKey
+
+  // 未勾选时直接跳过长按
+  if (!isColorPickerEnabled(colorKey)) {
+    longPressFired = false
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      longPressTimer = null
+    }
+    hideColorPicker()
+    return
+  }
+
+  // 按住达到阈值时直接打开，不依赖松开
+  longPressFired = false
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  longPressTimer = setTimeout(() => {
+    longPressTimer = null
+    // 定时器触发时再检查一次，防止长按期间被取消勾选
+    if (!isColorPickerEnabled(colorKey)) {
+      hideColorPicker()
+      return
+    }
+    longPressFired = true
+    void openColorPicker(colorKey)
+  }, 400)
+}
+
+function endLongPress(e?: Event) {
+  // 松开 / 移出：清除按下放大状态，颜色块自然落到切换后（或还原）的状态
+  pressedColorKey.value = null
+  // 松开 / 移出：若尚未触发长按则取消；若已触发则阻止后续 click 切换
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  if (longPressFired && e) {
+    e.preventDefault()
+  }
+}
+
+function onSwitchClick(e: MouseEvent, key: 'chartShowTotal' | 'chartShowInput' | 'chartShowOutput' | 'chartShowTotalCost' | 'chartShowCacheInput' | 'chartShowCacheCreation') {
+  // 长按触发颜色选择器后，本次点击不切换 checkbox
+  if (longPressFired) {
+    longPressFired = false
+    e.preventDefault()
+    return
+  }
+
+  const nextValue = !styleOptions[key]
+  styleOptions[key] = nextValue
+
+  // 取消勾选时立刻关闭对应颜色框，防止残留可点
+  if (!nextValue) {
+    const colorKey = colorKeyByShowKey[key]
+    if (visibleColorPickerKey.value === colorKey) {
+      hideColorPicker()
+    }
+  }
+}
+
+// 图表系列开关变化时：关闭对应颜色框
+watch(
+  () => [
+    styleOptions.chartShowTotal,
+    styleOptions.chartShowInput,
+    styleOptions.chartShowOutput,
+    styleOptions.chartShowTotalCost,
+    styleOptions.chartShowCacheInput,
+    styleOptions.chartShowCacheCreation,
+  ],
+  () => {
+    const key = visibleColorPickerKey.value
+    if (key && !isColorPickerEnabled(key)) {
+      hideColorPicker()
+    }
   },
 )
 
@@ -408,12 +1283,10 @@ function handleDrop(e: DragEvent) {
 }
 
 function addFiles(fileList: FileList | null) {
-  if (!fileList) return
-  for (const f of Array.from(fileList)) {
-    if (!files.value.some((x) => x.name === f.name)) {
-      files.value.push({ name: f.name, size: f.size, raw: f })
-    }
-  }
+  if (!fileList || fileList.length === 0) return
+  // 单文件模式：新文件覆盖之前上传的文件
+  const f = fileList[0]
+  files.value = [{ name: f.name, size: f.size, raw: f }]
 }
 
 function removeFile(file: UploadFile) {
@@ -785,13 +1658,67 @@ function applyStyle() {
 .style-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+}
+
+.style-section {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  legend {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 0 6px;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 .style-field {
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  &--indent {
+    margin-left: 12px;
+    max-width: calc(100% - 12px);
+  }
+
+  &--grow {
+    flex: 1;
+    min-width: 0;
+
+    :deep(.blog-input),
+    :deep(input) {
+      width: 100%;
+    }
+  }
+
+  &--row {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    .tool-label {
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    .style-checkbox--inline {
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+  }
 }
 
 .style-row {
@@ -802,12 +1729,233 @@ function applyStyle() {
   &--2 {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  &--title {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
 }
 
 .style-switches {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px 12px;
+}
+
+.style-checkboxes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px 12px;
+}
+
+.style-badge-fields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.style-badge-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  :deep(.blog-input),
+  :deep(input) {
+    height: 30px;
+    font-size: 0.8rem;
+  }
+}
+
+.badge-width-input {
+  margin-top: 6px;
+
+  :deep(.blog-input),
+  :deep(input) {
+    height: 30px;
+    font-size: 0.8rem;
+  }
+}
+
+.style-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  cursor: pointer;
+
+  &--inline {
+    margin-top: 4px;
+  }
+
+  input[type='checkbox'] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+}
+
+.style-orientation {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.style-orientation-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+  height: 72px; // 固定高度，确保嵌入输入框时不变形
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  svg {
+    opacity: 0.7;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  small {
+    font-size: 0.68rem;
+    opacity: 0.6;
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
+    border-color: var(--accent);
+    color: var(--accent);
+
+    svg {
+      opacity: 1;
+    }
+  }
+
+  &:hover:not(.active) {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    color: var(--text-primary);
+  }
+}
+
+.style-orientation-btn-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+
+  .style-orientation-btn--custom.active & {
+    opacity: 0;
+  }
+}
+
+.style-orientation-btn-overlay {
+  position: absolute;
+  inset: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeIn 0.2s forwards;
+
+  :deep(.blog-input),
+  :deep(input) {
+    width: 100%;
+    height: 32px;
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 0 6px;
+    border-radius: 6px;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+.style-module-toggles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.style-align-toggles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.style-align-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 4px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  svg {
+    opacity: 0.75;
+  }
+
+  span {
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+
+  &.active {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
+    border-color: var(--accent);
+    color: var(--accent);
+
+    svg {
+      opacity: 1;
+    }
+  }
+
+  &:hover:not(.active) {
+    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
+    color: var(--text-primary);
+  }
+}
+
+.style-module-btn {
+  padding: 8px 6px;
+  font-size: 0.82rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &.active {
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
+    border-color: var(--accent);
+    color: var(--accent);
+    font-weight: 600;
+  }
 }
 
 .color-input {
@@ -830,22 +1978,117 @@ function applyStyle() {
     border-radius: 4px;
     flex-shrink: 0;
   }
+
+  &--inline-row {
+    width: 56px;
+    height: 28px;
+    flex-shrink: 0;
+    border-radius: 6px;
+  }
 }
 
 .style-switch {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 0.85rem;
   color: var(--text-primary);
   cursor: pointer;
-  padding: 4px 0;
+  padding: 0;
+  border-radius: 8px;
+  background: transparent;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.style-switch-control {
+  position: relative;
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 
   input[type='checkbox'] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--accent);
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background: transparent;
     cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    transition: all 0.15s;
+    /* 纯视觉指示器：所有点击都交给 label 的 onSwitchClick 统一处理，
+       避免直接点 checkbox 时原生 toggle 与 styleOptions 状态脱钩 */
+    pointer-events: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 2px;
+      background: var(--swatch, var(--accent));
+      transform: scale(0);
+      transition: transform 0.15s ease;
+    }
+
+    &:checked::after {
+      transform: scale(1);
+    }
+
+    /* 按住时颜色块放大（不超过 checkbox 框内边界，内部可用区约 1.4 倍） */
+    &.is-pressed::after {
+      transform: scale(0.5);
+    }
+
+    &.is-pressed:checked::after {
+      transform: scale(1.3);
+    }
+  }
+}
+
+.color-input-hidden {
+  /* 与 checkbox 内部颜色块对齐：边框 2px + ::after inset 2px = 4px 偏移，颜色块 10×10 */
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 2px;
+  background: var(--swatch, var(--accent));
+  box-sizing: border-box;
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  cursor: pointer;
+
+  &.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+  }
+
+  &::-moz-color-swatch {
+    border: none;
+    border-radius: 2px;
   }
 }
 
@@ -858,7 +2101,17 @@ function applyStyle() {
 // ── 响应式 ──
 @media (max-width: 640px) {
   .style-row,
-  .style-switches {
+  .style-switches,
+  .style-checkboxes,
+  .style-badge-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .style-module-toggles {
+    grid-template-columns: 1fr;
+  }
+
+  .style-orientation {
     grid-template-columns: 1fr;
   }
 

@@ -36,116 +36,178 @@
 
     <rect x="0" y="0" :width="width" :height="height" :fill="styleOptions.bgColor" />
 
-    <g filter="url(#token-usage-shadow)">
-      <rect
-        :x="padding"
-        :y="padding"
-        :width="width - 2 * padding"
-        :height="topCardHeight"
-        rx="16"
-        :fill="styleOptions.cardBgColor"
-        :fill-opacity="cardOpacity"
-        stroke="rgba(255,255,255,0.8)"
-        stroke-width="1"
-        filter="url(#token-usage-glass)"
-      />
-    </g>
-    <text :x="padding * 2" :y="padding + 45" font-size="30" font-weight="700" :fill="styleOptions.fontColor" font-family="'Segoe UI', Arial, sans-serif">Token用量</text>
-
-    <g v-for="badge in badgeLayouts" :key="badge.label">
-      <rect
-        :x="badge.x"
-        :y="badge.y"
-        :width="badge.width"
-        :height="badge.height"
-        rx="20"
-        :fill="styleOptions.primaryColor"
-        fill-opacity="0.12"
-      />
-      <!-- 左上角标签 -->
+    <!-- ── 用量数据卡片 ── -->
+    <template v-if="styleOptions.showUsageModule">
+      <g filter="url(#token-usage-shadow)">
+        <rect
+          :x="padding"
+          :y="padding"
+          :width="width - 2 * padding"
+          :height="topCardHeight"
+          rx="16"
+          :fill="styleOptions.cardBgColor"
+          :fill-opacity="cardOpacity"
+          stroke="rgba(255,255,255,0.8)"
+          stroke-width="1"
+          filter="url(#token-usage-glass)"
+        />
+      </g>
       <text
-        :x="badge.x + (badge.large ? 20 : 15)"
-        :y="badge.y + (badge.large ? 35 : 30)"
-        :font-size="badge.large ? 24 : 22"
+        :x="cardTitleX"
+        :y="padding + 45"
+        :text-anchor="cardTitleAnchor"
+        font-size="30"
         font-weight="700"
         :fill="styleOptions.fontColor"
         font-family="'Segoe UI', Arial, sans-serif"
-      >{{ badge.label }}</text>
-      <!-- 右下角数值 -->
+      >{{ cardTitleText }}</text>
+
+      <g v-for="badge in badgeLayouts" :key="badge.label">
+        <rect
+          :x="badge.x"
+          :y="badge.y"
+          :width="badge.width"
+          :height="badge.height"
+          rx="20"
+          :fill="styleOptions.primaryColor"
+          fill-opacity="0.12"
+        />
+        <!-- 标题（胶囊左上/中/右） -->
+        <text
+          :x="badgeLabelX(badge)"
+          :y="badge.y + (badge.large ? 35 : 30)"
+          :text-anchor="badgeLabelAnchor"
+          :font-size="badge.large ? 24 : 22"
+          font-weight="700"
+          :fill="styleOptions.fontColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >{{ badge.label }}</text>
+        <!-- 数据（胶囊左下/中/右） -->
+        <text
+          :x="badgeValueX(badge)"
+          :y="badge.y + badge.height - 18"
+          :text-anchor="badgeValueAnchor"
+          :font-size="badge.large ? 26 : 24"
+          font-weight="700"
+          :fill="styleOptions.primaryColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >{{ badge.value }}</text>
+      </g>
+    </template>
+
+    <!-- ── 贡献图卡片 ── -->
+    <template v-if="styleOptions.showContributionModule">
+      <g filter="url(#token-usage-shadow)">
+        <rect
+          :x="padding"
+          :y="mainCardY"
+          :width="width - 2 * padding"
+          :height="mainCardHeight"
+          rx="16"
+          :fill="styleOptions.cardBgColor"
+          :fill-opacity="cardOpacity"
+          stroke="rgba(255,255,255,0.8)"
+          stroke-width="1"
+          filter="url(#token-usage-glass)"
+        />
+      </g>
       <text
-        :x="badge.x + badge.width - 15"
-        :y="badge.y + badge.height - 18"
+        :x="contributionTitleX"
+        :y="mainCardY + 40"
+        :text-anchor="contributionTitleAnchor"
+        font-size="20"
+        font-weight="600"
+        :fill="styleOptions.fontColor"
+        font-family="'Segoe UI', Arial, sans-serif"
+      >{{ contributionTitleText }}</text>
+      <text
+        v-if="styleOptions.showDateRange"
+        :x="width - padding * 2"
+        :y="mainCardY + 40"
         text-anchor="end"
-        :font-size="badge.large ? 26 : 24"
-        font-weight="700"
-        :fill="styleOptions.primaryColor"
+        font-size="14"
+        font-weight="400"
+        :fill="styleOptions.dateRangeFontColor || styleOptions.axisLabelColor"
         font-family="'Segoe UI', Arial, sans-serif"
-      >{{ badge.value }}</text>
-    </g>
+      >{{ rangeLabel }}</text>
 
-    <g filter="url(#token-usage-shadow)">
-      <rect
-        :x="padding"
-        :y="mainCardY"
-        :width="width - 2 * padding"
-        :height="mainCardHeight"
-        rx="16"
-        :fill="styleOptions.cardBgColor"
-        :fill-opacity="cardOpacity"
-        stroke="rgba(255,255,255,0.8)"
-        stroke-width="1"
-        filter="url(#token-usage-glass)"
-      />
-    </g>
-    <text :x="padding * 2" :y="mainCardY + 40" font-size="20" font-weight="600" :fill="styleOptions.fontColor" font-family="'Segoe UI', Arial, sans-serif">Token 贡献图</text>
-    <text :x="width - padding * 2" :y="mainCardY + 40" text-anchor="end" font-size="14" font-weight="400" :fill="styleOptions.axisLabelColor" font-family="'Segoe UI', Arial, sans-serif">{{ rangeLabel }}</text>
+      <!-- 月份行：轻量标签 -->
+      <g v-for="month in grid.monthLabels" :key="month.key">
+        <text
+          :x="month.x"
+          :y="monthLabelY"
+          text-anchor="middle"
+          font-size="11"
+          font-weight="500"
+          letter-spacing="0.04em"
+          :fill="styleOptions.monthLabelColor || styleOptions.axisLabelColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >
+          {{ month.label }}
+        </text>
+      </g>
 
-    <!-- 月份行：轻量标签 -->
-    <g v-for="month in grid.monthLabels" :key="month.key">
-      <text
-        :x="month.x"
-        :y="monthLabelY"
-        text-anchor="middle"
-        font-size="11"
-        font-weight="500"
-        letter-spacing="0.04em"
-        fill={styleOptions.axisLabelColor}
-        font-family="'Segoe UI', Arial, sans-serif"
-      >
-        {{ month.label }}
-      </text>
-    </g>
+      <!-- 周一~周日列：弱化辅助标签 -->
+      <g v-for="row in grid.rowLabels" :key="row.label">
+        <text
+          :x="padding + 15 + gridLabelWidth / 2"
+          :y="row.y"
+          text-anchor="middle"
+          dominant-baseline="middle"
+          font-size="11"
+          font-weight="500"
+          letter-spacing="0.02em"
+          :fill="styleOptions.weekdayLabelColor || styleOptions.axisLabelColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >
+          {{ row.shortLabel }}
+        </text>
+      </g>
 
-    <!-- 周一~周日列：弱化辅助标签 -->
-    <g v-for="row in grid.rowLabels" :key="row.label">
-      <text
-        :x="padding + 15 + gridLabelWidth / 2"
-        :y="row.y"
-        text-anchor="middle"
-        dominant-baseline="middle"
-        font-size="11"
-        font-weight="500"
-        letter-spacing="0.02em"
-        fill={styleOptions.axisLabelColor}
-        font-family="'Segoe UI', Arial, sans-serif"
-      >
-        {{ row.shortLabel }}
-      </text>
-    </g>
+      <g v-for="cell in grid.cells" :key="cell.key">
+        <rect
+          :x="cell.x"
+          :y="cell.y"
+          :width="cell.size"
+          :height="cell.size"
+          rx="6"
+          :fill="cell.fill"
+        />
+      </g>
 
-    <g v-for="cell in grid.cells" :key="cell.key">
-      <rect
-        :x="cell.x"
-        :y="cell.y"
-        :width="cell.size"
-        :height="cell.size"
-        rx="6"
-        :fill="cell.fill"
-      />
-    </g>
+      <!-- 贡献图图例 -->
+      <g v-if="styleOptions.showContributionLegend" :transform="`translate(${contributionLegendX}, ${contributionLegendY})`">
+        <text
+          x="0"
+          y="12"
+          font-size="11"
+          font-weight="400"
+          :fill="styleOptions.axisLabelColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >{{ contributionLegendLessText }}</text>
+        <g v-for="(item, i) in contributionLegendItems" :key="'legend-' + i">
+          <rect
+            :x="contributionLegendSwatchX + i * (contributionLegendSwatchSize + 4)"
+            :y="0"
+            :width="contributionLegendSwatchSize"
+            :height="contributionLegendSwatchSize"
+            rx="3"
+            :fill="item.color"
+          />
+        </g>
+        <text
+          :x="contributionLegendMoreX"
+          y="12"
+          font-size="11"
+          font-weight="400"
+          :fill="styleOptions.axisLabelColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >{{ contributionLegendMoreText }}</text>
+      </g>
+    </template>
 
-  
     <!-- ── 统计图卡片 ── -->
+    <template v-if="styleOptions.showChartModule">
     <g filter="url(#token-usage-shadow)">
       <rect
         :x="padding"
@@ -160,7 +222,15 @@
         filter="url(#token-usage-glass)"
       />
     </g>
-    <text :x="padding * 2" :y="statsTop + 38" font-size="20" font-weight="600" :fill="styleOptions.fontColor" font-family="'Segoe UI',Arial, sans-serif">Token 图表</text>
+    <text
+      :x="chartTitleX"
+      :y="statsTop + 38"
+      :text-anchor="chartTitleAnchor"
+      font-size="20"
+      font-weight="600"
+      :fill="styleOptions.fontColor"
+      font-family="'Segoe UI',Arial, sans-serif"
+    >{{ chartTitleText }}</text>
 
     <!-- 网格背景 -->
     <g>
@@ -199,7 +269,7 @@
       text-anchor="middle"
       font-size="10"
       font-weight="400"
-      :fill="styleOptions.axisLabelColor"
+      :fill="styleOptions.chartDateFontColor || styleOptions.axisLabelColor"
       font-family="'Segoe UI', Arial, sans-serif"
     >{{ label.label }}</text>
 
@@ -212,29 +282,32 @@
       text-anchor="end"
       font-size="10"
       font-weight="400"
-      :fill="styleOptions.axisLabelColor"
+      :fill="styleOptions.chartValueFontColor || styleOptions.axisLabelColor"
       font-family="'Segoe UI', Arial, sans-serif"
     >{{ label.label }}</text>
 
     <!-- 图例 -->
-    <g v-for="item in statsChart.legend" :key="'legend-' + item.key">
-      <rect
-        :x="item.x"
-        :y="item.y"
-        width="12"
-        height="12"
-        rx="2"
-        :fill="item.color"
-      />
-      <text
-        :x="item.x + 18"
-        :y="item.y + 10"
-        font-size="11"
-        font-weight="400"
-        :fill="styleOptions.fontColor"
-        font-family="'Segoe UI', Arial, sans-serif"
-      >{{ item.label }}</text>
-    </g>
+    <template v-if="styleOptions.showLegend">
+      <g v-for="item in statsChart.legend" :key="'legend-' + item.key">
+        <rect
+          :x="item.x"
+          :y="item.y"
+          width="12"
+          height="12"
+          rx="2"
+          :fill="item.color"
+        />
+        <text
+          :x="item.x + 18"
+          :y="item.y + 10"
+          font-size="11"
+          font-weight="400"
+          :fill="styleOptions.legendFontColor || styleOptions.fontColor"
+          font-family="'Segoe UI', Arial, sans-serif"
+        >{{ item.label }}</text>
+      </g>
+    </template>
+    </template>
   </svg>
 </template>
 
@@ -245,16 +318,13 @@ import {
   addDays,
   aggregateRows,
   dateKey,
-  endOfWeekSunday,
   formatCompactTokens,
   formatMoney,
   formatMonthLabel,
   formatRangeLabel,
-  getLocalDateParts,
   levelTextColor,
   levelToColor,
   scoreToLevel,
-  startOfWeekMonday,
   type TokenUsageStyleOptions,
 } from './tokenUsageSvg'
 
@@ -264,6 +334,18 @@ function formatCompactNumber(value: number): string {
   if (abs >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
   if (abs >= 1_000) return `${(value / 1_000).toFixed(1)}K`
   return Math.round(value).toString()
+}
+
+/**
+ * 估算一段文本在给定字号下的渲染宽度（px）。
+ * 中文（及全角）按 1 个字号宽，其余（数字/字母/符号）按 0.6 个字号宽。
+ */
+function estimateTextWidth(text: string, fontSize: number): number {
+  let units = 0
+  for (const ch of text) {
+    units += /[一-鿿＀-￯]/.test(ch) ? 1 : 0.6
+  }
+  return units * fontSize
 }
 
 interface Props {
@@ -313,22 +395,120 @@ defineExpose({
 })
 
 // 相对 168×86 的基准按 180/168 等比放大（宽 +12）
-const badgeWidth = 180
 const badgeHeight = 100
 const badgeGap = 12
+const badgeInnerInset = 15
 
-const width = computed(() => Number(props.styleOptions.width) || 720)
-const height = computed(() => Math.max(Number(props.styleOptions.height) || 1200, wholeHeight.value))
+const orientation = computed(() => props.styleOptions.orientation || 'portrait')
 const padding = computed(() => Number(props.styleOptions.padding) || 40)
-const cardOpacity = computed(() => {
-  const raw = Number(props.styleOptions.cardOpacity)
-  if (!Number.isFinite(raw)) return 0.48
-  // 百分比 0-100
-  return Math.min(1, Math.max(0, raw / 100))
+
+/** 用量卡片标题文本 */
+const cardTitleText = computed(() => props.styleOptions.usageCardTitleText || 'Token用量')
+
+/** 用量卡片标题对齐 */
+const cardTitleAnchor = computed(() => {
+  const align = props.styleOptions.usageCardTitleAlign || 'left'
+  return align === 'left' ? 'start' as const : align === 'right' ? 'end' as const : 'middle' as const
 })
-const contentWidth = computed(() => width.value - 2 * padding.value)
+const cardTitleX = computed(() => {
+  const align = props.styleOptions.usageCardTitleAlign || 'left'
+  const p = padding.value
+  if (align === 'center') return width.value / 2
+  if (align === 'right') return width.value - p * 2
+  return p * 2
+})
+
+/** 贡献图卡片标题文本 */
+const contributionTitleText = computed(() => props.styleOptions.contributionCardTitleText || 'Token 贡献图')
+
+/** 贡献图卡片标题对齐 */
+const contributionTitleAnchor = computed(() => {
+  const align = props.styleOptions.contributionCardTitleAlign || 'left'
+  return align === 'left' ? 'start' as const : align === 'right' ? 'end' as const : 'middle' as const
+})
+const contributionTitleX = computed(() => {
+  const align = props.styleOptions.contributionCardTitleAlign || 'left'
+  const p = padding.value
+  if (align === 'center') return width.value / 2
+  if (align === 'right') return width.value - p * 2
+  return p * 2
+})
+
+/** 图表卡片标题文本 */
+const chartTitleText = computed(() => props.styleOptions.chartCardTitleText || 'Token 图表')
+
+/** 图表卡片标题对齐 */
+const chartTitleAnchor = computed(() => {
+  const align = props.styleOptions.chartCardTitleAlign || 'left'
+  return align === 'left' ? 'start' as const : align === 'right' ? 'end' as const : 'middle' as const
+})
+const chartTitleX = computed(() => {
+  const align = props.styleOptions.chartCardTitleAlign || 'left'
+  const p = padding.value
+  if (align === 'center') return width.value / 2
+  if (align === 'right') return width.value - p * 2
+  return p * 2
+})
+
+/** 胶囊标题（label）的水平对齐：返回 { x, anchor } */
+const badgeLabelAnchor = computed(() => {
+  const align = props.styleOptions.usageTitleAlign || 'left'
+  return align === 'left' ? 'start' as const : align === 'right' ? 'end' as const : 'middle' as const
+})
+function badgeLabelX(badge: BadgeLayout): number {
+  const align = props.styleOptions.usageTitleAlign || 'left'
+  if (align === 'center') return badge.x + badge.width / 2
+  if (align === 'right') return badge.x + badge.width - badgeInnerInset
+  return badge.x + badgeInnerInset
+}
+
+/** 胶囊数据（value）的水平对齐：返回 { x, anchor } */
+const badgeValueAnchor = computed(() => {
+  const align = props.styleOptions.usageDataAlign || 'left'
+  return align === 'left' ? 'start' as const : align === 'right' ? 'end' as const : 'middle' as const
+})
+function badgeValueX(badge: BadgeLayout): number {
+  const align = props.styleOptions.usageDataAlign || 'left'
+  if (align === 'center') return badge.x + badge.width / 2
+  if (align === 'right') return badge.x + badge.width - badgeInnerInset
+  return badge.x + badgeInnerInset
+}
+
+const gridGap = 8
+const gridLabelWidth = 30
+const cellSize = 28
+const step = cellSize + gridGap
+const statsChartHeight = 300
+const moduleGap = 24
+
+
+/**
+ * 画布宽度：
+ * - 横版/自定义：取设置值（styleOptions.width）
+ * - 竖版：固定 720，不再随内容撑开
+ */
+const width = computed(() => {
+  if (orientation.value === 'portrait') {
+    return 720
+  }
+  if (orientation.value === 'landscape') {
+    return 1280
+  }
+  // 自定义：使用设置值
+  return Math.max(320, Number(props.styleOptions.width) || 1280)
+})
+
+/** 网格可用宽度（扣除左右 padding 与标签列） */
+const gridAvailableWidth = computed(() => {
+  const p = padding.value
+  return Math.max(0, width.value - 2 * p - 15 - gridLabelWidth - 15)
+})
+
+/** 根据画布宽度动态计算最多能放多少周（至少 1 周） */
+const maxWeeks = computed(() => Math.max(1, Math.floor(gridAvailableWidth.value / step)))
 
 const topCardHeight = computed(() => {
+  if (!props.styleOptions.showUsageModule) return 0
   const rowsCount = badgeRows.value.length
   const badgeBlockHeight = rowsCount * badgeHeight + Math.max(0, rowsCount - 1) * badgeGap
   // 标题下移 17px（28→45）后，顶部区域与底部留白同步修正
@@ -340,10 +520,13 @@ const badgeRows = computed(() => {
   const rows: typeof badges[] = []
   let currentRow: typeof badges = []
   let currentWidth = 0
+  const badgeContainerPadding = 32
+  // 卡片内可用宽度（卡片左右各留 padding + badgeContainerPadding + badgeGap）
+  const available = Math.max(0, width.value - 2 * padding.value - 2 * badgeContainerPadding - badgeGap)
 
   for (const badge of badges) {
     const w = badge.width
-    if (currentRow.length > 0 && currentWidth + badgeGap + w > contentWidth.value) {
+    if (currentRow.length > 0 && currentWidth + badgeGap + w > available) {
       rows.push(currentRow)
       currentRow = []
       currentWidth = 0
@@ -356,11 +539,25 @@ const badgeRows = computed(() => {
 })
 
 const badgeLayouts = computed<BadgeLayout[]>(() => {
+  if (!props.styleOptions.showUsageModule) return []
   const layouts: BadgeLayout[] = []
   // 与标题同步下移 17px（52→69）
   let y = padding.value + 69
+  const p = padding.value
+  const badgeContainerPadding = 32
+  // 卡片内可用宽度（卡片左右各留 padding + badgeContainerPadding）
+  const areaWidth = Math.max(0, width.value - 2 * p - 2 * badgeContainerPadding - badgeGap)
+  // 胶囊始终居中于卡片
+  const forceCenter = true
   for (const row of badgeRows.value) {
-    let x = padding.value * 2
+    // 当前行实际宽度
+    const rowWidth = row.reduce((sum, badge, i) => sum + badge.width + (i > 0 ? badgeGap : 0), 0)
+    let x = p + badgeContainerPadding + badgeGap
+    if (forceCenter || props.styleOptions.usageDataAlign === 'center') {
+      x = p + badgeContainerPadding + badgeGap + Math.max(0, (areaWidth - rowWidth) / 2) - 6
+    } else if (props.styleOptions.usageDataAlign === 'right') {
+      x = p + badgeContainerPadding + badgeGap + Math.max(0, areaWidth - rowWidth)
+    }
     for (const badge of row) {
       layouts.push({
         label: badge.label,
@@ -378,18 +575,56 @@ const badgeLayouts = computed<BadgeLayout[]>(() => {
   return layouts
 })
 
-const mainCardY = computed(() => padding.value + topCardHeight.value + 24)
+const mainCardY = computed(() => {
+  if (!props.styleOptions.showUsageModule) return padding.value
+  return padding.value + topCardHeight.value + moduleGap
+})
+
+/** 贡献图图例位置 */
+const contributionLegendY = computed(() => {
+  const gridBlockHeight = cellSize * 7 + gridGap * 6
+  return gridStartY.value + gridBlockHeight + 12
+})
+
+/** 贡献图图例色块大小与间距 */
+const contributionLegendSwatchSize = 14
+const contributionLegendSwatchCount = 5
+
+/** 贡献图图例色块颜色（从少到多取 5 档） */
+const contributionLegendItems = computed(() => {
+  const primary = props.styleOptions.primaryColor
+  const levels = [1, 3, 5, 7, 9]
+  return levels.map((level) => ({
+    color: levelToColor(level, primary),
+  }))
+})
+
+const contributionLegendSwatchX = 28
+const contributionLegendMoreX = computed(
+  () => contributionLegendSwatchX + contributionLegendSwatchCount * (contributionLegendSwatchSize + 4) + 6,
+)
+
+/** 贡献图图例文本 */
+const contributionLegendLessText = '少'
+const contributionLegendMoreText = '多'
+
+/** 贡献图图例总宽度 */
+const contributionLegendWidth = computed(
+  () => contributionLegendMoreX.value + 18,
+)
+
+/** 贡献图图例 X 位置（居右，右侧留 20px 间距） */
+const contributionLegendX = computed(
+  () => width.value - padding.value - contributionLegendWidth.value - 20,
+)
 const monthLabelY = computed(() => mainCardY.value + 40 + 20 + 16)
-const maxWeeks = 16
-const gridGap = 8
-const gridLabelWidth = 30
-const cellSize = 28
-const step = cellSize + gridGap
 const gridLeft = computed(() => padding.value + 15 + gridLabelWidth)
 const gridStartY = computed(() => monthLabelY.value + 18)
 const mainCardHeight = computed(() => {
+  if (!props.styleOptions.showContributionModule) return 0
   const gridBlockHeight = cellSize * 7 + gridGap * 6
-  return Math.max(280, 44 + 32 + 18 + gridBlockHeight + 36)
+  const legendHeight = props.styleOptions.showContributionLegend ? 36 : 0
+  return Math.max(280, 44 + 32 + 18 + gridBlockHeight + 12 + legendHeight + 16)
 })
 
 const aggregate = computed(() => aggregateRows(props.rows))
@@ -400,28 +635,51 @@ const visibleBadges = computed(() => {
   const totalConsumed =
     agg.totalTokens + agg.cacheInputTokens + agg.cacheCreationTokens
   const vibeDays = agg.dailyBuckets.length
+  const opts = props.styleOptions
+
+  // 普通徽章：标签字号 22、数值字号 24，左右各留 badgeInnerInset 内边距
+  const minBadgeWidth = (label: string, value: string) => {
+    const contentWidth = Math.max(
+      estimateTextWidth(label, 22),
+      estimateTextWidth(value, 24),
+    )
+    return Math.ceil(contentWidth + badgeInnerInset * 2)
+  }
+  // 大徽章：标签字号 24、数值字号 26
+  const minLargeBadgeWidth = (label: string, value: string) => {
+    const contentWidth = Math.max(
+      estimateTextWidth(label, 24),
+      estimateTextWidth(value, 26),
+    )
+    return Math.ceil(contentWidth + badgeInnerInset * 2)
+  }
+  // 用户设置宽度与最小宽度取较大值（留空/非法时按最小宽度）
+  const resolveWidth = (raw: string, _label: string, _value: string, minWidth: number) => {
+    const user = Number(raw)
+    return Number.isFinite(user) && user > 0 ? Math.max(user, minWidth) : minWidth
+  }
 
   return [
     {
       label: '总消耗Token',
       value: formatCompactTokens(totalConsumed),
       visible: true,
-      width: Math.round(badgeWidth * 1.5) + 6,
+      width: resolveWidth(opts.widthLargeTotal, '总消耗Token', formatCompactTokens(totalConsumed), minLargeBadgeWidth('总消耗Token', formatCompactTokens(totalConsumed))),
       large: true,
     },
     {
       label: 'Vibe Coding',
       value: `${vibeDays}天`,
       visible: true,
-      width: Math.round(badgeWidth * 1.5) + 6,
+      width: resolveWidth(opts.widthLargeVibe, 'Vibe Coding', `${vibeDays}天`, minLargeBadgeWidth('Vibe Coding', `${vibeDays}天`)),
       large: true,
     },
-    { label: '总用量', value: formatCompactTokens(agg.totalTokens), visible: props.styleOptions.showTotal, width: badgeWidth, large: false },
-    { label: '输入', value: formatCompactTokens(agg.inputTokens), visible: props.styleOptions.showInput, width: badgeWidth, large: false },
-    { label: '输出', value: formatCompactTokens(agg.outputTokens), visible: props.styleOptions.showOutput, width: badgeWidth, large: false },
-    { label: '总花费', value: formatMoney(agg.totalCost), visible: props.styleOptions.showTotalCost, width: badgeWidth, large: false },
-    { label: '缓存输入', value: formatCompactTokens(agg.cacheInputTokens), visible: props.styleOptions.showCacheInput, width: badgeWidth, large: false },
-    { label: '缓存创建', value: formatCompactTokens(agg.cacheCreationTokens), visible: props.styleOptions.showCacheCreation, width: badgeWidth, large: false },
+    { label: '总用量', value: formatCompactTokens(agg.totalTokens), visible: opts.showTotal, width: resolveWidth(opts.widthTotal, '总用量', formatCompactTokens(agg.totalTokens), minBadgeWidth('总用量', formatCompactTokens(agg.totalTokens))), large: false },
+    { label: '输入', value: formatCompactTokens(agg.inputTokens), visible: opts.showInput, width: resolveWidth(opts.widthInput, '输入', formatCompactTokens(agg.inputTokens), minBadgeWidth('输入', formatCompactTokens(agg.inputTokens))), large: false },
+    { label: '输出', value: formatCompactTokens(agg.outputTokens), visible: opts.showOutput, width: resolveWidth(opts.widthOutput, '输出', formatCompactTokens(agg.outputTokens), minBadgeWidth('输出', formatCompactTokens(agg.outputTokens))), large: false },
+    { label: '总花费', value: formatMoney(agg.totalCost), visible: opts.showTotalCost, width: resolveWidth(opts.widthTotalCost, '总花费', formatMoney(agg.totalCost), minBadgeWidth('总花费', formatMoney(agg.totalCost))), large: false },
+    { label: '缓存输入', value: formatCompactTokens(agg.cacheInputTokens), visible: opts.showCacheInput, width: resolveWidth(opts.widthCacheInput, '缓存输入', formatCompactTokens(agg.cacheInputTokens), minBadgeWidth('缓存输入', formatCompactTokens(agg.cacheInputTokens))), large: false },
+    { label: '缓存创建', value: formatCompactTokens(agg.cacheCreationTokens), visible: opts.showCacheCreation, width: resolveWidth(opts.widthCacheCreation, '缓存创建', formatCompactTokens(agg.cacheCreationTokens), minBadgeWidth('缓存创建', formatCompactTokens(agg.cacheCreationTokens))), large: false },
   ].filter(item => item.visible)
 })
 
@@ -435,74 +693,71 @@ const WEEKDAY_LABELS = [
   { label: '周日', shortLabel: '日' },
 ] as const
 
+/**
+ * 网格的锚点日期（最新有数据的日期，锁定在右下角）。
+ * 无数据时用今天。
+ */
+const gridAnchorDate = computed(() => {
+  const buckets = aggregate.value.dailyBuckets
+  const base = buckets.length > 0 ? buckets[buckets.length - 1].date : new Date()
+  const d = new Date(base)
+  d.setHours(0, 0, 0, 0)
+  return d
+})
+
+/**
+ * 每一行对应的星期（0=周一 … 6=周日）。
+ * 以锚点日期所在行为最后一行（索引 6），往上倒推。
+ * 例如锚点是周一，则行顺序为：周二、周三、周四、周五、周六、周日、周一。
+ */
+const rowWeekdays = computed<number[]>(() => {
+  const anchorWeekday = (gridAnchorDate.value.getDay() + 6) % 7
+  // 第 rowIndex 行（0 在顶部，6 在底部）对应的星期
+  // 底部（rowIndex=6）= anchorWeekday，往上每行 -1 天
+  return Array.from({ length: 7 }, (_, rowIndex) => {
+    return ((anchorWeekday - (6 - rowIndex)) % 7 + 7) % 7
+  })
+})
+
 const rowLabels = computed<GridRowLabel[]>(() =>
-  WEEKDAY_LABELS.map((item, index) => ({
-    label: item.label,
-    shortLabel: item.shortLabel,
+  rowWeekdays.value.map((weekday, index) => ({
+    label: WEEKDAY_LABELS[weekday].label,
+    shortLabel: WEEKDAY_LABELS[weekday].shortLabel,
     y: gridStartY.value + index * step + cellSize / 2,
   })),
 )
 
 const grid = computed(() => {
+  if (!props.styleOptions.showContributionModule) {
+    return { monthLabels: [] as GridMonthLabel[], rowLabels: [] as GridRowLabel[], cells: [] as GridCell[] }
+  }
   const buckets = aggregate.value.dailyBuckets
-  const wCount = maxWeeks
+  const wCount = maxWeeks.value
   const left = gridLeft.value
+  const anchor = gridAnchorDate.value
 
-  if (buckets.length === 0) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const startWeekday = (today.getDay() + 6) % 7
-    const gridStart = new Date(today)
-    gridStart.setDate(gridStart.getDate() - startWeekday - (wCount - 1) * 7)
+  // 网格总天数 = wCount 列 × 7 行；最新日期（anchor）锁定在右下角
+  const totalCells = wCount * 7
+  // 网格起始日期：从右下角 anchor 往前倒推 (totalCells - 1) 天
+  const gridStart = addDays(anchor, -(totalCells - 1))
 
-    const cells: GridCell[] = []
-    for (let i = 0; i < wCount * 7; i++) {
-      const date = addDays(gridStart, i)
-      const weekday = getLocalDateParts(date).weekday
-      const x = left + Math.floor(i / 7) * step
-      const y = gridStartY.value + weekday * step
-      cells.push({
-        key: dateKey(date),
-        x,
-        y,
-        size: cellSize,
-        day: String(date.getDate()),
-        level: 0,
-        fill: props.styleOptions.gridEmptyColor,
-        textColor: props.styleOptions.axisLabelColor,
-      })
-    }
-    return { monthLabels: [], rowLabels: rowLabels.value, cells }
-  }
-
-  const dataStart = startOfWeekMonday(buckets[0].date)
-  const dataEnd = endOfWeekSunday(buckets[buckets.length - 1].date)
-  const dataDays = Math.max(1, Math.round((dataEnd.getTime() - dataStart.getTime()) / 86_400_000) + 1)
-  const dataWeeks = Math.max(1, Math.ceil(dataDays / 7))
-
-  let gridStart = dataStart
-  if (dataWeeks <= wCount) {
-    const diff = wCount - dataWeeks
-    gridStart = new Date(dataStart)
-    gridStart.setDate(gridStart.getDate() - diff * 7)
-  } else {
-    gridStart = new Date(dataEnd)
-    gridStart.setDate(gridStart.getDate() - (wCount * 7 - 1))
-    gridStart = startOfWeekMonday(gridStart)
-  }
-
-  const maxScore = Math.max(...buckets.map((bucket) => bucket.totalTokens), 1)
-  const dayMap = new Map(buckets.map((bucket) => [dateKey(bucket.date), bucket.totalTokens]))
+  const emptyData = buckets.length === 0
+  const maxScore = emptyData
+    ? 1
+    : Math.max(...buckets.map((bucket) => bucket.totalTokens), 1)
+  const dayMap = emptyData
+    ? new Map<string, number>()
+    : new Map(buckets.map((bucket) => [dateKey(bucket.date), bucket.totalTokens]))
   const primaryColor = props.styleOptions.primaryColor
 
+  // 月份标签：每列首格（顶部，row=0）的日期决定该列所属月份
   const monthMap = new Map<string, GridMonthLabel>()
   for (let weekIndex = 0; weekIndex < wCount; weekIndex++) {
-    const monday = new Date(gridStart)
-    monday.setDate(monday.getDate() + weekIndex * 7)
-    const key = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}`
+    const colTopDate = addDays(gridStart, weekIndex * 7)
+    const key = `${colTopDate.getFullYear()}-${String(colTopDate.getMonth() + 1).padStart(2, '0')}`
     if (!monthMap.has(key)) {
       const x = left + weekIndex * step
-      monthMap.set(key, { key, label: formatMonthLabel(monday), x })
+      monthMap.set(key, { key, label: formatMonthLabel(colTopDate), x })
     }
   }
 
@@ -513,15 +768,14 @@ const grid = computed(() => {
   })
 
   const cells: GridCell[] = []
-  for (let i = 0; i < wCount * 7; i++) {
+  for (let i = 0; i < totalCells; i++) {
     const date = addDays(gridStart, i)
-    const weekday = getLocalDateParts(date).weekday
     const weekIndex = Math.floor(i / 7)
+    const rowIndex = i % 7
     const x = left + weekIndex * step
-    const y = gridStartY.value + weekday * step
+    const y = gridStartY.value + rowIndex * step
     const score = dayMap.get(dateKey(date)) ?? 0
-    // score > 0 至少 1 档；score = 0 不着色
-    const level = scoreToLevel(score, maxScore)
+    const level = emptyData ? 0 : scoreToLevel(score, maxScore)
     cells.push({
       key: dateKey(date),
       x,
@@ -534,26 +788,63 @@ const grid = computed(() => {
     })
   }
 
-  return { monthLabels, rowLabels: rowLabels.value, cells }
+  return { monthLabels: emptyData ? [] : monthLabels, rowLabels: rowLabels.value, cells }
 })
 
-const statsTop = computed(() => mainCardY.value + mainCardHeight.value + 24)
-const statsChartHeight = 300
+const statsTop = computed(() => {
+  if (!props.styleOptions.showContributionModule) {
+    if (!props.styleOptions.showUsageModule) return padding.value
+    return padding.value + topCardHeight.value + moduleGap
+  }
+  return mainCardY.value + mainCardHeight.value + moduleGap
+})
 
 const visibleSeries = computed(() => {
   const c = props.styleOptions
   const series = [
-    { key: 'totalTokens', label: '总用量', color: c.colorTotal, visible: c.showTotal },
-    { key: 'inputTokens', label: '输入', color: c.colorInput, visible: c.showInput },
-    { key: 'outputTokens', label: '输出', color: c.colorOutput, visible: c.showOutput },
-    { key: 'totalCost', label: '总花费', color: c.colorTotalCost, visible: c.showTotalCost, isCost: true },
-    { key: 'cacheInputTokens', label: '缓存输入', color: c.colorCacheInput, visible: c.showCacheInput },
-    { key: 'cacheCreationTokens', label: '缓存创建', color: c.colorCacheCreation, visible: c.showCacheCreation },
+    { key: 'totalTokens', label: '总用量', color: c.colorTotal, visible: c.chartShowTotal },
+    { key: 'inputTokens', label: '输入', color: c.colorInput, visible: c.chartShowInput },
+    { key: 'outputTokens', label: '输出', color: c.colorOutput, visible: c.chartShowOutput },
+    { key: 'totalCost', label: '总花费', color: c.colorTotalCost, visible: c.chartShowTotalCost, isCost: true },
+    { key: 'cacheInputTokens', label: '缓存输入', color: c.colorCacheInput, visible: c.chartShowCacheInput },
+    { key: 'cacheCreationTokens', label: '缓存创建', color: c.colorCacheCreation, visible: c.chartShowCacheCreation },
   ]
   return series.filter((s) => s.visible)
 })
 
-const wholeHeight = computed(() => statsTop.value + statsChartHeight + 40)
+/** 内容总高度（含底部边距），仅用于竖版高度计算 */
+const wholeHeight = computed(() => {
+  const p = padding.value
+  let y = p
+  if (props.styleOptions.showUsageModule) {
+    y += topCardHeight.value
+  }
+  if (props.styleOptions.showContributionModule) {
+    if (props.styleOptions.showUsageModule) y += moduleGap
+    y += mainCardHeight.value
+  }
+  if (props.styleOptions.showChartModule) {
+    if (props.styleOptions.showUsageModule || props.styleOptions.showContributionModule) y += moduleGap
+    y += statsChartHeight
+  }
+  y += p
+  return y
+})
+
+/**
+ * 画布高度：
+ * - 横版：由内容 + 边距决定（自适应）
+ * - 竖版：由内容 + 边距决定
+ */
+const height = computed(() => Math.ceil(wholeHeight.value))
+
+const cardOpacity = computed(() => {
+  const raw = Number(props.styleOptions.cardOpacity)
+  if (!Number.isFinite(raw)) return 0.48
+  // 百分比 0-100
+  return Math.min(1, Math.max(0, raw / 100))
+})
+
 
 
 interface StatsPoint {

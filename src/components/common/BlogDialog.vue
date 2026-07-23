@@ -41,7 +41,7 @@
           </div>
 
           <!-- Body -->
-          <div class="blog-dialog-body" :style="bodyStyle">
+          <div ref="bodyRef" class="blog-dialog-body" :style="bodyStyle">
             <slot />
           </div>
 
@@ -56,7 +56,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, watch, ref, nextTick } from 'vue'
+import { computed, watch, ref, nextTick, onUnmounted } from 'vue'
+import { useDialogStack, lockBodyScroll, unlockBodyScroll } from '@/composables/useDialogStack'
+
 
 interface Props {
   modelValue: boolean
@@ -91,6 +93,16 @@ const emit = defineEmits<{
 
 const overlayRef = ref<HTMLElement | null>(null)
 const dialogRef = ref<HTMLElement | null>(null)
+
+// 嵌套 Dialog 栈：控制分层滚动
+const { register, unregister, isTopmost, isNested } = useDialogStack()
+const bodyRef = ref<HTMLElement | null>(null)
+
+watch(isNested, (nested) => {
+  const body = bodyRef.value
+  if (!body) return
+  body.style.overflowY = nested ? 'hidden' : ''
+}, { immediate: true })
 
 function normalizeSize(value: string | number | undefined): string | undefined {
   if (value === undefined || value === null) return undefined
@@ -265,14 +277,35 @@ watch(
   () => props.modelValue,
   async (val) => {
     if (val) {
+      // 等 Teleport + v-if 真正挂载后再入栈，否则 overlayRef 为 null，
+      // isTopmost 判断失败，body 滚动锁定不会生效。
+      await nextTick()
+      register(overlayRef.value)
+      // 仅最顶层 Dialog 锁定页面滚动，避免嵌套时重复补偿滚动条
+      if (isTopmost.value) lockBodyScroll()
       await nextTick()
       overlayRef.value?.focus()
       props.onOpen?.()
     } else {
+      // 关闭前先判断是否当前顶层，再出栈并解锁
+      const wasTopmost = isTopmost.value
+      const el = overlayRef.value
+      if (wasTopmost) unlockBodyScroll()
+      unregister(el)
       props.onClose?.()
     }
-  }
+  },
+  { immediate: true },
 )
+
+onUnmounted(() => {
+  const el = overlayRef.value
+  const wasTopmost = isTopmost.value
+  unregister(el)
+  // 组件卸载时若仍持有锁（例如强制卸载），确保释放
+  if (wasTopmost) unlockBodyScroll()
+})
+
 
 defineExpose({ open, close })
 </script>
@@ -288,6 +321,9 @@ defineExpose({ open, close })
   padding: 24px;
   background: color-mix(in srgb, var(--text-primary) 35%, transparent);
   backdrop-filter: blur(4px);
+  /* 阻止滚轮/触控穿透到背后页面 */
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .blog-dialog {
@@ -357,6 +393,9 @@ defineExpose({ open, close })
   overflow-y: auto;
   flex: 1;
   color: var(--text-primary);
+  /* 允许 body 区域正常滚动，同时阻止滚动链穿透 */
+  overscroll-behavior: contain;
+  touch-action: pan-y;
 
   &::-webkit-scrollbar {
     width: 6px;

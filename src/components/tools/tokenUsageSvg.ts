@@ -17,6 +17,23 @@ export interface TokenUsageStyleOptions {
   showCacheInput: boolean
   showCacheCreation: boolean
   showTotalCost: boolean
+  /** 各用量徽章的宽度（px，字符串；留空或小于最小宽度时按最小宽度处理） */
+  widthTotal: string
+  widthInput: string
+  widthOutput: string
+  widthTotalCost: string
+  widthCacheInput: string
+  widthCacheCreation: string
+  /** 大徽章（总消耗、Vibe Coding）宽度 */
+  widthLargeTotal: string
+  widthLargeVibe: string
+  /** 图表系列独立开关（与上方用量徽章开关互不影响） */
+  chartShowTotal: boolean
+  chartShowInput: boolean
+  chartShowOutput: boolean
+  chartShowCacheInput: boolean
+  chartShowCacheCreation: boolean
+  chartShowTotalCost: boolean
   statsChartType: StatsChartType
   colorTotal: string
   colorInput: string
@@ -26,6 +43,35 @@ export interface TokenUsageStyleOptions {
   colorCacheCreation: string
   axisLabelColor: string
   gridEmptyColor: string
+
+  // 新增：横/竖版 + 三模块互斥开关
+  orientation: 'landscape' | 'portrait' | 'custom'
+  showUsageModule: boolean
+  showContributionModule: boolean
+  showChartModule: boolean
+
+  // 新增：用量数据徽章区布局
+  usageCardTitleText: string
+  usageCardTitleAlign: 'left' | 'center' | 'right'
+  contributionCardTitleText: string
+  contributionCardTitleAlign: 'left' | 'center' | 'right'
+  chartCardTitleText: string
+  chartCardTitleAlign: 'left' | 'center' | 'right'
+  usageTitleAlign: 'left' | 'center' | 'right'
+  usageDataAlign: 'left' | 'center' | 'right'
+
+  // 新增：贡献图设置
+  showContributionLegend: boolean
+  monthLabelColor: string
+  weekdayLabelColor: string
+  showDateRange: boolean
+  dateRangeFontColor: string
+
+  // 新增：图表设置（先占位）
+  chartDateFontColor: string
+  chartValueFontColor: string
+  showLegend: boolean
+  legendFontColor: string
 }
 
 interface BadgeItem {
@@ -466,9 +512,11 @@ export function generateTokenUsageSvg(
   rows: TokenUsageRow[],
   style: TokenUsageStyleOptions,
 ): string {
-  const width = Number(style.width) || 1200
-  const height = Number(style.height) || 720
   const padding = Number(style.padding) || 40
+  const isLandscape = style.orientation === 'landscape'
+  // 横版固定高度 1280，竖版固定宽度 720；另一维度由调用方传入的宽高决定
+  const width = isLandscape ? (Number(style.width) || 1280) : 720
+  const height = isLandscape ? 1280 : (Number(style.height) || 720)
   const agg = aggregateRows(rows)
   const badges = buildBadges(agg, style).filter((badge) => badge.visible)
   const accentLight = deriveAccentLight(style.primaryColor, style.bgColor)

@@ -175,6 +175,9 @@ onMounted(() => {
   min-width: 72px;
   border-radius: 10px;
   transition: background 0.25s ease, transform 0.25s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: default;
 
   &:hover {
     background: var(--bg-card-hover);
