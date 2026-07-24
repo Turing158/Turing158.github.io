@@ -135,12 +135,11 @@
 
         <div class="pagination-size">
           <span>{{ $t('articles.perPage') }}</span>
-          <select v-model="pageSize" class="pagination-select">
-            <option :value="5">5</option>
-            <option :value="10">10</option>
-            <option :value="20">20</option>
-            <option :value="50">50</option>
-          </select>
+          <BlogSelect
+            v-model="pageSizeOption"
+            :options="pageSizeOptions"
+            :clearable="false"
+          />
         </div>
       </div>
     </div>
@@ -162,6 +161,7 @@ import { formatViewCount } from '@/utils/formatViewCount'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
+import BlogSelect from '@/components/common/BlogSelect.vue'
 
 // SEO
 usePageSeo('文章', '查看所有技术文章和教程', '#/articles')
@@ -211,7 +211,14 @@ const filteredArticles = computed(() => {
 
 // 分页
 const currentPage = ref(1)
-const pageSize = ref(10)
+const pageSizeOptions = [
+  { label: '5', value: '5' },
+  { label: '10', value: '10' },
+  { label: '20', value: '20' },
+  { label: '50', value: '50' },
+]
+const pageSizeOption = ref(pageSizeOptions[1])
+const pageSize = computed(() => Number(pageSizeOption.value.value))
 
 // 筛选变化时重置到第一页
 watch(filteredArticles, () => {
@@ -219,7 +226,7 @@ watch(filteredArticles, () => {
 })
 
 // 每页条数变化时，若当前页超出总页数则跳到最后一页
-watch(pageSize, () => {
+watch(pageSizeOption, () => {
   const lastPage = Math.max(1, Math.ceil(filteredArticles.value.length / pageSize.value))
   if (currentPage.value > lastPage) {
     currentPage.value = lastPage

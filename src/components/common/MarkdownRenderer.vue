@@ -11,7 +11,36 @@ const props = defineProps<{
 
 const containerRef = ref<HTMLElement | null>(null)
 
-// 复制代码按钮点击处理
+// ==================== 图片加载失败处理 ====================
+
+const handleImageError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  if (img.dataset.failed) return
+  img.dataset.failed = '1'
+
+  const alt = img.alt || '图片'
+  const wrapper = document.createElement('div')
+  wrapper.className = 'markdown-image-error'
+  wrapper.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span class="markdown-image-error-alt">${alt.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c] || c))}</span>`
+  img.replaceWith(wrapper)
+}
+
+const bindImageErrors = () => {
+  if (!containerRef.value) return
+  containerRef.value.querySelectorAll('img').forEach((img) => {
+    img.addEventListener('error', handleImageError)
+  })
+}
+
+const unbindImageErrors = () => {
+  if (!containerRef.value) return
+  containerRef.value.querySelectorAll('img').forEach((img) => {
+    img.removeEventListener('error', handleImageError)
+  })
+}
+
+// ==================== 复制代码 ====================
+
 const handleCopyClick = async (e: Event) => {
   const btn = (e.target as HTMLElement).closest('.code-copy-btn') as HTMLElement | null
   if (!btn) return
@@ -27,7 +56,6 @@ const handleCopyClick = async (e: Event) => {
       btn.classList.remove('copied')
     }, 1500)
   } catch {
-    // fallback
     const ta = document.createElement('textarea')
     ta.value = decodeURIComponent(escape(atob(b64)))
     ta.style.position = 'fixed'
@@ -45,12 +73,12 @@ const handleCopyClick = async (e: Event) => {
   }
 }
 
-// Expose headings for TOC
+// ==================== TOC ====================
+
 const getHeadings = () => {
   if (!containerRef.value) return []
   const headings = containerRef.value.querySelectorAll('h2, h3')
   return Array.from(headings).map((el, i) => {
-    // markdown-it-anchor 已生成 id，仅在缺失时回退
     if (!el.id) {
       el.id = `heading-${el.tagName}-${i}`
     }
@@ -64,12 +92,8 @@ const getHeadings = () => {
 
 defineExpose({ getHeadings })
 
-// 使用事件委托监听复制按钮
-watch(() => props.html, () => {
-  // html 变化后不需要重新绑定，因为用的是容器上的事件委托
-}, { immediate: true })
+// ==================== 锚点滚动 ====================
 
-// 归一化为 GitHub 风格 slug：转小写、空白转连字符、去除其余标点（保留连字符/下划线/CJK）
 const slugify = (s: string) =>
   s
     .toLowerCase()
@@ -77,7 +101,6 @@ const slugify = (s: string) =>
     .replace(/\s+/g, '-')
     .replace(/[^\w一-龥-]/g, '')
 
-// 拦截页内锚点链接点击，手动滚动（Hash 路由下浏览器会当成路由跳转）
 const handleAnchorClick = (e: Event) => {
   const link = (e.target as HTMLElement).closest('a[href^="#"]') as HTMLAnchorElement | null
   if (!link) return
@@ -85,7 +108,6 @@ const handleAnchorClick = (e: Event) => {
   if (!href || href === '#') return
   const targetId = decodeURIComponent(href.slice(1))
   let target: HTMLElement | null = document.getElementById(targetId)
-  // 锚点与标题 id 不完全匹配时（如手写锚点去掉了 "+"、改了大小写），用归一化 slug 回退匹配标题
   if (!target && containerRef.value) {
     const want = slugify(targetId)
     const headings = containerRef.value.querySelectorAll<HTMLElement>('h1, h2, h3, h4, h5, h6')
@@ -100,14 +122,26 @@ const handleAnchorClick = (e: Event) => {
   }
 }
 
+// ==================== 生命周期 ====================
+
+watch(
+  () => props.html,
+  () => {
+    setTimeout(bindImageErrors, 0)
+  },
+  { immediate: true }
+)
+
 onMounted(() => {
   containerRef.value?.addEventListener('click', handleCopyClick)
   containerRef.value?.addEventListener('click', handleAnchorClick)
+  bindImageErrors()
 })
 
 onUnmounted(() => {
   containerRef.value?.removeEventListener('click', handleCopyClick)
   containerRef.value?.removeEventListener('click', handleAnchorClick)
+  unbindImageErrors()
 })
 </script>
 

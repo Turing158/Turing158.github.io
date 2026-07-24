@@ -161,7 +161,7 @@ const { isNavUnlocked } = useAchievements()
 const isMobile = ref(window.innerWidth < 768)
 const isCollapsed = ref(window.innerWidth < 768)
 const fullBlogName = 'Turing_ICE'
-const { displayedText: blogName, showCursor: showBlogCursor } = useTypewriter(fullBlogName, 120, 60, 2000, 800)
+const { displayedText: blogName, showCursor: showBlogCursor } = useTypewriter(fullBlogName, 120, 60)
 const avatarUrl = 'https://foruda.gitee.com/avatar/1682216074543204020/12834578_turing-ice_1682216074.png'
 
 // 监听窗口变化，同步 isMobile 状态
@@ -468,6 +468,7 @@ const toggleLang = () => {
   white-space: nowrap;
   min-height: 1.2em;
   line-height: 1.2em;
+  contain: content;
 }
 
 .typewriter-cursor {
@@ -478,6 +479,7 @@ const toggleLang = () => {
   margin-left: 2px;
   animation: blink-cursor 0.8s step-end infinite;
   vertical-align: text-bottom;
+  contain: content;
 }
 
 @keyframes blink-cursor {
