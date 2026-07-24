@@ -66,16 +66,20 @@
                 {{ $t('articles.readingTime', { time: article.readingTime }) }}
               </span>
               <!-- 浏览量 -->
-              <span
-                v-if="viewCounts[article.slug] !== undefined"
-                class="article-card-views"
-                :title="`${viewCounts[article.slug]} 次浏览`"
-              >
+              <span class="article-card-views">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
-                {{ formatViewCount(viewCounts[article.slug]) }}
+                <template v-if="viewCountsLoading">
+                  <span class="views-spinner" />
+                </template>
+                <template v-else-if="viewCounts[article.slug] !== undefined">
+                  {{ formatViewCount(viewCounts[article.slug]) }}
+                </template>
+                <template v-else>
+                  ---
+                </template>
               </span>
               <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
               <!-- 评论计数 -->
@@ -172,8 +176,8 @@ const { articles } = storeToRefs(store)
 const slugs = computed(() => articles.value.map(a => a.slug))
 const { counts: commentCounts } = useGitalkCounts(slugs.value)
 
-// 浏览量
-const { counts: viewCounts } = useViewCounts(slugs.value)
+// 浏览量（传入 getter 函数以支持响应式追踪）
+const { counts: viewCounts, loading: viewCountsLoading } = useViewCounts(() => slugs.value)
 
 // 所有唯一标签
 const allTags = computed(() => {
@@ -538,6 +542,22 @@ onUnmounted(() => {
     border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .views-spinner {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 2px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: views-spin 0.6s linear infinite;
+  }
+}
+
+@keyframes views-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

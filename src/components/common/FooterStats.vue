@@ -107,20 +107,16 @@ function animateNumber(
   requestAnimationFrame(tick)
 }
 
-// 格式化数字显示
-function formatWords(n: number): string {
-  if (n >= 10000) {
-    return (n / 10000).toFixed(1) + 'w'
-  }
+// 格式化数字显示（国际单位：K / M / B）
+function formatLargeNumber(n: number): string {
+  if (n >= 1_000_000_000) return (n / 1_000_000_000).toFixed(1) + 'B'
+  if (n >= 1_000_000) return (n / 1_000_000).toFixed(1) + 'M'
+  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'K'
   return n.toLocaleString()
 }
 
-function formatViews(n: number): string {
-  if (n >= 10000) {
-    return (n / 10000).toFixed(1) + 'w'
-  }
-  return n.toLocaleString()
-}
+const formatWords = formatLargeNumber
+const formatViews = formatLargeNumber
 
 onMounted(() => {
   // 等待数据加载后执行动画

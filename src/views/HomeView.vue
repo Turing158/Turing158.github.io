@@ -700,11 +700,12 @@ function mapGiteeEvent(ev: any): ActivityItem | null {
 }
 
 async function fetchGiteeTimeline(): Promise<any[]> {
-  const target = `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`
+  const target = `/gitee/contribution`
   const sources = [
     target,
-    `https://corsproxy.io/?url=${encodeURIComponent(target)}`,
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`,
+    `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`,
+    `https://corsproxy.io/?url=${encodeURIComponent(`https://gitee.com/${giteeUser}/contribution_timeline?limit=10`)}`,
+    `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://gitee.com/${giteeUser}/contribution_timeline?limit=10`)}`,
   ]
   for (const url of sources) {
     try {

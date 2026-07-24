@@ -1,24 +1,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useArticles } from '@/composables/useArticles'
-import AV from 'leancloud-storage'
-import { config } from '@/config'
+import { getTotalViews } from '@/api/viewCount'
 
 // 博客起始日期（用于计算运行天数）
 const BLOG_START_DATE = new Date('2022-06-01')
-
-// 初始化 LeanCloud（确保只初始化一次）
-let lcInitialized = false
-const ensureLCInit = () => {
-  if (!lcInitialized) {
-    AV.init({
-      appId: config.leancloud.appId,
-      appKey: config.leancloud.appKey,
-      serverURL: config.leancloud.serverURL,
-    })
-    lcInitialized = true
-  }
-}
 
 /**
  * Footer 趣味统计 composable
@@ -91,21 +77,13 @@ export function useFooterStats() {
     return cm.toFixed(1) + ' cm'
   })
 
-  // 获取总浏览量（从 LeanCloud 批量获取）
+  // 获取总浏览量（从 Worker 代理获取）
   const fetchTotalViews = async () => {
     loadingViews.value = true
-    ensureLCInit()
-
     try {
-      const query = new AV.Query('ArticleViewCount')
-      const results = await query.find()
-      let total = 0
-      for (const item of results) {
-        total += item.get('count') || 0
-      }
-      totalViews.value = total
+      totalViews.value = await getTotalViews()
     } catch {
-      // LeanCloud 不可用时使用本地估算
+      // 不可用时使用本地估算
       totalViews.value = store.articles.length * 42
     } finally {
       loadingViews.value = false

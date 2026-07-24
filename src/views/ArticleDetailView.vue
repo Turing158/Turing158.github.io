@@ -137,8 +137,8 @@ const headings = ref<TocHeading[]>([])
 const htmlLoading = ref(false)
 const htmlError = ref<string | null>(null)
 
-// 浏览量
-const { viewCount, incrementViewCount } = useViewCount(slug.value)
+// 浏览量（useViewCount 内部 onMounted 自动递增）
+const { viewCount } = useViewCount(slug.value)
 
 // 将 headings 传递给 layout 中的 TOC
 const updateHeadings = () => {
@@ -196,8 +196,7 @@ async function loadArticle() {
     updateDocumentTitle(article.value.title)
   }
 
-  // 增加浏览量
-  incrementViewCount()
+  // useViewCount 内部 onMounted 已自动调用递增
 
   // 成就系统：记录文章访问（用于 bookworm 成就：访问 5 篇不同文章）
   if (slug.value) {
