@@ -700,7 +700,7 @@ function mapGiteeEvent(ev: any): ActivityItem | null {
 }
 
 async function fetchGiteeTimeline(): Promise<any[]> {
-  const target = `/gitee/contribution`
+  const target = `/api/gitee/contribution`
   const sources = [
     target,
     `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`,

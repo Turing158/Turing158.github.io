@@ -13,10 +13,6 @@ const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'Turing158.github.io'
 // --- Gitee 配置 ---
 const GITEE_OWNER = import.meta.env.VITE_GITEE_OWNER || 'turing-ice'
 
-// --- Gitalk OAuth 配置 ---
-const GITALK_CLIENT_ID = import.meta.env.VITE_GITALK_CLIENT_ID || '0275b8f48f2a7e0ac1b0'
-const GITALK_CLIENT_SECRET = import.meta.env.VITE_GITALK_CLIENT_SECRET || '173a61730904837485e645de785bc24d0379d936'
-
 // --- 博客元信息 ---
 const BLOG_TITLE = 'Turing_ICE'
 const BLOG_AUTHOR = 'Turing158'
@@ -32,7 +28,7 @@ const DEVELOPING_REPOS = [
 ]
 
 // --- 评论代理 ---
-const GITALK_PROXY = 'https://proxy-gitalk-api.netlify.app/github_access_token'
+const GITALK_PROXY = 'https://gitalk.turing158.de5.net/github_access_token'
 
 // --- 节假日 API ---
 const HOLIDAY_API_BASE = 'https://date.nager.at/api/v3/publicholidays'
@@ -50,8 +46,6 @@ export const config = {
     owner: GITEE_OWNER,
   },
   gitalk: {
-    clientID: GITALK_CLIENT_ID,
-    clientSecret: GITALK_CLIENT_SECRET,
     proxy: GITALK_PROXY,
   },
   blog: {

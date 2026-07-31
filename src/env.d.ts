@@ -18,8 +18,6 @@ declare module 'gray-matter' {
 
 declare module 'gitalk' {
   interface GitalkConfig {
-    clientID: string
-    clientSecret: string
     repo: string
     owner: string
     admin: string[]

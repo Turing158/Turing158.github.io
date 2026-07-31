@@ -704,17 +704,22 @@
       "showCacheInput": "显示缓存输入",
       "showCacheCreation": "显示缓存创建",
       "showTotalCost": "显示总花费",
-      "parsedCount": "已解析 {count} 条用量记录",
-      "cancel": "取消",
-      "confirm": "确认"
+      "parsedCount": "已解析 {count} 条用量记录"
     }
+  },
+  "secretKey": {
+    "title": "输入 secret_key",
+    "description": "请输入 secret_key 以创建文章记录",
+    "placeholder": "请输入 secret_key"
   },
   "common": {
     "loading": "加载中",
     "error": "加载失败",
     "switchLang": "English",
     "collapse": "收起",
-    "expand": "展开菜单"
+    "expand": "展开菜单",
+    "cancel": "取消",
+    "confirm": "确认"
   },
   "contextMenu": {
     "goBack": "返回上一页",

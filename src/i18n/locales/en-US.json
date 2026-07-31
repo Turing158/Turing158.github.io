@@ -646,17 +646,22 @@
       "showCacheInput": "Show Cache Input",
       "showCacheCreation": "Show Cache Creation",
       "showTotalCost": "Show Total Cost",
-      "parsedCount": "{count} usage records parsed",
-      "cancel": "Cancel",
-      "confirm": "Confirm"
+      "parsedCount": "{count} usage records parsed"
     }
+  },
+  "secretKey": {
+    "title": "Enter secret_key",
+    "description": "Please enter secret_key to create article record",
+    "placeholder": "Enter secret_key"
   },
   "common": {
     "loading": "Loading",
     "error": "Load failed",
     "switchLang": "中文",
     "collapse": "Collapse",
-    "expand": "Open menu"
+    "expand": "Open menu",
+    "cancel": "Cancel",
+    "confirm": "Confirm"
   },
   "contextMenu": {
     "goBack": "Go Back",

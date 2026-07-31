@@ -1,34 +1,45 @@
 /**
  * 文章浏览量 API 模块
  *
- * 通过 Cloudflare Worker 代理请求 LeanCloud，
- * 维护 slug ↔ objectId 映射缓存，对外提供高层 API。
+ * 通过 Cloudflare Worker 代理请求 Supabase，
+ * 缓存全量文章数据（slug、uuid、count），对外提供高层 API。
  */
 
-const API_BASE = 'https://api.turing158.dpdns.org/leancloud'
+import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
+import SecretKeyInputDialog from '@/components/common/SecretKeyInputDialog.vue'
+import blogTip from '@/plugins/blog-tip'
+import zhCN from '@/i18n/locales/zh-CN.json'
+import enUS from '@/i18n/locales/en-US.json'
 
-// ==================== 映射缓存 ====================
+const API_BASE = '/api/article'
 
-const slugToObjectMap = new Map<string, string>()
-const objectToSlugMap = new Map<string, string>()
-let mappingBuilt = false
-let mappingBuilding = false
-let mappingPromise: Promise<void> | null = null
+// ==================== 缓存结构 ====================
+
+interface ArticleCacheItem {
+  uuid: string  // Supabase 中的 id
+  count: number
+}
+
+const articleCache = new Map<string, ArticleCacheItem>()
+let cacheBuilt = false
+let cacheBuilding = false
+let cacheBuildPromise: Promise<void> | null = null
 
 // ==================== 底层请求 ====================
 
-async function request(path: string, body?: unknown) {
-  // /find 接口：空 body 传 undefined（查全部），数组直接传
+async function request(path: string, body?: unknown, extraHeaders?: Record<string, string>) {
   let requestBody: string | undefined
-  if (path === '/find' && body === undefined) {
-    requestBody = undefined
-  } else if (body !== undefined) {
+  if (body !== undefined) {
     requestBody = JSON.stringify(body)
   }
 
   const res = await fetch(`${API_BASE}${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...extraHeaders,
+    },
     body: requestBody,
   })
   if (!res.ok) {
@@ -38,56 +49,88 @@ async function request(path: string, body?: unknown) {
   return res.json()
 }
 
-// ==================== 映射管理 ====================
+// ==================== 缓存管理 ====================
 
 /**
- * 建立 slug ↔ objectId 映射
+ * 建立全量文章缓存（slug → { uuid, count }）
  */
-async function buildMapping(): Promise<void> {
-  if (mappingBuilt) return
-  if (mappingBuilding) return mappingPromise!
+async function buildCache(): Promise<void> {
+  if (cacheBuilt) return
+  if (cacheBuilding) return cacheBuildPromise!
 
-  mappingBuilding = true
-  mappingPromise = (async () => {
+  cacheBuilding = true
+  cacheBuildPromise = (async () => {
     try {
-      const data = await request('/find') as { results?: Array<{ slug: string; objectId: string }> }
-      const results = data.results || []
+      const data = await request('/find/all') as Array<{ id: string; slug: string; count: number }>
 
-      for (const item of results) {
-        slugToObjectMap.set(item.slug, item.objectId)
-        objectToSlugMap.set(item.objectId, item.slug)
+      for (const item of data) {
+        articleCache.set(item.slug, { uuid: item.id, count: item.count })
       }
 
-      mappingBuilt = true
+      cacheBuilt = true
     } catch {
-      mappingBuilt = false
+      cacheBuilt = false
     } finally {
-      mappingBuilding = false
+      cacheBuilding = false
     }
   })()
 
-  return mappingPromise
+  return cacheBuildPromise
 }
 
 /**
- * 重置映射缓存
+ * 重置缓存
  */
-export function resetMapping(): void {
-  slugToObjectMap.clear()
-  objectToSlugMap.clear()
-  mappingBuilt = false
-  mappingBuilding = false
-  mappingPromise = null
+export function resetCache(): void {
+  articleCache.clear()
+  cacheBuilt = false
+  cacheBuilding = false
+  cacheBuildPromise = null
+}
+
+// ==================== Secret Key 输入 ====================
+
+// 为动态 Dialog 创建独立的 i18n 实例（与主应用隔离，避免冲突）
+const dialogI18n = createI18n({
+  legacy: false,
+  locale: localStorage.getItem('blog-lang') || 'zh-CN',
+  fallbackLocale: 'zh-CN',
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS,
+  },
+})
+
+/**
+ * 弹出 SecretKeyInputDialog 获取用户输入的 secret_key
+ */
+function requestSecretKey(): Promise<string | null> {
+  return new Promise((resolve) => {
+    const mountPoint = document.createElement('div')
+    document.body.appendChild(mountPoint)
+
+    const app = createApp(SecretKeyInputDialog, {
+      onConfirm: (secretKey: string) => {
+        app.unmount()
+        mountPoint.remove()
+        resolve(secretKey)
+      },
+      onCancel: () => {
+        app.unmount()
+        mountPoint.remove()
+        resolve(null)
+      },
+    })
+    app.use(dialogI18n)
+    app.mount(mountPoint)
+  })
 }
 
 // ==================== 内部辅助 ====================
 
-async function getObjectId(slug: string): Promise<string | undefined> {
-  if (slugToObjectMap.has(slug)) return slugToObjectMap.get(slug)
-  await buildMapping()
-  return slugToObjectMap.get(slug)
-}
-
+/**
+ * 创建新文章记录（仅本地开发环境）
+ */
 async function createRecord(slug: string): Promise<string> {
   // 仅在本地环境允许创建记录
   const isLocal = typeof window !== 'undefined' &&
@@ -96,27 +139,42 @@ async function createRecord(slug: string): Promise<string> {
     console.warn('[ViewCount] createRecord is only allowed in local environment')
     return ''
   }
-  const { token } = await request('/request-create-token', { slug }) as { token: string }
-  const created = await request('/create', { slug, createToken: token }) as { objectId: string }
-  const objectId = created.objectId
-  if (objectId) {
-    slugToObjectMap.set(slug, objectId)
-    objectToSlugMap.set(objectId, slug)
+
+  const secretKey = await requestSecretKey()
+  if (!secretKey) {
+    console.warn('[ViewCount] 用户取消输入 secret_key')
+    return ''
   }
-  return objectId
+
+  try {
+    const secretKeyBase64 = btoa(secretKey)
+    const created = await request('/create', { article_slug: slug }, { secret_key: secretKeyBase64 }) as {
+      id: string
+      slug: string
+      count: number
+    }
+
+    // 写入缓存
+    articleCache.set(slug, { uuid: created.id, count: created.count })
+    blogTip.show('文章记录创建成功', { type: 'success' })
+    return created.id
+  } catch (err: any) {
+    blogTip.show('创建失败: ' + err.message, { type: 'error' })
+    throw err
+  }
 }
 
 // ==================== 高层 API ====================
 
 /**
- * 获取单篇文章浏览量
+ * 获取单篇文章浏览量（内存读取，零网络请求）
  */
 export async function getViewCount(slug: string): Promise<number> {
   try {
-    const objectId = await getObjectId(slug)
-    if (!objectId) return 0
-    const record = await request(`/find/${objectId}`) as { count?: number }
-    return record.count || 0
+    if (!articleCache.has(slug)) {
+      await buildCache()
+    }
+    return articleCache.get(slug)?.count ?? 0
   } catch (err: any) {
     console.error('[ViewCount] 获取浏览量失败:', err.message)
     return 0
@@ -128,12 +186,26 @@ export async function getViewCount(slug: string): Promise<number> {
  */
 export async function incrementViewCount(slug: string): Promise<number> {
   try {
-    let objectId = await getObjectId(slug)
-    if (!objectId) {
-      objectId = await createRecord(slug)
+    // 确保缓存已初始化
+    await buildCache()
+
+    let cached = articleCache.get(slug)
+    if (!cached) {
+      // 缓存中不存在，创建新记录
+      await createRecord(slug)
+      cached = articleCache.get(slug)
+      if (!cached) return 0
     }
-    const record = await request(`/view/${objectId}`) as { count?: number }
-    return record.count || 0
+
+    const record = await request('/view', { article_id: cached.uuid }) as {
+      id: string
+      slug: string
+      count: number
+    }
+
+    // 同步更新缓存
+    articleCache.set(slug, { uuid: cached.uuid, count: record.count })
+    return record.count
   } catch (err: any) {
     console.error('[ViewCount] 增加浏览量失败:', err.message)
     return 0
@@ -141,25 +213,17 @@ export async function incrementViewCount(slug: string): Promise<number> {
 }
 
 /**
- * 批量获取文章浏览量
+ * 批量获取文章浏览量（内存读取，零网络请求）
  */
 export async function getViewCounts(slugs: string[]): Promise<Record<string, number>> {
   try {
-    await buildMapping()
-    const objectIds = slugs
-      .map((s) => slugToObjectMap.get(s))
-      .filter((id): id is string => Boolean(id))
-    if (objectIds.length === 0) return {}
+    await buildCache()
 
-    const result = await request('/find', objectIds) as { results?: Array<{ objectId: string; count?: number }> }
     const counts: Record<string, number> = {}
-    for (const item of result.results || []) {
-      const slug = objectToSlugMap.get(item.objectId)
-      if (slug) counts[slug] = item.count || 0
-    }
     for (const slug of slugs) {
-      if (!(slug in counts) && slugToObjectMap.has(slug)) {
-        counts[slug] = 0
+      const cached = articleCache.get(slug)
+      if (cached) {
+        counts[slug] = cached.count
       }
     }
     return counts
@@ -174,11 +238,7 @@ export async function getViewCounts(slugs: string[]): Promise<Record<string, num
  */
 export async function getTotalViews(): Promise<number> {
   try {
-    const allRecords = await request('/find') as { results?: Array<{ count?: number }> }
-    let total = 0
-    for (const item of allRecords.results || []) {
-      total += item.count || 0
-    }
+    const total = await request('/sum/count') as number
     return total
   } catch (err: any) {
     console.error('[ViewCount] 获取总浏览量失败:', err.message)

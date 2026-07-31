@@ -95,7 +95,7 @@ import { computed, ref, onBeforeUnmount, type CSSProperties } from 'vue'
 
 interface Props {
   modelValue: string
-  type?: 'text' | 'number' | 'textarea'
+  type?: 'text' | 'password' | 'number' | 'textarea'
   placeholder?: string
   width?: string | number | 'auto'
   rows?: number
