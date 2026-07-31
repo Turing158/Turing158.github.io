@@ -12,7 +12,12 @@ import blogTip from '@/plugins/blog-tip'
 import zhCN from '@/i18n/locales/zh-CN.json'
 import enUS from '@/i18n/locales/en-US.json'
 
-const API_BASE = '/api/article'
+// API 基址：
+// - 本地开发走 Vite proxy（vite.config.ts 的 server.proxy 把 /api 转发到后端）
+// - 生产环境（GitHub Pages 等纯静态托管）无代理能力，需直连后端绝对地址
+// 优先从环境变量读取，未配置时按开发/生产自动选择
+const API_BASE = import.meta.env.VITE_API_BASE
+  ?? (import.meta.env.DEV ? '/api/article' : 'https://api.turing158.dpdns.org/article')
 
 // ==================== 缓存结构 ====================
 
