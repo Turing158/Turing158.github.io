@@ -194,6 +194,8 @@
     "title": "工具集",
     "description": "常用在线工具，开箱即用。",
     "copied": "已复制!",
+    "dragToReorder": "长按拖动以重排工具",
+    "resetOrder": "重置顺序",
     "jsonFormatterName": "JSON 格式化",
     "jsonFormatterDesc": "格式化、压缩、验证 JSON 数据，支持语法高亮展示。",
     "jsonFormatterTags": ["JSON", "格式化", "压缩"],
@@ -251,6 +253,9 @@
     "tokenUsageChartName": "Token 用量图",
     "tokenUsageChartDesc": "上传 Token 日志文件，在浏览器中生成可视化的用量 SVG 图表，支持自定义样式。",
     "tokenUsageChartTags": ["Token", "图表", "SVG", "可视化"],
+    "clineModelsName": "Cline 免费模型",
+    "clineModelsDesc": "获取 Cline 提供的免费与推荐 AI 模型列表，点击标签复制模型 ID。",
+    "clineModelsTags": ["Cline", "免费", "模型"],
     "copy": "复制",
     "jsonFormatter": {
       "inputLabel": "输入 JSON",
@@ -705,6 +710,17 @@
       "showCacheCreation": "显示缓存创建",
       "showTotalCost": "显示总花费",
       "parsedCount": "已解析 {count} 条用量记录"
+    },
+    "clineModels": {
+      "intro": "实时获取 Cline CLI 的免费与推荐模型列表。点击任意标签即可复制模型 ID，无需再打开 Cline CLI 查看。",
+      "freeSectionTitle": "免费模型",
+      "recommendedSectionTitle": "推荐模型",
+      "loading": "加载中...",
+      "loadFailed": "加载失败",
+      "retry": "重试",
+      "copied": "已复制模型 ID",
+      "clickToCopy": "点击复制模型 ID",
+      "empty": "暂无模型"
     }
   },
   "secretKey": {

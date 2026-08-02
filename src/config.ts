@@ -34,6 +34,13 @@ const GITALK_PROXY = 'https://gitalk.turing158.de5.net/github_access_token'
 const HOLIDAY_API_BASE = 'https://date.nager.at/api/v3/publicholidays'
 const HOLIDAY_COUNTRY = 'CN'
 
+// --- Cline 推荐模型 API ---
+// 通过 Cloudflare Worker 代理（dev-docs/work.js 的 /cline/model/recommended）转发 Cline 接口，规避浏览器 CORS
+// - 本地开发走 Vite proxy（vite.config.ts 的 server.proxy 把 /api 转发到后端）
+// - 生产环境直连后端绝对地址
+const CLINE_MODELS_API = import.meta.env.VITE_CLINE_API_BASE
+  ?? (import.meta.env.DEV ? '/api/cline/model/recommended' : 'https://api.turing158.dpdns.org/cline/model/recommended')
+
 // --- 缓存 TTL（毫秒） ---
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
@@ -57,6 +64,9 @@ export const config = {
   holiday: {
     apiBase: HOLIDAY_API_BASE,
     country: HOLIDAY_COUNTRY,
+  },
+  cline: {
+    apiBase: CLINE_MODELS_API,
   },
   cache: {
     articlesTTL: ARTICLES_CACHE_TTL,

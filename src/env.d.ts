@@ -3,6 +3,8 @@
 interface ImportMetaEnv {
   /** 浏览量 API 基址，未配置时按开发/生产自动选择（见 src/api/viewCount.ts） */
   readonly VITE_API_BASE?: string
+  /** Cline 模型 API 基址，未配置时按开发/生产自动选择（见 src/config.ts） */
+  readonly VITE_CLINE_API_BASE?: string
 }
 
 interface ImportMeta {

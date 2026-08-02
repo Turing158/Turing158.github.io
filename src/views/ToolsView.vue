@@ -11,17 +11,35 @@
 <template>
   <div class="tools-view">
     <h1 class="page-title">{{ $t('tools.title') }}</h1>
-    <p class="page-desc">{{ $t('tools.description') }}</p>
+    <div class="page-header">
+      <p class="page-desc">{{ $t('tools.description') }}</p>
+      <button
+        v-if="orderChanged"
+        class="tools-reset-btn"
+        :title="$t('tools.resetOrder')"
+        @click="resetOrder"
+      >{{ $t('tools.resetOrder') }}</button>
+    </div>
 
     <div v-if="showCards" class="tools-grid">
       <div
         v-for="(tool, index) in tools"
         :key="tool.component"
         class="tool-card"
-        :class="{ 'card-visible': cardVisibleStates[tool.component] }"
+        :class="{
+          'card-visible': cardVisibleStates[tool.component],
+          'is-dragging': draggingComponent === tool.component,
+        }"
         :style="{ '--card-index': index }"
         @click="openTool(tool)"
       >
+        <span
+          class="tool-drag-handle"
+          :title="$t('tools.dragToReorder')"
+          @pointerdown.stop="onHandlePointerDown($event, tool.component)"
+        >
+          <SidebarIcon name="gripVertical" :size="14" />
+        </span>
         <div class="tool-icon">{{ tool.icon }}</div>
         <h3 class="tool-name">{{ tool.name }}</h3>
         <p class="tool-desc">{{ tool.description }}</p>
@@ -29,6 +47,20 @@
           <span v-for="tag in tool.tags" :key="tag" class="tool-tag">{{ tag }}</span>
         </div>
       </div>
+    </div>
+
+    <!-- 拖拽浮动副本（跟随光标） -->
+    <div
+      v-if="draggingComponent"
+      class="tool-card drag-ghost"
+      :style="{ left: dragPos.x + 'px', top: dragPos.y + 'px' }"
+    >
+      <span class="tool-drag-handle tool-drag-handle--active">
+        <SidebarIcon name="gripVertical" :size="14" />
+      </span>
+      <div class="tool-icon">{{ tools.find((t) => t.component === draggingComponent)?.icon }}</div>
+      <h3 class="tool-name">{{ tools.find((t) => t.component === draggingComponent)?.name }}</h3>
+      <p class="tool-desc">{{ tools.find((t) => t.component === draggingComponent)?.description }}</p>
     </div>
 
     <!-- 工具弹窗 -->
@@ -72,6 +104,7 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, defineAsyncComponent, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
+import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
@@ -115,6 +148,7 @@ const componentMap: Record<string, Component> = {
   TokenUsageChartTool: defineAsyncComponent(() => import('@/components/tools/TokenUsageChartTool.vue')),
   PasswordStrengthTool: defineAsyncComponent(() => import('@/components/tools/PasswordStrengthTool.vue')),
   LoremIpsumTool: defineAsyncComponent(() => import('@/components/tools/LoremIpsumTool.vue')),
+  ClineModelsTool: defineAsyncComponent(() => import('@/components/tools/ClineModelsTool.vue')),
 }
 
 // 工具元数据
@@ -138,16 +172,70 @@ const toolKeys = [
   { key: 'tokenUsageChart', component: 'TokenUsageChartTool', icon: '📈' },
   { key: 'passwordStrength', component: 'PasswordStrengthTool', icon: '🔒' },
   { key: 'loremIpsum', component: 'LoremIpsumTool', icon: '📝' },
+  { key: 'clineModels', component: 'ClineModelsTool', icon: '🤖' },
 ] as const
 
+// 工具卡片自定义顺序（持久化到 localStorage）
+const ORDER_KEY = 'blog-tools-order'
+
+// 读取持久化顺序,与当前 toolKeys 合并:剔除失效 key,补齐新增 key 到末尾
+function loadOrderedComponents(): string[] {
+  const defaults = toolKeys.map((k) => k.component) // 默认顺序
+  let saved: string[] = []
+  try {
+    const raw = localStorage.getItem(ORDER_KEY)
+    if (raw) saved = JSON.parse(raw)
+    if (!Array.isArray(saved)) saved = []
+  } catch {
+    saved = []
+  }
+
+  const validSet = new Set<string>(defaults)
+  const valid = saved.filter((k) => validSet.has(k)) // 剔除失效 key
+  const seen = new Set(valid)
+  defaults.forEach((k) => {
+    if (!seen.has(k)) valid.push(k) // 补齐新增 key 到末尾
+  })
+  return valid
+}
+
+const orderedComponents = ref<string[]>(loadOrderedComponents())
+
+function persistOrder() {
+  try {
+    localStorage.setItem(ORDER_KEY, JSON.stringify(orderedComponents.value))
+  } catch {
+    /* 忽略 localStorage 异常 */
+  }
+}
+
+// 重置为默认顺序
+function resetOrder() {
+  orderedComponents.value = toolKeys.map((k) => k.component)
+  persistOrder()
+}
+
+// 是否已偏离默认顺序（决定「重置顺序」按钮是否显示）
+const orderChanged = computed(
+  () =>
+    orderedComponents.value.length !== toolKeys.length ||
+    orderedComponents.value.some((c, i) => c !== toolKeys[i].component),
+)
+
 const tools = computed<Tool[]>(() =>
-  toolKeys.map(({ key, component, icon }) => ({
-    name: t(`tools.${key}Name`),
-    icon,
-    description: t(`tools.${key}Desc`),
-    tags: tm(`tools.${key}Tags`) as string[],
-    component,
-  }))
+  orderedComponents.value
+    .map((component) => {
+      const meta = toolKeys.find((k) => k.component === component)
+      if (!meta) return null
+      return {
+        name: t(`tools.${meta.key}Name`),
+        icon: meta.icon,
+        description: t(`tools.${meta.key}Desc`),
+        tags: tm(`tools.${meta.key}Tags`) as string[],
+        component: meta.component,
+      } as Tool
+    })
+    .filter((x): x is Tool => x !== null),
 )
 
 const activeTool = ref<Tool | null>(null)
@@ -166,6 +254,103 @@ const currentComponent = computed(() => {
   if (!activeTool.value) return null
   return componentMap[activeTool.value.component] || null
 })
+
+// ── 拖拽重排（长按 0.5s 进入,松手按落点插入并持久化）──
+// 范式参照 MainLayout.vue 的折叠按钮拖拽 + RandomGeneratorTool 的 pointer 长按
+const draggingComponent = ref<string | null>(null)
+const dragPos = ref({ x: 0, y: 0 }) // 浮动副本跟随光标的位置
+const LONG_PRESS_MS = 500
+const MOVE_THRESHOLD = 4
+
+let pressStartX = 0
+let pressStartY = 0
+let dragStartIndex = -1
+let longPressTimer: ReturnType<typeof setTimeout> | null = null
+let hasMoved = false
+
+function onHandlePointerDown(e: PointerEvent, component: string) {
+  if (!showCards.value) return
+  if (e.pointerType === 'mouse' && e.button !== 0) return // 仅左键
+  pressStartX = e.clientX
+  pressStartY = e.clientY
+  hasMoved = false
+  dragStartIndex = orderedComponents.value.indexOf(component)
+  longPressTimer = setTimeout(() => {
+    if (!hasMoved) {
+      draggingComponent.value = component
+      dragPos.value = { x: pressStartX, y: pressStartY }
+    }
+  }, LONG_PRESS_MS)
+  document.addEventListener('pointermove', onPointerMove)
+  document.addEventListener('pointerup', onPointerUp)
+  document.addEventListener('pointercancel', onPointerUp)
+}
+
+function onPointerMove(e: PointerEvent) {
+  if (
+    Math.abs(e.clientX - pressStartX) > MOVE_THRESHOLD ||
+    Math.abs(e.clientY - pressStartY) > MOVE_THRESHOLD
+  ) {
+    hasMoved = true
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      longPressTimer = null
+    }
+  }
+  if (draggingComponent.value) {
+    e.preventDefault() // 仅拖拽中阻止滚动,不影响长按计时
+    dragPos.value = { x: e.clientX, y: e.clientY }
+  }
+}
+
+function onPointerUp(e: PointerEvent) {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  if (draggingComponent.value) {
+    const targetIndex = computeDropIndex(e.clientX, e.clientY)
+    if (targetIndex !== -1 && targetIndex !== dragStartIndex && dragStartIndex !== -1) {
+      const arr = [...orderedComponents.value]
+      const [moved] = arr.splice(dragStartIndex, 1)
+      arr.splice(targetIndex, 0, moved)
+      orderedComponents.value = arr
+      persistOrder()
+    }
+    draggingComponent.value = null
+  }
+  document.removeEventListener('pointermove', onPointerMove)
+  document.removeEventListener('pointerup', onPointerUp)
+  document.removeEventListener('pointercancel', onPointerUp)
+}
+
+// 落点 → 目标插入索引（遍历卡片,落在哪张的范围内,再按中线判断插 i 或 i+1）
+function computeDropIndex(x: number, y: number): number {
+  const cards = Array.from(document.querySelectorAll<HTMLElement>('.tool-card:not(.drag-ghost)'))
+  for (let i = 0; i < cards.length; i++) {
+    const r = cards[i].getBoundingClientRect()
+    const inCol = x >= r.left - 8 && x <= r.right + 8
+    const inRow = y >= r.top - 8 && y <= r.bottom + 8
+    if (inCol && inRow) {
+      const midX = r.left + r.width / 2
+      // 水平网格:auto-fill,落点偏左则插 i,偏右则 i+1
+      const before = x < midX
+      return before ? i : i + 1
+    }
+  }
+  return -1
+}
+
+function cancelDrag() {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    longPressTimer = null
+  }
+  draggingComponent.value = null
+  document.removeEventListener('pointermove', onPointerMove)
+  document.removeEventListener('pointerup', onPointerUp)
+  document.removeEventListener('pointercancel', onPointerUp)
+}
 
 function cancelDeferredContent() {
   if (contentReadyRaf) {
@@ -297,6 +482,7 @@ const unregisterContextMenu = registerContextProvider((target) => {
 onUnmounted(() => {
   cancelDeferredContent()
   unregisterContextMenu()
+  cancelDrag()
 })
 </script>
 
@@ -327,6 +513,7 @@ onUnmounted(() => {
 }
 
 .tool-card {
+  position: relative;
   background: var(--bg-card);
   border-radius: 12px;
   padding: 24px;
@@ -455,5 +642,92 @@ onUnmounted(() => {
   overflow-y: auto;
   color: var(--text-primary);
   margin: 0;
+}
+
+/* 标题区 + 重置顺序按钮 */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.page-header .page-desc {
+  margin-bottom: 0;
+}
+
+.tools-reset-btn {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.tools-reset-btn:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: var(--bg-secondary);
+}
+
+/* 拖拽手柄（右上角，hover 卡片时显示） */
+.tool-drag-handle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s, color 0.2s;
+  touch-action: none; /* 让 pointer 事件不被滚动抢占 */
+}
+
+.tool-card:hover .tool-drag-handle {
+  opacity: 0.55;
+}
+
+.tool-drag-handle:hover {
+  opacity: 1;
+  background: var(--bg-secondary);
+  color: var(--accent);
+}
+
+.tool-drag-handle:active {
+  cursor: grabbing;
+}
+
+.tool-drag-handle--active {
+  opacity: 1;
+}
+
+/* 拖拽中：原位卡片半透明 */
+.tool-card.is-dragging {
+  opacity: 0.3;
+  transform: scale(0.98);
+}
+
+/* 拖拽浮动副本（跟随光标） */
+.tool-card.drag-ghost {
+  position: fixed;
+  margin: 0;
+  width: 280px;
+  transform: translate(-50%, -50%) scale(0.96) rotate(-1.5deg);
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 12px 32px var(--shadow-strong);
+  opacity: 0.95;
+  transition: none;
+  cursor: grabbing;
 }
 </style>

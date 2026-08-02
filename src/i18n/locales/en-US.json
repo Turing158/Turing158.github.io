@@ -166,6 +166,8 @@
     "title": "Tools",
     "description": "Common online tools, ready to use.",
     "copied": "Copied!",
+    "dragToReorder": "Long-press to drag and reorder tools",
+    "resetOrder": "Reset order",
     "jsonFormatterName": "JSON Formatter",
     "jsonFormatterDesc": "Format, minify, and validate JSON data with syntax highlighting.",
     "jsonFormatterTags": ["JSON", "Format", "Minify"],
@@ -223,6 +225,9 @@
     "tokenUsageChartName": "Token Usage Chart",
     "tokenUsageChartDesc": "Upload token log files and generate a visualized usage SVG chart in the browser, with customizable styling.",
     "tokenUsageChartTags": ["Token", "Chart", "SVG", "Visualization"],
+    "clineModelsName": "Cline Free Models",
+    "clineModelsDesc": "Fetch Cline's free and recommended AI model lists. Click a tag to copy the model ID.",
+    "clineModelsTags": ["Cline", "Free", "Models"],
     "copy": "Copy",
     "jsonFormatter": {
       "inputLabel": "Input JSON",
@@ -647,6 +652,17 @@
       "showCacheCreation": "Show Cache Creation",
       "showTotalCost": "Show Total Cost",
       "parsedCount": "{count} usage records parsed"
+    },
+    "clineModels": {
+      "intro": "Real-time list of Cline CLI's free and recommended models. Click any tag to copy its ID — no need to open Cline CLI to check.",
+      "freeSectionTitle": "Free Models",
+      "recommendedSectionTitle": "Recommended Models",
+      "loading": "Loading...",
+      "loadFailed": "Failed to load",
+      "retry": "Retry",
+      "copied": "Model ID copied",
+      "clickToCopy": "Click to copy model ID",
+      "empty": "No models available"
     }
   },
   "secretKey": {
