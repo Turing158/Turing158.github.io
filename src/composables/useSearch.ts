@@ -1,24 +1,26 @@
 /**
  * 搜索 composable
- * 跨文章（articles）、项目（projects）、发行版（releases）进行文本搜索
+ * 跨文章（articles）、项目（projects）、发行版（releases）、工具（tools）进行文本搜索
  * 由 SearchDialog 调用
  *
  * 文章搜索使用 Fuse.js 实现模糊匹配 + 相关度排序
- * 项目/发行版使用简单 includes（数据量小，无需索引）
+ * 项目/发行版/工具使用简单 includes（数据量小，无需索引）
  */
 
 import { ref, computed } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { useArticles } from '@/composables/useArticles'
 import { useReleases } from '@/composables/useReleases'
 import { useSearchIndex } from '@/composables/useSearchIndex'
 import { categories as projectCategories } from '@/data/projects'
-import type { SearchResult, ArticleResult, ProjectResult, ReleaseResult } from '@/types/search'
+import { toolKeys } from '@/data/tools'
+import type { SearchResult, ArticleResult, ProjectResult, ReleaseResult, ToolResult } from '@/types/search'
 import type { Project } from '@/data/projects'
 
 /** 搜索结果类型筛选 */
-export type SearchTab = 'all' | 'article' | 'project' | 'release'
+export type SearchTab = 'all' | 'article' | 'project' | 'release' | 'tool'
 
 /** 带分数的搜索结果（内部排序用） */
 interface ScoredResult {
@@ -29,6 +31,7 @@ interface ScoredResult {
 export function useSearch() {
   const store = useAppStore()
   const { articles } = storeToRefs(store)
+  const { t, tm } = useI18n()
   const { fetchArticles } = useArticles()
   const { releases, fetchReleases } = useReleases()
   const { build: buildIndex, search: fuseSearch } = useSearchIndex()
@@ -52,6 +55,19 @@ export function useSearch() {
     }
     return flat
   })
+
+  // 工具元数据：name / desc / tags 走 i18n，随语言切换响应
+  const allTools = computed<ToolResult[]>(() =>
+    toolKeys.map((k) => ({
+      type: 'tool' as const,
+      id: k.component,
+      component: k.component,
+      icon: k.icon,
+      name: t(`tools.${k.key}Name`),
+      description: t(`tools.${k.key}Desc`),
+      tags: (tm(`tools.${k.key}Tags`) as string[]) ?? [],
+    })),
+  )
 
   // 搜索结果：实时响应 query 变化
   const results = computed<SearchResult[]>(() => {
@@ -120,6 +136,19 @@ export function useSearch() {
       }
     }
 
+    // --- 搜索工具 ---
+    for (const tool of allTools.value) {
+      const searchText = [tool.name, tool.description, ...tool.tags]
+        .join(' ')
+        .toLowerCase()
+      if (searchText.includes(q)) {
+        matched.push({
+          result: tool,
+          score: 999,
+        })
+      }
+    }
+
     // 按 score 排序（分数越低越匹配）
     matched.sort((a, b) => a.score - b.score)
 
@@ -137,11 +166,12 @@ export function useSearch() {
   // 各类型结果计数
   const counts = computed(() => {
     const q = query.value.trim().toLowerCase()
-    if (!q) return { all: 0, article: 0, project: 0, release: 0 }
+    if (!q) return { all: 0, article: 0, project: 0, release: 0, tool: 0 }
 
     const fuseResults = fuseSearch(q)
     let projectCount = 0
     let releaseCount = 0
+    let toolCount = 0
 
     for (const proj of allProjects.value) {
       const searchText = [proj.name, proj.description, ...(proj.tech ?? [])]
@@ -157,11 +187,19 @@ export function useSearch() {
       if (searchText.includes(q)) releaseCount++
     }
 
+    for (const tool of allTools.value) {
+      const searchText = [tool.name, tool.description, ...tool.tags]
+        .join(' ')
+        .toLowerCase()
+      if (searchText.includes(q)) toolCount++
+    }
+
     return {
-      all: fuseResults.length + projectCount + releaseCount,
+      all: fuseResults.length + projectCount + releaseCount + toolCount,
       article: fuseResults.length,
       project: projectCount,
       release: releaseCount,
+      tool: toolCount,
     }
   })
 

@@ -111,6 +111,24 @@
     </div>
     <span class="card-type-badge">{{ $t('search.typeRelease') }}</span>
   </div>
+
+  <!-- 工具卡片：点击跳转工具页并带 query 自动打开 -->
+  <router-link
+    v-else-if="result.type === 'tool'"
+    :to="{ name: 'tools', query: { tool: result.component } }"
+    class="search-card search-card--tool"
+    @click="props.shouldClose()"
+  >
+    <div class="tool-card-header">
+      <span class="tool-card-icon">{{ result.icon }}</span>
+      <h3 class="card-title" v-html="highlight(result.name, query)" />
+    </div>
+    <p class="card-desc" v-html="highlight(result.description, query)" />
+    <div v-if="result.tags.length > 0" class="card-tech">
+      <span v-for="tag in result.tags" :key="tag" class="tech-tag" v-html="highlight(tag, query)" />
+    </div>
+    <span class="card-type-badge">{{ $t('search.typeTool') }}</span>
+  </router-link>
 </template>
 
 <script setup lang="ts">
@@ -439,6 +457,26 @@ function openGitee() {
       }
     }
   }
+}
+
+/* ======================== */
+/* 工具卡片                 */
+/* ======================== */
+.search-card--tool {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tool-card-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 /* ======================== */

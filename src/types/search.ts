@@ -58,5 +58,16 @@ export interface ReleaseResult {
   assets: ReleaseAsset[]
 }
 
+// 工具搜索结果
+export interface ToolResult {
+  type: 'tool'
+  id: string // = component
+  component: string // ToolsView componentMap 的键,用于定位工具
+  icon: string
+  name: string
+  description: string
+  tags: string[]
+}
+
 // 统一搜索结果类型
-export type SearchResult = ArticleResult | ProjectResult | ReleaseResult
+export type SearchResult = ArticleResult | ProjectResult | ReleaseResult | ToolResult

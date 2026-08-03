@@ -804,11 +804,13 @@
     "typeArticle": "文章",
     "typeProject": "项目",
     "typeRelease": "发行",
+    "typeTool": "工具",
     "resultsCount": "找到 {n} 个结果",
     "tabAll": "全部",
     "tabArticles": "文章",
     "tabProjects": "项目",
     "tabReleases": "发行",
+    "tabTools": "工具",
     "shortcut": "Ctrl+K 搜索"
   },
   "components": {

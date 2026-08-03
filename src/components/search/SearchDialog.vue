@@ -55,6 +55,14 @@
           {{ $t('search.tabReleases') }}
           <span v-if="query" class="tab-count">{{ counts.release }}</span>
         </button>
+        <button
+          class="search-tab"
+          :class="{ active: activeTab === 'tool' }"
+          @click="activeTab = 'tool'"
+        >
+          {{ $t('search.tabTools') }}
+          <span v-if="query" class="tab-count">{{ counts.tool }}</span>
+        </button>
       </div>
 
       <!-- 状态提示 -->

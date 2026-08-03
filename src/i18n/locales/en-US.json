@@ -775,11 +775,13 @@
     "typeArticle": "Article",
     "typeProject": "Project",
     "typeRelease": "Release",
+    "typeTool": "Tool",
     "resultsCount": "{n} results found",
     "tabAll": "All",
     "tabArticles": "Articles",
     "tabProjects": "Projects",
     "tabReleases": "Releases",
+    "tabTools": "Tools",
     "shortcut": "Ctrl+K to search"
   },
   "components": {

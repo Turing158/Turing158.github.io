@@ -21,7 +21,7 @@
       >{{ $t('tools.resetOrder') }}</button>
     </div>
 
-    <div v-if="showCards" class="tools-grid">
+    <div v-if="showCards" ref="gridRef" class="tools-grid">
       <div
         v-for="(tool, index) in tools"
         :key="tool.component"
@@ -31,6 +31,7 @@
           'is-dragging': draggingComponent === tool.component,
         }"
         :style="{ '--card-index': index }"
+        :data-component="tool.component"
         @click="openTool(tool)"
       >
         <span
@@ -101,13 +102,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted, defineAsyncComponent, type Component } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted, watch, defineAsyncComponent, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
+import { toolKeys } from '@/data/tools'
+import { useRoute, useRouter } from 'vue-router'
 
 // 分隔符编辑弹窗：低频使用，异步加载
 const SeparatorEditorDialog = defineAsyncComponent(
@@ -151,29 +154,7 @@ const componentMap: Record<string, Component> = {
   ClineModelsTool: defineAsyncComponent(() => import('@/components/tools/ClineModelsTool.vue')),
 }
 
-// 工具元数据
-const toolKeys = [
-  { key: 'jsonFormatter', component: 'JsonFormatter', icon: '📋' },
-  { key: 'base64', component: 'Base64Tool', icon: '🔐' },
-  { key: 'regex', component: 'RegexTool', icon: '🔍' },
-  { key: 'color', component: 'ColorConverter', icon: '🎨' },
-  { key: 'timestamp', component: 'TimestampConverter', icon: '⏰' },
-  { key: 'textCounter', component: 'TextCounter', icon: '📊' },
-  { key: 'randomGenerator', component: 'RandomGenerator', icon: '🎲' },
-  { key: 'randomString', component: 'RandomStringGenerator', icon: '🔤' },
-  { key: 'holidayQuery', component: 'HolidayQueryTool', icon: '🎉' },
-  { key: 'md5', component: 'Md5Tool', icon: '🔑' },
-  { key: 'sha', component: 'ShaTool', icon: '🔒' },
-  { key: 'diff', component: 'DiffCheckerTool', icon: '📑' },
-  { key: 'codeRunner', component: 'CodeRunnerTool', icon: '▶' },
-  { key: 'apiTest', component: 'ApiTestTool', icon: '🌐' },
-  { key: 'sqlFormatter', component: 'SqlFormatterTool', icon: '🗃️' },
-  { key: 'cronEditor', component: 'CronEditorTool', icon: '⏱️' },
-  { key: 'tokenUsageChart', component: 'TokenUsageChartTool', icon: '📈' },
-  { key: 'passwordStrength', component: 'PasswordStrengthTool', icon: '🔒' },
-  { key: 'loremIpsum', component: 'LoremIpsumTool', icon: '📝' },
-  { key: 'clineModels', component: 'ClineModelsTool', icon: '🤖' },
-] as const
+// 工具元数据来自共享模块 @/data/tools（搜索功能也索引同一份列表）
 
 // 工具卡片自定义顺序（持久化到 localStorage）
 const ORDER_KEY = 'blog-tools-order'
@@ -243,6 +224,7 @@ const dialogOpen = ref(false)
 const contentReady = ref(false)
 const showCards = ref(false)
 const cardVisibleStates = ref<Record<string, boolean>>({})
+const gridRef = ref<HTMLElement | null>(null)
 
 // 成就系统：setup 中取一次，避免每次 openTool 重复调用 composable
 const achievements = useAchievements()
@@ -255,7 +237,7 @@ const currentComponent = computed(() => {
   return componentMap[activeTool.value.component] || null
 })
 
-// ── 拖拽重排（长按 0.5s 进入,松手按落点插入并持久化）──
+// ── 拖拽重排（长按 0.5s 进入,拖动过程实时预览重排,松手持久化）──
 // 范式参照 MainLayout.vue 的折叠按钮拖拽 + RandomGeneratorTool 的 pointer 长按
 const draggingComponent = ref<string | null>(null)
 const dragPos = ref({ x: 0, y: 0 }) // 浮动副本跟随光标的位置
@@ -264,9 +246,20 @@ const MOVE_THRESHOLD = 4
 
 let pressStartX = 0
 let pressStartY = 0
-let dragStartIndex = -1
+let dragStartIndex = -1 // 拖拽起始索引(用于取消恢复)
+let dragCurrentIndex = -1 // 被拖项在 orderedComponents 中的当前索引(实时更新)
+let savedOrder: string[] = [] // 进入拖拽时的顺序快照,取消时恢复
 let longPressTimer: ReturnType<typeof setTimeout> | null = null
 let hasMoved = false
+let didInteract = false // 本次手柄按下是否进入过拖拽（含未移动的长按），用于抑制松手后的卡片 click
+
+// 同步锁住网格内文字选择：在浏览器默认选择动作触发前生效，避免长按 0.5s 期间选中卡片文字
+function setUserSelectLock(on: boolean) {
+  const grid = gridRef.value
+  if (!grid) return
+  grid.style.userSelect = on ? 'none' : ''
+  grid.style.webkitUserSelect = on ? 'none' : ''
+}
 
 function onHandlePointerDown(e: PointerEvent, component: string) {
   if (!showCards.value) return
@@ -274,7 +267,11 @@ function onHandlePointerDown(e: PointerEvent, component: string) {
   pressStartX = e.clientX
   pressStartY = e.clientY
   hasMoved = false
+  didInteract = true // 标记本次按下需抑制后续 click,避免长按后松手误触打开工具
   dragStartIndex = orderedComponents.value.indexOf(component)
+  dragCurrentIndex = dragStartIndex
+  savedOrder = [...orderedComponents.value]
+  setUserSelectLock(true) // 立即锁选择，防止长按计时期间选中文字
   longPressTimer = setTimeout(() => {
     if (!hasMoved) {
       draggingComponent.value = component
@@ -300,42 +297,128 @@ function onPointerMove(e: PointerEvent) {
   if (draggingComponent.value) {
     e.preventDefault() // 仅拖拽中阻止滚动,不影响长按计时
     dragPos.value = { x: e.clientX, y: e.clientY }
+    applyPreviewReorder(e.clientX, e.clientY)
   }
 }
 
-function onPointerUp(e: PointerEvent) {
+// 实时预览重排：把被拖项挪到光标当前落点,卡片随之挪位
+// 配合 FLIP 动画：重排前后捕获卡片位置,反向平移后过渡归零,让重排"飞"过去
+function applyPreviewReorder(x: number, y: number) {
+  const targetIndex = computeDropIndex(x, y)
+  // 落点无效 或 与当前索引相同 → 不动,避免抖动
+  if (targetIndex === -1 || targetIndex === dragCurrentIndex) return
+
+  // FLIP First：记录每张卡片重排前的位置(被拖项跳过,它跟手的是 ghost 副本)
+  const firstRects = captureCardRects()
+
+  const arr = [...orderedComponents.value]
+  const [moved] = arr.splice(dragCurrentIndex, 1)
+  arr.splice(targetIndex, 0, moved)
+  orderedComponents.value = arr
+  dragCurrentIndex = targetIndex // 追踪被拖项新位置
+
+  // FLIP Last + Play：DOM 更新后算位移,反向平移再过渡归零
+  nextTick(() => playFlip(firstRects))
+}
+
+// 捕获网格内每张卡片(除被拖项)的当前位置,以 data-component 为键
+function captureCardRects(): Map<string, DOMRect> {
+  const map = new Map<string, DOMRect>()
+  const dragging = draggingComponent.value
+  const cards = gridRef.value?.querySelectorAll<HTMLElement>('.tool-card:not(.drag-ghost)') ?? []
+  for (const card of cards) {
+    const component = card.dataset.component
+    if (!component || component === dragging) continue
+    map.set(component, card.getBoundingClientRect())
+  }
+  return map
+}
+
+// FLIP Play：对比 firstRects,把每张卡片从新位置反向平移回旧视觉位,再过渡归零
+function playFlip(firstRects: Map<string, DOMRect>) {
+  if (!firstRects.size) return
+  const cards = gridRef.value?.querySelectorAll<HTMLElement>('.tool-card:not(.drag-ghost)') ?? []
+  const moved: HTMLElement[] = []
+  for (const card of cards) {
+    const component = card.dataset.component
+    if (!component) continue
+    const first = firstRects.get(component)
+    if (!first) continue
+    const last = card.getBoundingClientRect()
+    const dx = first.left - last.left
+    const dy = first.top - last.top
+    if (dx === 0 && dy === 0) continue
+    // 先瞬移到旧视觉位(无过渡),下一帧再开启过渡归零
+    card.style.transition = 'none'
+    card.style.transform = `translate(${dx}px, ${dy}px)`
+    moved.push(card)
+  }
+  if (!moved.length) return
+  // 强制重排,确保上面的 inline style 生效,再开启过渡
+  void document.body.offsetHeight
+  for (const card of moved) {
+    card.style.transition = 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1)'
+    card.style.transform = ''
+    // 过渡结束后清掉 inline transition,恢复卡片默认 transition(管入场/hover)
+    card.addEventListener('transitionend', clearFlipStyle, { once: true })
+  }
+}
+
+// FLIP 过渡收尾：移除 inline transition,让卡片回归 CSS 默认过渡
+function clearFlipStyle(e: TransitionEvent) {
+  const card = e.currentTarget as HTMLElement
+  if (e.propertyName !== 'transform') return
+  card.style.transition = ''
+  card.removeEventListener('transitionend', clearFlipStyle)
+}
+
+function onPointerUp() {
   if (longPressTimer) {
     clearTimeout(longPressTimer)
     longPressTimer = null
   }
   if (draggingComponent.value) {
-    const targetIndex = computeDropIndex(e.clientX, e.clientY)
-    if (targetIndex !== -1 && targetIndex !== dragStartIndex && dragStartIndex !== -1) {
-      const arr = [...orderedComponents.value]
-      const [moved] = arr.splice(dragStartIndex, 1)
-      arr.splice(targetIndex, 0, moved)
-      orderedComponents.value = arr
+    // 顺序已在拖动中实时更新,这里只做收尾(落点已是当前 dragCurrentIndex)
+    if (dragCurrentIndex !== dragStartIndex) {
       persistOrder()
     }
     draggingComponent.value = null
+    savedOrder = []
   }
+  setUserSelectLock(false)
   document.removeEventListener('pointermove', onPointerMove)
   document.removeEventListener('pointerup', onPointerUp)
   document.removeEventListener('pointercancel', onPointerUp)
 }
 
-// 落点 → 目标插入索引（遍历卡片,落在哪张的范围内,再按中线判断插 i 或 i+1）
+// 落点 → 目标插入索引
+// 被拖项仍占据 DOM 位置(is-dragging 半透明),但语义上"已离开原位"：
+// 计算命中时排除被拖项卡片,得到的 i 是"排除被拖项后"的位置,
+// 再用其原始索引(originalIndex)映射回完整数组的真实插入点
 function computeDropIndex(x: number, y: number): number {
+  const dragging = draggingComponent.value
   const cards = Array.from(document.querySelectorAll<HTMLElement>('.tool-card:not(.drag-ghost)'))
+  let originalIndex = -1
+  const others: { rect: DOMRect; index: number }[] = []
   for (let i = 0; i < cards.length; i++) {
-    const r = cards[i].getBoundingClientRect()
+    const component = cards[i].dataset.component
+    if (component === dragging) {
+      originalIndex = i
+      continue
+    }
+    others.push({ rect: cards[i].getBoundingClientRect(), index: i })
+  }
+
+  for (const { rect: r, index: i } of others) {
     const inCol = x >= r.left - 8 && x <= r.right + 8
     const inRow = y >= r.top - 8 && y <= r.bottom + 8
     if (inCol && inRow) {
       const midX = r.left + r.width / 2
-      // 水平网格:auto-fill,落点偏左则插 i,偏右则 i+1
       const before = x < midX
-      return before ? i : i + 1
+      // i 是被拖项"未移除时"的真实索引；before ? i : i+1 即完整数组的目标插入点
+      // 若被拖项在 i 之前(originalIndex < i),目标点需 -1 还原到排除后的语义
+      const raw = before ? i : i + 1
+      return originalIndex !== -1 && originalIndex < raw ? raw - 1 : raw
     }
   }
   return -1
@@ -346,7 +429,16 @@ function cancelDrag() {
     clearTimeout(longPressTimer)
     longPressTimer = null
   }
+  // 取消拖拽:恢复进入时的顺序,同样走 FLIP 动画让卡片归位
+  if (savedOrder.length) {
+    const firstRects = captureCardRects()
+    orderedComponents.value = savedOrder
+    savedOrder = []
+    nextTick(() => playFlip(firstRects))
+  }
   draggingComponent.value = null
+  dragCurrentIndex = -1
+  setUserSelectLock(false)
   document.removeEventListener('pointermove', onPointerMove)
   document.removeEventListener('pointerup', onPointerUp)
   document.removeEventListener('pointercancel', onPointerUp)
@@ -417,6 +509,11 @@ function onSeparatorCancel() {
 
 // 打开工具
 function openTool(tool: Tool) {
+  // 若本次点击源自手柄的拖拽交互（长按 / 拖动），抑制打开
+  if (didInteract) {
+    didInteract = false
+    return
+  }
   activeTool.value = tool
   contentReady.value = false
   dialogOpen.value = true
@@ -442,6 +539,33 @@ function onDialogClose() {
   activeTool.value = null
   // 分隔符编辑在关闭时已被销毁，无需手动清理
 }
+
+const route = useRoute()
+const router = useRouter()
+
+// 搜索结果跳转过来时带 `?tool=<component>`,自动打开对应工具
+// 用 watch 而非 onMounted:同路由(/tools → /tools?tool=X)组件复用,onMounted 不再触发
+function maybeOpenFromQuery(component: unknown) {
+  if (typeof component !== 'string' || !component) return
+  const meta = toolKeys.find((k) => k.component === component)
+  if (!meta) return
+  const tool = tools.value.find((t) => t.component === component)
+  if (tool) {
+    openTool(tool)
+    // 清掉 query,避免刷新或返回时重复打开
+    router.replace({ name: 'tools' })
+  }
+}
+
+// 监听 query.tool 变化(含首次进入),响应跨页跳转与同路由 query 变更两种路径
+watch(
+  () => route.query.tool,
+  (component) => {
+    // 等卡片进场 setup 完成,确保 openTool 依赖的 state 就绪
+    nextTick(() => maybeOpenFromQuery(component))
+  },
+  { immediate: true },
+)
 
 onMounted(async () => {
   await nextTick()
@@ -675,7 +799,7 @@ onUnmounted(() => {
   background: var(--bg-secondary);
 }
 
-/* 拖拽手柄（右上角，hover 卡片时显示） */
+/* 拖拽手柄（右上角，常驻显示） */
 .tool-drag-handle {
   position: absolute;
   top: 8px;
@@ -688,13 +812,9 @@ onUnmounted(() => {
   border-radius: 6px;
   color: var(--text-secondary);
   cursor: grab;
-  opacity: 0;
+  opacity: 0.55;
   transition: opacity 0.2s, background 0.2s, color 0.2s;
   touch-action: none; /* 让 pointer 事件不被滚动抢占 */
-}
-
-.tool-card:hover .tool-drag-handle {
-  opacity: 0.55;
 }
 
 .tool-drag-handle:hover {
