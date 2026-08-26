@@ -2,7 +2,6 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { config } from '@/config'
 import i18n from '@/i18n'
-import { useSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 
 const routes: RouteRecordRaw[] = [
@@ -48,6 +47,12 @@ const routes: RouteRecordRaw[] = [
     name: 'tools',
     component: () => import('@/views/ToolsView.vue'),
     meta: { titleKey: 'pageTitle.tools' },
+  },
+  {
+    path: '/tools/:id',
+    name: 'tool-detail',
+    component: () => import('@/views/ToolDetailView.vue'),
+    meta: { titleKey: 'pageTitle.toolDetail' },
   },
   {
     path: '/achievements',
@@ -173,27 +178,6 @@ router.afterEach((to) => {
     const achievements = useAchievements()
     achievements.handleRouteVisit(to.name)
   }
-
-  // 独立页面跳过全局 SEO（useSeo 会套用博客标题模板和主题色），由页面自行 useHead
-  if (to.meta.layout === 'standalone') return
-
-  // 为每个页面设置默认 SEO
-  const titleKey = to.meta.titleKey as string | undefined
-  let pageTitle = titleKey ? i18n.global.t(titleKey) : ''
-
-  if (to.name === 'commits' && to.params.repo) {
-    pageTitle = to.params.repo as string
-  }
-  if (to.name === 'release-detail' && to.params.repo) {
-    pageTitle = to.params.repo as string
-  }
-
-  // 使用 useSeo 设置页面级 meta
-  useSeo({
-    title: pageTitle,
-    url: to.fullPath,
-    type: 'website',
-  })
 })
 
 export default router

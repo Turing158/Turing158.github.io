@@ -43,9 +43,11 @@
         <div class="hero-actions">
           <a :href="frontendUrl" target="_blank" rel="noopener" class="forum-btn forum-btn-primary">
             <span class="btn-icon">▶</span> {{ t('forum.viewFrontend') }}
+            <ExternalLinkIcon />
           </a>
           <a :href="backendUrl" target="_blank" rel="noopener" class="forum-btn forum-btn-secondary">
             <span class="btn-icon">▶</span> {{ t('forum.viewBackend') }}
+            <ExternalLinkIcon />
           </a>
         </div>
       </div>
@@ -92,9 +94,11 @@
           <div class="repo-actions">
             <a :href="frontendUrl" target="_blank" rel="noopener" class="forum-btn forum-btn-primary forum-btn--small">
               {{ t('forum.viewRepo') }}
+              <ExternalLinkIcon />
             </a>
             <a :href="frontendUrl + '/commits'" target="_blank" rel="noopener" class="forum-btn forum-btn-ghost forum-btn--small">
               {{ t('forum.viewCommits') }}
+              <ExternalLinkIcon />
             </a>
           </div>
         </div>
@@ -114,9 +118,11 @@
           <div class="repo-actions">
             <a :href="backendUrl" target="_blank" rel="noopener" class="forum-btn forum-btn-primary forum-btn--small">
               {{ t('forum.viewRepo') }}
+              <ExternalLinkIcon />
             </a>
             <a :href="backendUrl + '/commits'" target="_blank" rel="noopener" class="forum-btn forum-btn-ghost forum-btn--small">
               {{ t('forum.viewCommits') }}
+              <ExternalLinkIcon />
             </a>
           </div>
         </div>
@@ -210,6 +216,7 @@
               class="forum-btn forum-btn-primary forum-btn--small"
             >
               {{ asset.name }}
+              <ExternalLinkIcon />
             </a>
           </div>
           <div v-else class="download-no-assets">
@@ -307,6 +314,7 @@ import { setLocale } from '@/i18n'
 import { config } from '@/config'
 import { useGitalk } from '@/composables/useGitalk'
 import axios from 'axios'
+import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 
 const FRONTEND_REPO = 'StarFall-vue'
 const BACKEND_REPO = 'StarFall-SpringBoot'
@@ -1617,34 +1625,6 @@ function toggleLang() {
     font-size: 16px;
   }
 }
-
-// ===== 无障碍：减少动画（与Windows系统中的“窗口内的动画控件和元素”有冲突） =====
-// @media (prefers-reduced-motion: reduce) {
-//   .deco-block {
-//     animation: none;
-//   }
-
-//   .hero-badge,
-//   .title-main,
-//   .title-sub,
-//   .forum-tagline,
-//   .forum-subtagline,
-//   .hero-actions,
-//   .intro-box,
-//   .forum-repo-card,
-//   .forum-feature-card,
-//   .tech-group,
-//   .tech-tag,
-//   .download-card,
-//   .ack-item,
-//   .footer-note {
-//     animation: none;
-//   }
-
-//   * {
-//     transition: none !important;
-//   }
-// }
 
 // ===== 首次访问提示弹窗（像素风） =====
 .notice-overlay {

@@ -880,21 +880,6 @@
   animation: gt-fade-in 0.35s ease;
 }
 
-/* Reduced motion 支持（与Windows系统中的“窗口内的动画控件和元素”有冲突，全部都使用动画） */
-/* @media (prefers-reduced-motion: reduce) {
-  .gt-container .gt-comment,
-  .gt-container .gt-popup {
-    animation: none;
-  }
-
-  .gt-container *,
-  .gt-container *::before,
-  .gt-container *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-} */
-
 /* ═══════════════════════════════════════════════════════════════
  * 14. SFMC 页面主题 — 像素风 / Minecraft 洞穴绿风格
  * ═══════════════════════════════════════════════════════════════ */
@@ -1540,21 +1525,6 @@
 .sfmc-page .gt-container .gt-comment {
   animation: gt-fade-in 0.25s ease;
 }
-
-/* Reduced motion（与Windows系统中的“窗口内的动画控件和元素”有冲突，全部都使用动画） */
-/* @media (prefers-reduced-motion: reduce) {
-  .sfmc-page .gt-container .gt-comment,
-  .sfmc-page .gt-container .gt-popup {
-    animation: none;
-  }
-
-  .sfmc-page .gt-container *,
-  .sfmc-page .gt-container *::before,
-  .sfmc-page .gt-container *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-} */
 
 /* ═══════════════════════════════════════════════════════════════
  * 15. StarFall Forum 页面主题 — 暖色像素风 / Minecraft 泥土风格
@@ -2203,21 +2173,6 @@
   animation: gt-fade-in 0.25s ease;
 }
 
-/* Reduced motion （与Windows系统中的“窗口内的动画控件和元素”有冲突，全部都使用动画）*/
-/* @media (prefers-reduced-motion: reduce) {
-  .forum-page .gt-container .gt-comment,
-  .forum-page .gt-container .gt-popup {
-    animation: none;
-  }
-
-  .forum-page .gt-container *,
-  .forum-page .gt-container *::before,
-  .forum-page .gt-container *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-} */
-
 /* ═══════════════════════════════════════════════════════════════
  * 16. SFMC Jar 页面主题 — 像素风 / Minecraft 星空蓝风格
  * ═══════════════════════════════════════════════════════════════ */
@@ -2863,18 +2818,3 @@
 .sfmc-jar-page .gt-container .gt-comment {
   animation: gt-fade-in 0.25s ease;
 }
-
-/* Reduced motion （与Windows系统中的“窗口内的动画控件和元素”有冲突，全部都使用动画）*/
-/* @media (prefers-reduced-motion: reduce) {
-  .sfmc-jar-page .gt-container .gt-comment,
-  .sfmc-jar-page .gt-container .gt-popup {
-    animation: none;
-  }
-
-  .sfmc-jar-page .gt-container *,
-  .sfmc-jar-page .gt-container *::before,
-  .sfmc-jar-page .gt-container *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-  }
-} */

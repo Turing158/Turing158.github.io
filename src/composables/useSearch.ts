@@ -61,6 +61,7 @@ export function useSearch() {
     toolKeys.map((k) => ({
       type: 'tool' as const,
       id: k.component,
+      key: k.key,
       component: k.component,
       icon: k.icon,
       name: t(`tools.${k.key}Name`),

@@ -951,12 +951,6 @@ onMounted(async () => {
   50% { opacity: 0; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .typewriter-cursor {
-    animation: none;
-  }
-}
-
 .profile-bio {
   color: var(--text-secondary);
   font-size: 0.85rem;

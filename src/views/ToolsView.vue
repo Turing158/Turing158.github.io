@@ -73,6 +73,49 @@
       @open="onDialogOpen"
       @close="onDialogClose"
     >
+      <template #before-close>
+        <div
+          v-if="activeTool"
+          class="tool-detail-launcher"
+          :class="{ 'is-open': detailActionsOpen }"
+        >
+          <button
+            type="button"
+            class="tool-detail-launcher-trigger"
+            :aria-label="$t('tools.expandDetailNavigationFor', { name: activeTool.name })"
+            :aria-expanded="detailActionsOpen"
+            @click="detailActionsOpen = !detailActionsOpen"
+            @blur="detailActionsOpen = false"
+          >
+            <SidebarIcon name="externalLink" :size="15" />
+          </button>
+          <div class="tool-detail-launcher-actions">
+            <RouterLink
+              :to="activeToolDetailRoute"
+              class="tool-detail-launcher-action tool-detail-launcher-action--jump"
+              target="_blank"
+              rel="noopener noreferrer"
+              :aria-label="$t('tools.jumpToDetailFor', { name: activeTool.name })"
+              @click="detailActionsOpen = false"
+            >
+              <span class="tool-detail-launcher-label">
+                {{ $t('tools.jumpToDetail') }}
+              </span>
+            </RouterLink>
+            <RouterLink
+              :to="activeToolDetailRoute"
+              class="tool-detail-launcher-action tool-detail-launcher-action--switch"
+              :aria-label="$t('tools.switchToDetailFor', { name: activeTool.name })"
+              @click="detailActionsOpen = false"
+            >
+              <span class="tool-detail-launcher-label">
+                {{ $t('tools.switchToDetail') }}
+              </span>
+            </RouterLink>
+          </div>
+        </div>
+      </template>
+
       <template v-if="activeTool" #title>
         <span class="modal-icon">{{ activeTool.icon }}</span>
         <span class="modal-title-text">{{ activeTool.name }}</span>
@@ -110,7 +153,7 @@ import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { toolKeys } from '@/data/tools'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
 
 // 分隔符编辑弹窗：低频使用，异步加载
 const SeparatorEditorDialog = defineAsyncComponent(
@@ -152,6 +195,7 @@ const componentMap: Record<string, Component> = {
   PasswordStrengthTool: defineAsyncComponent(() => import('@/components/tools/PasswordStrengthTool.vue')),
   LoremIpsumTool: defineAsyncComponent(() => import('@/components/tools/LoremIpsumTool.vue')),
   ClineModelsTool: defineAsyncComponent(() => import('@/components/tools/ClineModelsTool.vue')),
+  GithubInfoTool: defineAsyncComponent(() => import('@/components/tools/GithubInfoTool.vue')),
 }
 
 // 工具元数据来自共享模块 @/data/tools（搜索功能也索引同一份列表）
@@ -221,6 +265,7 @@ const tools = computed<Tool[]>(() =>
 
 const activeTool = ref<Tool | null>(null)
 const dialogOpen = ref(false)
+const detailActionsOpen = ref(false)
 const contentReady = ref(false)
 const showCards = ref(false)
 const cardVisibleStates = ref<Record<string, boolean>>({})
@@ -235,6 +280,16 @@ let contentReadyTimer: ReturnType<typeof setTimeout> | null = null
 const currentComponent = computed(() => {
   if (!activeTool.value) return null
   return componentMap[activeTool.value.component] || null
+})
+
+const activeToolDetailRoute = computed<RouteLocationRaw>(() => {
+  const tool = activeTool.value
+  if (!tool) return { name: 'tools' }
+  const meta = toolKeys.find((item) => item.component === tool.component)
+  return {
+    name: 'tool-detail',
+    params: { id: meta?.key ?? tool.component },
+  }
 })
 
 // ── 拖拽重排（长按 0.5s 进入,拖动过程实时预览重排,松手持久化）──
@@ -515,6 +570,7 @@ function openTool(tool: Tool) {
     return
   }
   activeTool.value = tool
+  detailActionsOpen.value = false
   contentReady.value = false
   dialogOpen.value = true
   scheduleContentMount()
@@ -535,6 +591,7 @@ function onDialogOpen() {
 
 function onDialogClose() {
   cancelDeferredContent()
+  detailActionsOpen.value = false
   contentReady.value = false
   activeTool.value = null
   // 分隔符编辑在关闭时已被销毁，无需手动清理
@@ -732,6 +789,154 @@ onUnmounted(() => {
 .modal-title-text {
   font-size: 1.2rem;
   color: var(--text-primary);
+}
+
+/* Dialog 详情页入口：从圆形图标中心向左右展开为连体操作组 */
+.tool-detail-launcher {
+  position: absolute;
+  top: 14px;
+  /* 展开后为两侧按钮预留空间，右端不遮挡关闭按钮 */
+  right: 94px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  overflow: visible;
+}
+
+.tool-detail-launcher-trigger,
+.tool-detail-launcher-action {
+  height: 32px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tool-detail-launcher-trigger {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 32px;
+  padding: 0;
+  place-items: center;
+  border-radius: 50%;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    border-radius 0.2s ease,
+    opacity 0.28s ease;
+}
+
+.tool-detail-launcher-actions {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: flex;
+  height: 32px;
+  width: 128px;
+  align-items: stretch;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  clip-path: inset(0 48px round 16px);
+  transform: translateX(-50%);
+  transform-origin: center;
+  will-change: clip-path, opacity;
+  transition:
+    clip-path 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease,
+    visibility 0s linear 0.3s;
+}
+
+.tool-detail-launcher-action {
+  display: inline-flex;
+  flex: 0 0 64px;
+  width: 64px;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tool-detail-launcher-label {
+  opacity: 0;
+  transform: translateX(6px);
+  will-change: transform, opacity;
+  transition:
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.12s ease;
+}
+
+.tool-detail-launcher-action--switch .tool-detail-launcher-label {
+  transform: translateX(-6px);
+}
+
+.tool-detail-launcher-action--jump {
+  border-radius: 16px 0 0 16px;
+}
+
+.tool-detail-launcher-action--switch {
+  border-left: 0;
+  border-radius: 0 16px 16px 0;
+}
+
+.tool-detail-launcher:hover .tool-detail-launcher-actions,
+.tool-detail-launcher:focus-within .tool-detail-launcher-actions,
+.tool-detail-launcher.is-open .tool-detail-launcher-actions {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  clip-path: inset(0 round 16px);
+  transition-delay: 0s;
+}
+
+.tool-detail-launcher:hover .tool-detail-launcher-label,
+.tool-detail-launcher:focus-within .tool-detail-launcher-label,
+.tool-detail-launcher.is-open .tool-detail-launcher-label {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.08s;
+}
+
+.tool-detail-launcher:hover .tool-detail-launcher-trigger,
+.tool-detail-launcher:focus-within .tool-detail-launcher-trigger,
+.tool-detail-launcher.is-open .tool-detail-launcher-trigger {
+  border-color: transparent;
+  background: transparent;
+  color: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tool-detail-launcher-trigger:hover,
+.tool-detail-launcher-action:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg-card);
+}
+
+.tool-detail-launcher-trigger:focus-visible,
+.tool-detail-launcher-action:focus-visible {
+  z-index: 3;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* 工具表单共享样式 —— 子组件继承 */

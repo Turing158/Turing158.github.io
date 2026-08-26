@@ -139,6 +139,19 @@ const icons: Record<string, Shape[]> = {
     { type: 'circle', cx: 11, cy: 11, r: 8 },
     { type: 'line', x1: 21, y1: 21, x2: 16.65, y2: 16.65 },
   ],
+  externalLink: [
+    { type: 'path', d: 'M15 3h6v6' },
+    { type: 'path', d: 'M10 14 21 3' },
+    { type: 'path', d: 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6' },
+  ],
+  hub: [
+    { type: 'rect', x: 9, y: 2, width: 6, height: 6, rx: 1 },
+    { type: 'rect', x: 2, y: 16, width: 6, height: 6, rx: 1 },
+    { type: 'rect', x: 16, y: 16, width: 6, height: 6, rx: 1 },
+    { type: 'line', x1: 12, y1: 8, x2: 12, y2: 12 },
+    { type: 'line', x1: 5, y1: 16, x2: 9.5, y2: 12 },
+    { type: 'line', x1: 19, y1: 16, x2: 14.5, y2: 12 },
+  ],
   system: [
     { type: 'rect', x: 2, y: 3, width: 20, height: 14, rx: 2 },
     { type: 'line', x1: 8, y1: 21, x2: 16, y2: 21 },

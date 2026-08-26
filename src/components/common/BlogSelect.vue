@@ -646,23 +646,4 @@ defineExpose({
   transform: translateY(-4px);
 }
 
-/* @media (prefers-reduced-motion: reduce) {
-  .blog-select-suffix {
-    transition: none;
-  }
-
-  .blog-select-option {
-    transition: none;
-  }
-
-  .blog-select-dropdown-enter-active,
-  .blog-select-dropdown-leave-active {
-    transition: opacity 0.1s ease;
-  }
-
-  .blog-select-dropdown-enter-from,
-  .blog-select-dropdown-leave-to {
-    transform: none;
-  }
-} */
 </style>

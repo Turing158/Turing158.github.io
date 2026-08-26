@@ -261,17 +261,4 @@ async function retryConnection() {
   }
 }
 
-// 减少动画偏好（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画）
-/* @media (prefers-reduced-motion: reduce) {
-  .pwa-offline-page {
-    &__icon,
-    &__circle {
-      animation: none;
-    }
-
-    &__spinner {
-      animation: spin 2s linear infinite;
-    }
-  }
-} */
 </style>

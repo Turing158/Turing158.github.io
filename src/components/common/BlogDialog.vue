@@ -24,6 +24,8 @@
           aria-modal="true"
           ref="dialogRef"
         >
+          <slot name="before-close" />
+
           <!-- Close button -->
           <slot v-if="showClose" name="close">
             <button class="blog-dialog-close" @click="close" aria-label="Close">

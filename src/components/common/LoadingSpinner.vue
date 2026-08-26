@@ -203,20 +203,4 @@ const variantClass = computed(() => `loading-variant--${props.variant}`)
   gap: 8px;
 }
 
-/* 无障碍减少动画（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画）
-@media (prefers-reduced-motion: reduce) {
-  .loading-dot,
-  .loading-spinner,
-  .bounce-item,
-  .loading-ring {
-    animation: none;
-  }
-
-  .loading-dot,
-  .bounce-item {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-*/
 </style>

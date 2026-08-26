@@ -188,13 +188,4 @@ function handleItemClick(item: ContextMenuItem) {
   transform: scale(0.96);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .brand-text {
-    transition: none;
-
-    &:hover {
-      transform: none;
-    }
-  }
-}
 </style>

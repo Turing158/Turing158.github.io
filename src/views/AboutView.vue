@@ -643,23 +643,6 @@ const contactLinks = computed<ContactLink[]>(() => [
   transition: all 0.25s ease;
 }
 
-// ── Reduced Motion（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画） ──
-/* @media (prefers-reduced-motion: reduce) {
-  .avatar-wrapper::before {
-    animation: none;
-  }
-
-  .skill-category,
-  .timeline-item {
-    animation: none;
-    opacity: 1;
-  }
-
-  .timeline-pulse {
-    animation: none;
-  }
-} */
-
 // ── Responsive ──
 @media (max-width: 480px) {
   .about-header {

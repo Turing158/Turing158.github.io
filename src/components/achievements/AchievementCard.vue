@@ -342,23 +342,4 @@ function formatFullTime(timestamp: number): string {
   }
 }
 
-// 尊重系统减少动态效果（与Windows系统中的"窗口内的动画控件和元素"有冲突，全部都使用动画）
-/* @media (prefers-reduced-motion: reduce) {
-  .achievement-card {
-    transition-duration: 0.01ms !important;
-
-    &:hover {
-      transform: none !important;
-    }
-  }
-  .card-shine {
-    animation: none;
-  }
-  .achievement-card.is-latest {
-    animation: none;
-  }
-  .card-icon-wrap {
-    transition-duration: 0.01ms !important;
-  }
-} */
 </style>

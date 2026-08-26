@@ -42,6 +42,22 @@
           </span>
           <span class="nav-text">{{ $t('search.trigger') }}</span>
         </button>
+        <a
+          href="https://hub.turing158.cc.cd"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="nav-link hub-link"
+          @click="isMobile && (isCollapsed = true)"
+        >
+          <span class="nav-indicator" aria-hidden="true"></span>
+          <span class="nav-icon">
+            <SidebarIcon name="hub" :size="20" />
+          </span>
+          <span class="nav-text">hub</span>
+          <span class="nav-external">
+            <SidebarIcon name="externalLink" :size="14" />
+          </span>
+        </a>
       </nav>
 
       <div class="sidebar-footer">
@@ -343,7 +359,7 @@ const navItems = computed(() => {
     { path: '/articles', icon: 'articles', labelKey: 'nav.articles', activeNames: ['articles', 'article-detail'] },
     { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
     { path: '/releases', icon: 'releases', labelKey: 'nav.releases', activeNames: ['releases', 'release-detail'] },
-    { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools'] },
+    { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools', 'tool-detail'] },
     { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
   ]
 
@@ -622,6 +638,31 @@ const toggleLang = () => {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+}
+
+// 外部链接导航项 — 复用 .nav-link 样式，重置 <a> 默认值
+.hub-link {
+  cursor: pointer;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+// 外部链接图标 — 右侧的小箭头，悬浮时增强
+.nav-external {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  margin-left: auto;
+  color: var(--text-sidebar);
+  opacity: 0.75;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, color 0.25s ease;
+}
+
+.hub-link:hover .nav-external {
+  opacity: 1;
+  color: var(--text-sidebar-active);
+  transform: translate(1px, -1px);
 }
 
 .sidebar-footer {
@@ -964,31 +1005,4 @@ const toggleLang = () => {
   }
 }
 
-// // 尊重系统「减少动态效果」设置：保留菜单图标的移入/移出/点击反馈，去掉其余大幅位移与缩放
-// @media (prefers-reduced-motion: reduce) {
-//   .avatar-wrap,
-//   .nav-text,
-//   .nav-indicator,
-//   .theme-btn,
-//   .lang-btn,
-//   .collapse-btn,
-//   .expand-btn {
-//     transition-duration: 0.01ms;
-//   }
-
-//   .avatar-wrap:hover,
-//   .nav-link:hover .nav-text,
-//   .theme-btn:hover,
-//   .theme-btn:hover :deep(svg),
-//   .theme-btn:active :deep(svg),
-//   .lang-btn:hover,
-//   .lang-btn:hover :deep(svg),
-//   .lang-btn:active :deep(svg),
-//   .collapse-btn:hover,
-//   .collapse-btn:hover :deep(svg),
-//   .collapse-btn:active :deep(svg),
-//   .expand-btn:hover {
-//     transform: none;
-//   }
-// }
 </style>

@@ -2,6 +2,7 @@
 /dist
 /.DS_Store
 *.local
+.claude/
 /src/generated
 /.playwright-mcp
 /scripts

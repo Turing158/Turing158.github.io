@@ -68,6 +68,7 @@
                 @click="open(release.assets[0].browser_download_url)"
               >
                 {{ $t('releases.download') }}
+                <ExternalLinkIcon />
               </Button>
               <Button
                 v-if="getStandalonePage(release.repo)"
@@ -99,6 +100,7 @@ import { useReleases } from '@/composables/useReleases'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
+import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 
 const router = useRouter()
 

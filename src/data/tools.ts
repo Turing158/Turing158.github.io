@@ -39,4 +39,5 @@ export const toolKeys: readonly ToolMeta[] = [
   { key: 'passwordStrength', component: 'PasswordStrengthTool', icon: '🔒' },
   { key: 'loremIpsum', component: 'LoremIpsumTool', icon: '📝' },
   { key: 'clineModels', component: 'ClineModelsTool', icon: '🤖' },
+  { key: 'githubInfo', component: 'GithubInfoTool', icon: '🐙' },
 ] as const

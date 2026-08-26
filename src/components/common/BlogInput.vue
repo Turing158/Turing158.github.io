@@ -33,6 +33,7 @@
 
     <textarea
       v-if="type === 'textarea'"
+      :id="id"
       ref="inputRef"
       :value="modelValue"
       :placeholder="placeholder"
@@ -48,6 +49,7 @@
 
     <input
       v-else
+      :id="id"
       ref="inputRef"
       :type="type"
       :value="modelValue"
@@ -94,6 +96,7 @@
 import { computed, ref, onBeforeUnmount, type CSSProperties } from 'vue'
 
 interface Props {
+  id?: string
   modelValue: string
   type?: 'text' | 'password' | 'number' | 'textarea'
   placeholder?: string

@@ -62,6 +62,7 @@ export interface ReleaseResult {
 export interface ToolResult {
   type: 'tool'
   id: string // = component
+  key: string // ToolMeta.key,用作 /tools/:id 路由参数
   component: string // ToolsView componentMap 的键,用于定位工具
   icon: string
   name: string
