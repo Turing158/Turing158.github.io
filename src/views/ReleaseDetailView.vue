@@ -205,6 +205,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
 const GITHUB_OWNER = 'Turing158'
@@ -419,6 +420,13 @@ onMounted(() => {
 
 // ── 右键菜单上下文提供者 ──
 const { t } = useI18n()
+
+// SEO：标题跟随仓库名（路由 afterEach 不再统一设置 meta）
+usePageSeo(
+  repoName,
+  computed(() => t('pageReleases.seoDescription', { repo: repoName.value })),
+  computed(() => `#/release/${repoName.value}`),
+)
 
 const unregisterContextMenu = registerContextProvider((target) => {
   // 仅在发行详情区域右键时提供

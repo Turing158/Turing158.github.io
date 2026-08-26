@@ -129,7 +129,8 @@
     "search": "Search",
     "expand": "Expand",
     "collapse": "Collapse",
-    "moreCommits": "More Commits"
+    "moreCommits": "More Commits",
+    "seoDescription": "Commit history and code changes for the {repo} repository"
   },
   "about": {
     "title": "About",
@@ -793,7 +794,8 @@
     "assets": "Assets",
     "loading": "Loading...",
     "loadFailed": "Failed to load",
-    "retry": "Retry"
+    "retry": "Retry",
+    "seoDescription": "Releases, changelogs and downloads for {repo}"
   },
   "search": {
     "trigger": "Search",

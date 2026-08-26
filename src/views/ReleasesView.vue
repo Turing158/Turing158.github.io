@@ -101,8 +101,12 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
+
+// SEO（路由 afterEach 不再统一设置 meta）
+usePageSeo('发行', '各项目的发行版本、更新日志与下载资源', '#/releases')
 
 const { loading, error, releases, fetchReleases } = useReleases()
 

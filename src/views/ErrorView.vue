@@ -97,7 +97,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Button } from 'animal-island-vue'
-import { updateDocumentTitle } from '@/router'
+import { useSeo } from '@/composables/useSeo'
 
 const router = useRouter()
 const route = useRoute()
@@ -105,8 +105,8 @@ const route = useRoute()
 // 错误信息
 const errorMessage = ref('')
 
-// 更新页面标题
-updateDocumentTitle('服务器错误')
+// SEO：错误页不应被索引（路由 afterEach 不再统一设置 meta）
+useSeo({ title: '服务器错误', url: '#/error', noIndex: true })
 
 // 从路由参数获取错误信息
 onMounted(() => {

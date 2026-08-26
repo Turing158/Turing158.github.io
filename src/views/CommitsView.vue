@@ -186,6 +186,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
 
@@ -382,6 +383,13 @@ onMounted(() => {
 
 // ── 右键菜单上下文提供者 ──
 const { t } = useI18n()
+
+// SEO：标题跟随仓库名（路由 afterEach 不再统一设置 meta）
+usePageSeo(
+  repoName,
+  computed(() => t('pageCommits.seoDescription', { repo: repoName.value })),
+  computed(() => `#/commits/${repoName.value}`),
+)
 
 const unregisterContextMenu = registerContextProvider((target) => {
   // 仅在提交记录区域右键时提供

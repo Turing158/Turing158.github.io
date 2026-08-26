@@ -89,10 +89,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue'
 import { useRouter } from 'vue-router'
-import { updateDocumentTitle } from '@/router'
+import { useSeo } from '@/composables/useSeo'
 
 const router = useRouter()
-updateDocumentTitle('页面未找到')
+
+// SEO：404 页不应被索引（路由 afterEach 不再统一设置 meta）
+useSeo({ title: '页面未找到', url: '#/not-found', noIndex: true })
 
 // ─── 路由 ────────────────────────────────────────────
 function goHome() { router.push('/') }
