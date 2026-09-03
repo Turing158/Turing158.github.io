@@ -12,6 +12,8 @@ import 'animal-island-vue/style'
 import './styles/variables.css'
 import './styles/animal-island-theme.css'
 import './styles/global.css'
+// 必须在 github-markdown-light.css / github.css 之后，用于覆盖其写死的浅色取值
+import './styles/markdown-dark.css'
 import './styles/gitalk-theme.css'
 
 const app = createApp(App)

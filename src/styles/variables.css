@@ -21,6 +21,14 @@
   --toggle-bg: #d4c9b8;
   --toggle-active: #4a7c59;
   --toggle-knob: #ffffff;
+
+  /* github-markdown-css 引用但未随样式表提供的变量，桥接到主题变量。
+     未定义时 kbd 边框、焦点轮廓等声明会整条失效。
+     danger 一组取 GitHub 亮色主题取值，暗色下在下面的 [data-theme="dark"] 覆盖。 */
+  --borderColor-muted: var(--border);
+  --borderColor-accent-emphasis: var(--accent);
+  --fgColor-danger: #d1242f;
+  --bgColor-danger-muted: color-mix(in srgb, #d1242f 12%, transparent);
 }
 
 [data-theme="ocean"] {
@@ -90,6 +98,10 @@
   --toggle-bg: #283548;
   --toggle-active: #2eaadc;
   --toggle-knob: #0c1222;
+
+  /* 亮色下的 #d1242f 压在深色代码块上只有 3.2:1，换成 GitHub 暗色主题取值 */
+  --fgColor-danger: #f85149;
+  --bgColor-danger-muted: color-mix(in srgb, #f85149 15%, transparent);
 }
 
 /* 暗色模式图片暗化 filter */
@@ -101,10 +113,9 @@
   filter: brightness(1);
 }
 
-/* 暗色模式代码块高亮适配 */
-[data-theme="dark"] .code-block-wrapper {
-  filter: brightness(0.95);
-}
+/* 暗色模式代码块高亮适配见 markdown-dark.css
+   （原先这里对 .code-block-wrapper 加 brightness(0.95)，会连语言标签和复制按钮
+   一起压暗，且 filter 创建的层叠上下文会影响内部绝对定位元素，已移除。） */
 
 /* 暗色模式滚动条 */
 [data-theme="dark"] ::-webkit-scrollbar {

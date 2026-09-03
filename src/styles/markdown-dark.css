@@ -1,0 +1,333 @@
+/**
+ * 暗色主题下的 Markdown 正文适配
+ *
+ * main.ts 只加载了 github-markdown-css 的 light 变体和 highlight.js 的
+ * github.css（light）。两者把浅色下的前景/背景色写死在样式表里，切到
+ * data-theme="dark" 之后就出现深色文字压深色背景 —— 代码块的字符串/注释、
+ * 表格的行底色与边框、引用块文字尤其明显。这里按 github-markdown-dark /
+ * github-dark 的配色把写死的取值重新映射到主题变量或暗色取值。
+ *
+ * 选择器一律写成 [data-theme="dark"] .markdown-body <上游选择器>，
+ * 比上游多一个属性选择器 + 一个类，特异性必然更高，因此不需要 !important。
+ * 不使用 :where() 收拢分组 —— 上游存在 .hljs-title.class_.inherited__（0,3,0）
+ * 和 .markdown-body .pl-s .pl-pse .pl-s1（0,4,0）这类高特异性复合选择器，
+ * :where() 不贡献特异性会被它们反超。
+ */
+
+/* ── 正文基础 ── */
+
+[data-theme="dark"] .markdown-body {
+  /* task list 复选框、内嵌滚动条等原生控件跟随暗色 */
+  color-scheme: dark;
+}
+
+[data-theme="dark"] .markdown-body a {
+  color: var(--accent);
+}
+
+[data-theme="dark"] .markdown-body a:hover {
+  color: var(--accent-hover);
+}
+
+[data-theme="dark"] .markdown-body h1,
+[data-theme="dark"] .markdown-body h2 {
+  border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] .markdown-body h6,
+[data-theme="dark"] .markdown-body blockquote,
+[data-theme="dark"] .markdown-body .footnotes {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .markdown-body .footnotes {
+  border-top-color: var(--border);
+}
+
+/* 脚注跳转高亮：上游把命中项文字写死成 #1f2328（深色），暗色下几乎全黑 */
+[data-theme="dark"] .markdown-body .footnotes li:target {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .markdown-body .footnotes li:target::before {
+  border-color: var(--accent);
+}
+
+[data-theme="dark"] .markdown-body .absent {
+  color: #f85149;
+}
+
+[data-theme="dark"] .markdown-body mark {
+  color: var(--text-primary);
+  background-color: rgba(187, 128, 9, 0.35);
+}
+
+[data-theme="dark"] .markdown-body kbd {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
+  border-color: var(--border);
+}
+
+/* ── 表格 ── */
+
+[data-theme="dark"] .markdown-body table th,
+[data-theme="dark"] .markdown-body table td {
+  border-color: var(--border);
+}
+
+/* 行底色改为透明 + 半透明叠加：同一套值在文章正文和评论卡片上都成立 */
+[data-theme="dark"] .markdown-body table tr {
+  background-color: transparent;
+  border-top-color: var(--border);
+}
+
+[data-theme="dark"] .markdown-body table tr:nth-child(2n) {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .markdown-body table thead tr,
+[data-theme="dark"] .markdown-body table thead tr:nth-child(2n) {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+/* ── 代码块容器 ── */
+
+/* 背景由 global.css 的 var(--code-bg) 负责，这里只修正被写死的前景色 */
+[data-theme="dark"] .markdown-body pre,
+[data-theme="dark"] .markdown-body .highlight pre {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .markdown-body .hljs {
+  color: var(--text-primary);
+  background: var(--code-bg);
+}
+
+/* 复制按钮：global.css 给的 --bg-card 在暗色下与 --code-bg 几乎同色，按钮会“隐形” */
+[data-theme="dark"] .markdown-body .code-copy-btn {
+  color: var(--text-primary);
+  background: var(--bg-card-hover);
+  border-color: var(--border-strong);
+}
+
+/* ── highlight.js token 配色 ──
+   取自 highlight.js/styles/github-dark.css，在暗色下整体替换 github.css。 */
+
+[data-theme="dark"] .markdown-body .hljs-doctag,
+[data-theme="dark"] .markdown-body .hljs-keyword,
+[data-theme="dark"] .markdown-body .hljs-meta .hljs-keyword,
+[data-theme="dark"] .markdown-body .hljs-template-tag,
+[data-theme="dark"] .markdown-body .hljs-template-variable,
+[data-theme="dark"] .markdown-body .hljs-type,
+[data-theme="dark"] .markdown-body .hljs-variable.language_ {
+  color: #ff7b72;
+}
+
+[data-theme="dark"] .markdown-body .hljs-title,
+[data-theme="dark"] .markdown-body .hljs-title.class_,
+[data-theme="dark"] .markdown-body .hljs-title.class_.inherited__,
+[data-theme="dark"] .markdown-body .hljs-title.function_ {
+  color: #d2a8ff;
+}
+
+[data-theme="dark"] .markdown-body .hljs-attr,
+[data-theme="dark"] .markdown-body .hljs-attribute,
+[data-theme="dark"] .markdown-body .hljs-literal,
+[data-theme="dark"] .markdown-body .hljs-meta,
+[data-theme="dark"] .markdown-body .hljs-number,
+[data-theme="dark"] .markdown-body .hljs-operator,
+[data-theme="dark"] .markdown-body .hljs-variable,
+[data-theme="dark"] .markdown-body .hljs-selector-attr,
+[data-theme="dark"] .markdown-body .hljs-selector-class,
+[data-theme="dark"] .markdown-body .hljs-selector-id {
+  color: #79c0ff;
+}
+
+[data-theme="dark"] .markdown-body .hljs-regexp,
+[data-theme="dark"] .markdown-body .hljs-string,
+[data-theme="dark"] .markdown-body .hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+
+[data-theme="dark"] .markdown-body .hljs-built_in,
+[data-theme="dark"] .markdown-body .hljs-symbol {
+  color: #ffa657;
+}
+
+[data-theme="dark"] .markdown-body .hljs-comment,
+[data-theme="dark"] .markdown-body .hljs-code,
+[data-theme="dark"] .markdown-body .hljs-formula {
+  color: #8b949e;
+}
+
+[data-theme="dark"] .markdown-body .hljs-name,
+[data-theme="dark"] .markdown-body .hljs-quote,
+[data-theme="dark"] .markdown-body .hljs-selector-tag,
+[data-theme="dark"] .markdown-body .hljs-selector-pseudo {
+  color: #7ee787;
+}
+
+[data-theme="dark"] .markdown-body .hljs-subst,
+[data-theme="dark"] .markdown-body .hljs-emphasis,
+[data-theme="dark"] .markdown-body .hljs-strong {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .markdown-body .hljs-section {
+  color: #58a6ff;
+}
+
+[data-theme="dark"] .markdown-body .hljs-bullet {
+  color: #f2cc60;
+}
+
+[data-theme="dark"] .markdown-body .hljs-addition {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+
+[data-theme="dark"] .markdown-body .hljs-deletion {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+
+/* ── GitHub Alert（> [!NOTE] / [!TIP] 等） ── */
+
+[data-theme="dark"] .markdown-body .markdown-alert {
+  border-left-color: var(--border-strong);
+}
+
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-note {
+  border-left-color: #1f6feb;
+}
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: #4493f8;
+}
+
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-important {
+  border-left-color: #8957e5;
+}
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: #ab7df8;
+}
+
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-warning {
+  border-left-color: #9e6a03;
+}
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: #d29922;
+}
+
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-tip {
+  border-left-color: #238636;
+}
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: #3fb950;
+}
+
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-caution {
+  border-left-color: #da3633;
+}
+[data-theme="dark"] .markdown-body .markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: #f85149;
+}
+
+/* ── GitHub 服务端高亮 token（pl-*） ──
+   gitalk 评论渲染的是 GitHub API 返回的 bodyHTML，代码高亮用 pl-* 而非 hljs-*。
+   取值来自 github-markdown-dark.css。 */
+
+[data-theme="dark"] .markdown-body .pl-c,
+[data-theme="dark"] .markdown-body .pl-ba {
+  color: #9198a1;
+}
+
+[data-theme="dark"] .markdown-body .pl-c1,
+[data-theme="dark"] .markdown-body .pl-s .pl-v {
+  color: #79c0ff;
+}
+
+[data-theme="dark"] .markdown-body .pl-e,
+[data-theme="dark"] .markdown-body .pl-en,
+[data-theme="dark"] .markdown-body .pl-mdr {
+  color: #d2a8ff;
+}
+
+[data-theme="dark"] .markdown-body .pl-smi,
+[data-theme="dark"] .markdown-body .pl-s .pl-s1,
+[data-theme="dark"] .markdown-body .pl-mi,
+[data-theme="dark"] .markdown-body .pl-mb {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .markdown-body .pl-ent {
+  color: #7ee787;
+}
+
+[data-theme="dark"] .markdown-body .pl-k {
+  color: #ff7b72;
+}
+
+[data-theme="dark"] .markdown-body .pl-s,
+[data-theme="dark"] .markdown-body .pl-pds,
+[data-theme="dark"] .markdown-body .pl-s .pl-pse .pl-s1,
+[data-theme="dark"] .markdown-body .pl-sr,
+[data-theme="dark"] .markdown-body .pl-sr .pl-sre,
+[data-theme="dark"] .markdown-body .pl-sr .pl-sra,
+[data-theme="dark"] .markdown-body .pl-corl {
+  color: #a5d6ff;
+}
+
+[data-theme="dark"] .markdown-body .pl-v,
+[data-theme="dark"] .markdown-body .pl-smw {
+  color: #ffa657;
+}
+
+[data-theme="dark"] .markdown-body .pl-bu {
+  color: #f85149;
+}
+
+[data-theme="dark"] .markdown-body .pl-sr .pl-cce {
+  color: #7ee787;
+}
+
+[data-theme="dark"] .markdown-body .pl-ml {
+  color: #f2cc60;
+}
+
+[data-theme="dark"] .markdown-body .pl-mh,
+[data-theme="dark"] .markdown-body .pl-mh .pl-en,
+[data-theme="dark"] .markdown-body .pl-ms {
+  color: #58a6ff;
+}
+
+[data-theme="dark"] .markdown-body .pl-md {
+  color: #ffdcd7;
+  background-color: #67060c;
+}
+
+[data-theme="dark"] .markdown-body .pl-mi1 {
+  color: #aff5b4;
+  background-color: #033a16;
+}
+
+[data-theme="dark"] .markdown-body .pl-mc {
+  color: #ffdfb6;
+  background-color: #5a1e02;
+}
+
+[data-theme="dark"] .markdown-body .pl-mi2 {
+  color: var(--text-primary);
+  background-color: #1158c7;
+}
+
+[data-theme="dark"] .markdown-body .pl-c2 {
+  color: var(--text-primary);
+  background-color: #b62324;
+}
+
+/* markup.ignored / markup.untracked。github-markdown-dark 给的 #3d444d 压在
+   代码块底色上只有 1.7:1，几乎看不见；这里取一个仍明显弱于注释（#8b949e）
+   但过 AA 4.5:1 的灰。 */
+[data-theme="dark"] .markdown-body .pl-sg {
+  color: #7d8590;
+}
