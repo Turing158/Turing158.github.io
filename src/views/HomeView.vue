@@ -299,16 +299,16 @@ import { useAchievements } from '@/composables/useAchievements'
 import { useTypewriter } from '@/composables/useTypewriter'
 import '@/styles/gitalk-theme.css'
 
-// SEO
-usePageSeo(
-  computed(() => config.blog.title),
-  'Turing_ICE 的个人博客，分享技术文章、开发工具和学习笔记',
-  '#/'
-)
-
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
 const store = useAppStore()
 const { t, locale } = useI18n()
+
+// SEO
+usePageSeo(
+  computed(() => config.blog.title),
+  computed(() => t('seo.home')),
+  '#/',
+)
 
 // Gramophone (Gitalk Comments)
 const { init: initGitalk } = useGitalk('gitalk-container-home', 'home-comments', '留声机评论')

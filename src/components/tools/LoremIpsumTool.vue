@@ -22,10 +22,11 @@
     <label class="tool-label">{{ $t('tools.loremIpsum.amountLabel') }}</label>
     <div class="li-amount">
       <BlogInput
-        v-model.number="amount"
+        v-model="amountStr"
         type="number"
-        min="1"
-        max="100"
+        :min="1"
+        :max="100"
+        :step="1"
         class="li-amount-input"
       />
       <span class="li-amount-unit">{{ activeMode === 'paragraphs' ? $t('tools.loremIpsum.paragraphs') : activeMode === 'sentences' ? $t('tools.loremIpsum.sentences') : $t('tools.loremIpsum.words') }}</span>
@@ -84,7 +85,7 @@ const languages = reactive([
 
 const activeMode = ref<Mode>('paragraphs')
 const activeLanguage = ref<Language>('latin')
-const amount = ref(3)
+const amountStr = ref<string>('3')
 const output = ref('')
 
 // ─── 语料库 ────────────────────────────────────────
@@ -214,8 +215,8 @@ function getSentenceFn(): SentenceFn {
 }
 
 function generate() {
-  const n = Math.max(1, Math.min(100, amount.value || 1))
-  amount.value = n
+  const n = Math.max(1, Math.min(100, Math.floor(Number(amountStr.value)) || 1))
+  amountStr.value = String(n)
   const fn = getSentenceFn()
 
   switch (activeMode.value) {

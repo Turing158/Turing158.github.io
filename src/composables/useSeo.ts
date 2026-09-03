@@ -7,7 +7,7 @@ export interface SeoOptions {
   title?: MaybeRef<string>
   description?: MaybeRef<string>
   keywords?: MaybeRef<string[] | string>
-  image?: MaybeRef<string>
+  image?: MaybeRef<string | undefined>
   url?: MaybeRef<string>
   type?: MaybeRef<string>
   author?: MaybeRef<string>

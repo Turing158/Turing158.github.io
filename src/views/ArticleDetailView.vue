@@ -92,7 +92,6 @@ import Gitalk from 'gitalk'
 import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 import { config } from '@/config'
-import { updateDocumentTitle } from '@/router'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import BlogTip from '@/plugins/blog-tip'
@@ -189,10 +188,7 @@ async function ensureArticleHtml() {
 async function loadArticle() {
   await fetchArticles()
 
-  // 文章标题加载完成后更新浏览器标题
-  if (article.value?.title) {
-    updateDocumentTitle(article.value.title)
-  }
+  // 标题由 useArticleSeo 响应 article 变化自动更新
 
   // useViewCount 内部 onMounted 已自动调用递增
 

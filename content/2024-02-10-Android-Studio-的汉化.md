@@ -13,7 +13,7 @@ tags:
 
 有没有觉得现在的**Android Studio与IntelliJ IDEA**一模一样，没错
 
-![image-20240221230530840](https://www.z4a.net/images/2024/02/22/image-20240221230530840.png)
+![image-20240221230530840](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946729967_image-20240221230530840.webp)
 
 所以，它的插件**几乎**都与**IDEA**的插件相兼容，但是，因为有些插件，需要与Android Studio版本相兼容，才能安装并使用
 
@@ -23,31 +23,31 @@ tags:
 
 1. 点击左下角的**小齿轮**，再点击**about**
 
-   ![image-20240221231055478](https://www.z4a.net/images/2024/02/22/image-20240221231055478.png)
+   ![image-20240221231055478](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946727804_image-20240221231055478.webp)
 
 2. 找到第二行**AI-**后面的三个数字，记住这个数字，之后会考
 
-   ![image-20240221231233535](https://www.z4a.net/images/2024/02/22/image-20240221231233535.png)
+   ![image-20240221231233535](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946726239_image-20240221231233535.webp)
 
 3. 前往[JetBrains Marketplace](https://plugins.jetbrains.com/)直接搜索插件，如果你网好，会标出下面的选项，点击**第一个**就是，如果不好，直接搜索
 
-   ![image-20240221231502946](https://www.z4a.net/images/2024/02/22/image-20240221231502946.png)
+   ![image-20240221231502946](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946732887_image-20240221231502946.webp)
 
 4. 搜索之后选择第二个，**中文语言包**
 
-   ![image-20240221231611013](https://www.z4a.net/images/2024/02/22/image-20240221231611013.png)
+   ![image-20240221231611013](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946728378_image-20240221231611013.webp)
 
 5. 点进去之后，点第二个，查看**所有的插件版本**
 
-   ![image-20240221231812214](https://www.z4a.net/images/2024/02/22/image-20240221231812214.png)
+   ![image-20240221231812214](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946731742_image-20240221231812214.webp)
 
 6. 找到版本号**前面三个数字**与**第二步的数字**一样的版本号，比如**231.283**，点击右边的**Download**下载
 
-   ![image-20240221232046464](https://www.z4a.net/images/2024/02/22/image-20240221232046464.png)
+   ![image-20240221232046464](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946736988_image-20240221232046464.webp)
 
 7. 下载好之后，在**Android Studio**的首页，点击**Plugins-右上角小齿轮-Install Plugin from Disk...**，然后找到**下载**的**压缩包**，点击它，然后点最下面的**ok**
 
-   ![image-20240221232327176](https://www.z4a.net/images/2024/02/22/image-20240221232324716.png)
+   ![image-20240221232327176](https://pic.turing158.de5.net/file/Android-Studio-Chinese/1787946729978_image-20240221232324716.webp)
 
 8. 最后，**重启Android Studio**就你看到**中文版的Android Studio**
 

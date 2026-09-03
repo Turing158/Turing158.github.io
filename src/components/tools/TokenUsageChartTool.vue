@@ -907,10 +907,10 @@
     <template #footer>
       <div class="dialog-actions">
         <Button size="small" @click="showStyleDialog = false">
-          {{ $t('tools.tokenUsageChart.cancel') }}
+          {{ $t('common.cancel') }}
         </Button>
         <Button type="primary" size="small" @click="applyStyle">
-          {{ $t('tools.tokenUsageChart.confirm') }}
+          {{ $t('common.confirm') }}
         </Button>
       </div>
     </template>

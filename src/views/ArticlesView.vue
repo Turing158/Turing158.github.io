@@ -156,15 +156,20 @@ import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useGitalkCounts } from '@/composables/useGitalkCount'
 import { useViewCounts } from '@/composables/useViewCount'
-import { formatReadingTime } from '@/composables/useReadingTime'
 import { formatViewCount } from '@/utils/formatViewCount'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import BlogSelect from '@/components/common/BlogSelect.vue'
 
+const { t } = useI18n()
+
 // SEO
-usePageSeo('文章', '查看所有技术文章和教程', '#/articles')
+usePageSeo(
+  computed(() => t('pageTitle.articles')),
+  computed(() => t('seo.articles')),
+  '#/articles',
+)
 
 const { fetchArticles, loading } = useArticles()
 const store = useAppStore()
@@ -263,7 +268,6 @@ onMounted(async () => {
 })
 
 // ── 右键菜单上下文提供者 ──
-const { t } = useI18n()
 const router = useRouter()
 
 const unregisterContextMenu = registerContextProvider((target) => {

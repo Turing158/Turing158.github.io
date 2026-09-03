@@ -50,7 +50,7 @@
           </button>
           <router-link to="/" class="pixel-nav-link pixel-back-btn">
             <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg>
-            <span>{{ t('sfmcJar.goToBlog') }}</span>
+            <span>{{ t('sfmcJar.back') }}</span>
           </router-link>
         </nav>
       </div>
@@ -117,7 +117,7 @@
           <svg class="header-deco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"/></svg>
         </div>
         <div class="features-grid">
-          <div v-for="(f, idx) in features" :key="f.key" class="feature-card">
+          <div v-for="f in features" :key="f.key" class="feature-card">
             <div class="feature-icon-box" :style="{ background: f.color }">
               <div v-html="f.icon" class="feature-svg"></div>
             </div>

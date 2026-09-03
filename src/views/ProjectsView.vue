@@ -75,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onBeforeUnmount, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, nextTick, onBeforeUnmount, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
@@ -86,8 +86,14 @@ import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 
+const { t } = useI18n()
+
 // SEO
-usePageSeo('项目', '开发中的项目、已完成项目和教程', '#/projects')
+usePageSeo(
+  computed(() => t('pageTitle.projects')),
+  computed(() => t('seo.projects')),
+  '#/projects',
+)
 
 const router = useRouter()
 const categories = ref(projectCategories)
@@ -168,7 +174,6 @@ function openGitee() {
 }
 
 // ── 右键菜单上下文提供者 ──
-const { t } = useI18n()
 
 const unregisterContextMenu = registerContextProvider((target) => {
   // 仅在项目卡片上右键时提供

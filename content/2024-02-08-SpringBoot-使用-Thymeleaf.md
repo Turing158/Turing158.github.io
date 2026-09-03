@@ -98,7 +98,7 @@ tags:
 
 推荐搭配[**demo**](#demo)使用。*代码里的class标签都不需要理，样式而已，下面的代码一般第一个div用来显示，第二个div用来操作*
 
-![image-20240207031937219](https://www.z4a.net/images/2024/02/22/image-20240207031937219.png)
+![image-20240207031937219](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947217565_image-20240207031937219.webp)
 
 ### th:id
 
@@ -137,7 +137,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207031959922](https://www.z4a.net/images/2024/02/22/image-20240207031959922.png)
+   ![image-20240207031959922](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947218786_image-20240207031959922.webp)
 
 ### th:if | th:unless
 
@@ -181,7 +181,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032023404](https://www.z4a.net/images/2024/02/22/image-20240207032023404.png)
+   ![image-20240207032023404](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947225023_image-20240207032023404.webp)
 
 ### th:text | th:utext
 
@@ -220,7 +220,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032050544](https://www.z4a.net/images/2024/02/22/image-20240207032050544.png)
+   ![image-20240207032050544](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947229627_image-20240207032050544.webp)
 
 ### th:each
 
@@ -304,7 +304,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032110649](https://www.z4a.net/images/2024/02/22/image-20240207032110649.png)
+   ![image-20240207032110649](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947227116_image-20240207032110649.webp)
 
 ### th:value
 
@@ -346,7 +346,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032133650](https://www.z4a.net/images/2024/02/22/image-20240207032133650.png)
+   ![image-20240207032133650](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947223153_image-20240207032133650.webp)
 
 ### th:style
 
@@ -398,7 +398,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032213570](https://www.z4a.net/images/2024/02/22/image-20240207032213570.png)
+   ![image-20240207032213570](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947225829_image-20240207032213570.webp)
 
 ### th:onclick | th:href
 
@@ -452,7 +452,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032243151](https://www.z4a.net/images/2024/02/22/image-20240207032243151.png)
+   ![image-20240207032243151](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947230597_image-20240207032243151.webp)
 
 ### th:switch | th:case
 
@@ -499,7 +499,7 @@ tags:
 
 3. 通过启动**demo**的**springboot**启动类启动查看效果
 
-   ![image-20240207032306079](https://www.z4a.net/images/2024/02/22/image-20240207032306079.png)
+   ![image-20240207032306079](https://pic.turing158.de5.net/file/SpringBoot-Thymeleaf/1787947222792_image-20240207032306079.webp)
 
 # Thyemeleaf的全局对象
 

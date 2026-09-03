@@ -54,14 +54,21 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAchievements } from '@/composables/useAchievements'
 import { usePageSeo } from '@/composables/useSeo'
 import AchievementCard from '@/components/achievements/AchievementCard.vue'
 import AchievementProgress from '@/components/achievements/AchievementProgress.vue'
 import type { AchievementCategory } from '@/data/achievements'
 
+const { t } = useI18n()
+
 // SEO
-usePageSeo('成就', '成就/徽章系统 — 探索所有隐藏成就', '#/achievements')
+usePageSeo(
+  computed(() => t('pageTitle.achievements')),
+  computed(() => t('seo.achievements')),
+  '#/achievements',
+)
 
 const {
   getByCategory,

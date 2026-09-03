@@ -194,7 +194,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
@@ -264,7 +264,7 @@ function slugify(text: string): string {
 }
 
 // 给标题加上 id，使锚点链接可定位
-md.renderer.rules.heading_open = function (tokens, idx, options, env, self) {
+md.renderer.rules.heading_open = function (tokens, idx, options, _env, self) {
   const inline = tokens[idx + 1]
   if (inline && inline.type === 'inline') {
     tokens[idx].attrSet('id', slugify(inline.content))
@@ -421,7 +421,7 @@ onMounted(() => {
 // ── 右键菜单上下文提供者 ──
 const { t } = useI18n()
 
-// SEO：标题跟随仓库名（路由 afterEach 不再统一设置 meta）
+// SEO：标题跟随仓库名
 usePageSeo(
   repoName,
   computed(() => t('pageReleases.seoDescription', { repo: repoName.value })),

@@ -105,8 +105,14 @@ import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
 
-// SEO（路由 afterEach 不再统一设置 meta）
-usePageSeo('发行', '各项目的发行版本、更新日志与下载资源', '#/releases')
+const { t } = useI18n()
+
+// SEO
+usePageSeo(
+  computed(() => t('pageTitle.releases')),
+  computed(() => t('seo.releases')),
+  '#/releases',
+)
 
 const { loading, error, releases, fetchReleases } = useReleases()
 
@@ -141,7 +147,6 @@ onMounted(() => {
 })
 
 // ── 右键菜单上下文提供者 ──
-const { t } = useI18n()
 const GITHUB_OWNER = 'Turing158'
 
 const unregisterContextMenu = registerContextProvider((target) => {

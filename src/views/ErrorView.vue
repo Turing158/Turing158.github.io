@@ -94,19 +94,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { Button } from 'animal-island-vue'
 import { useSeo } from '@/composables/useSeo'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 
 // 错误信息
 const errorMessage = ref('')
 
-// SEO：错误页不应被索引（路由 afterEach 不再统一设置 meta）
-useSeo({ title: '服务器错误', url: '#/error', noIndex: true })
+// SEO：错误页不应被索引
+useSeo({
+  title: computed(() => t('pageTitle.error')),
+  url: '#/error',
+  noIndex: true,
+})
 
 // 从路由参数获取错误信息
 onMounted(() => {

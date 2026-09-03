@@ -9,6 +9,8 @@ export function useTypewriter(
   text: string,
   typeSpeed = 120,
   deleteSpeed = 60,
+  pauseBeforeDelete = 2000,
+  pauseBeforeType = 800,
 ) {
   const displayedText = ref('')
   const isTyping = ref(false)
@@ -21,10 +23,6 @@ export function useTypewriter(
   let phase: 'typing' | 'pausing-after-type' | 'deleting' | 'pausing-after-delete' = 'typing'
   let lastTimestamp = 0
   let accumulatedTime = 0
-
-  // 暂停时长（打字完成后 / 删除完成后）
-  const pauseBeforeDelete = 2000
-  const pauseBeforeType = 800
 
   function clearTimer() {
     if (timer) {

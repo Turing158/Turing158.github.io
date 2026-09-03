@@ -1,7 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-import { config } from '@/config'
-import i18n from '@/i18n'
 import { useAchievements } from '@/composables/useAchievements'
 
 const routes: RouteRecordRaw[] = [
@@ -135,40 +133,11 @@ export function registerProgress(listener: { onStart: () => void; onDone: () => 
   progressListeners.push(listener)
 }
 
-router.beforeEach((to) => {
-  const titleKey = to.meta.titleKey as string | undefined
-  let pageTitle = titleKey ? i18n.global.t(titleKey) : ''
-
-  // 提交记录页：动态替换为仓库名
-  if (to.name === 'commits' && to.params.repo) {
-    pageTitle = to.params.repo as string
-  }
-
-  // 发行详情页：动态替换为仓库名
-  if (to.name === 'release-detail' && to.params.repo) {
-    pageTitle = to.params.repo as string
-  }
-
-  const { titleTemplate, title: blogTitle } = config.blog
-  // 独立页面不套用博客标题模板，直接使用完整产品名
-  if (to.meta.layout === 'standalone') {
-    document.title = pageTitle
-    progressListeners.forEach(l => l.onStart())
-    return
-  }
-  document.title = titleTemplate
-    .replace('{current_page}', pageTitle)
-    .replace('{blog_title}', blogTitle)
+router.beforeEach(() => {
+  // 页面标题 / meta 由各视图的 useSeo / usePageSeo 设置（响应语言与异步数据）。
+  // 独立页面自行调用 useHead，这里只负责进度条。
   progressListeners.forEach(l => l.onStart())
 })
-
-// 供组件在获取到异步数据后更新标题
-export function updateDocumentTitle(pageTitle: string) {
-  const { titleTemplate, title: blogTitle } = config.blog
-  document.title = titleTemplate
-    .replace('{current_page}', pageTitle)
-    .replace('{blog_title}', blogTitle)
-}
 
 router.afterEach((to) => {
   progressListeners.forEach(l => l.onDone())

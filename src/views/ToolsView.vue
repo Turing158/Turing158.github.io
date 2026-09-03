@@ -160,9 +160,6 @@ const SeparatorEditorDialog = defineAsyncComponent(
   () => import('@/components/tools/SeparatorEditorDialog.vue')
 )
 
-// SEO
-usePageSeo('工具', '开发者工具集：JSON格式化、Base64编解码、正则测试、颜色转换等', '#/tools')
-
 interface Tool {
   name: string
   icon: string
@@ -172,6 +169,13 @@ interface Tool {
 }
 
 const { t, tm } = useI18n()
+
+// SEO
+usePageSeo(
+  computed(() => t('pageTitle.tools')),
+  computed(() => t('seo.tools')),
+  '#/tools',
+)
 
 // 组件映射：字符串名 → 异步组件（按需加载，避免 Tools 页全量同步导入）
 const componentMap: Record<string, Component> = {

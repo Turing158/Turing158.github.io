@@ -384,7 +384,7 @@ onMounted(() => {
 // ── 右键菜单上下文提供者 ──
 const { t } = useI18n()
 
-// SEO：标题跟随仓库名（路由 afterEach 不再统一设置 meta）
+// SEO：标题跟随仓库名
 usePageSeo(
   repoName,
   computed(() => t('pageCommits.seoDescription', { repo: repoName.value })),

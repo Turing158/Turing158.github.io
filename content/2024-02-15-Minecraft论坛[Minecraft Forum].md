@@ -105,17 +105,17 @@ As a member of the Spring family bucket, it can perfectly adapt to the **SpringB
 
 The layout is top, middle, and bottom. The top is a wheel chart and bulletin, the middle is a navigation bar, and the bottom is a content display
 
-![image-20240504134729695](https://www.z4a.net/images/2024/05/04/image-20240504134729695.png)
+![image-20240504134729695](https://pic.turing158.de5.net/file/StarFall-Forum/1787947350082_image-20240504134729695.webp)
 
 ### Login \ Register \ Forgot password
 
 Operations involving private data require dynamic image verification codes to prevent brute force cracking of user information
 
-![image-20240504134922744](https://www.z4a.net/images/2024/05/04/image-20240504134922744.png)
+![image-20240504134922744](https://pic.turing158.de5.net/file/StarFall-Forum/1787947361358_image-20240504134922744.webp)
 
-![image-20240504135330654](https://www.z4a.net/images/2024/05/04/image-20240504135330654.png)
+![image-20240504135330654](https://pic.turing158.de5.net/file/StarFall-Forum/1787947349786_image-20240504135330654.webp)
 
-![image-20240504135345693](https://www.z4a.net/images/2024/05/04/image-20240504135345693.png)
+![image-20240504135345693](https://pic.turing158.de5.net/file/StarFall-Forum/1787947352747_image-20240504135345693.webp)
 
 ### Topic
 
@@ -123,31 +123,31 @@ Theme page is not logged in users can also access, in order to let users browse 
 
 Click on the topic's title to take you to the details page
 
-![image-20240504135719600](https://www.z4a.net/images/2024/05/04/image-20240504135719600.png)
+![image-20240504135719600](https://pic.turing158.de5.net/file/StarFall-Forum/1787947353305_image-20240504135719600.webp)
 
 ### Topic detail page
 
 Click the avatar in the right column to jump to the user's detailed page, and you can like and step on it after logging in under the title
 
-![image-20240504140133716](https://www.z4a.net/images/2024/05/04/image-20240504140133716.png)
+![image-20240504140133716](https://pic.turing158.de5.net/file/StarFall-Forum/1787947353016_image-20240504140133716.webp)
 
 ### Topic comment
 
 Users can comment on topics after logging in
 
-![image-20240504140325580](https://www.z4a.net/images/2024/05/04/image-20240504140325580.png)
+![image-20240504140325580](https://pic.turing158.de5.net/file/StarFall-Forum/1787947344060_image-20240504140325580.webp)
 
 ### After login page
 
 The navigation bar has more check-in options. If you are an administrator, more management options will appear
 
-![image-20240504135948864](https://www.z4a.net/images/2024/05/04/image-20240504135948864.png)
+![image-20240504135948864](https://pic.turing158.de5.net/file/StarFall-Forum/1787947351403_image-20240504135948864.webp)
 
 ### Personal homepage
 
 You can see your personal information, as well as published topics, and published topics can be edited and deleted
 
-![image-20240504140513608](https://www.z4a.net/images/2024/05/04/image-20240504140513608.png)
+![image-20240504140513608](https://pic.turing158.de5.net/file/StarFall-Forum/1787947339076_image-20240504140513608.webp)
 
 ### Personal Settings
 
@@ -155,61 +155,61 @@ You can see your personal information, as well as published topics, and publishe
 
 You can make changes to your personal information, including your avatar
 
-![image-20240504140645294](https://www.z4a.net/images/2024/05/04/image-20240504140645294.png)
+![image-20240504140645294](https://pic.turing158.de5.net/file/StarFall-Forum/1787947343346_image-20240504140645294.webp)
 
 #### Modify profile avatar
 
 Avatar changes can be clipped and uploaded with VueCropper support
 
-![image-20240504140736212](https://www.z4a.net/images/2024/05/04/image-20240504140736212.png)
+![image-20240504140736212](https://pic.turing158.de5.net/file/StarFall-Forum/1787947339631_image-20240504140736212.webp)
 
 #### Change password
 
-![image-20240504140818609](https://www.z4a.net/images/2024/05/04/image-20240504140818609.png)
+![image-20240504140818609](https://pic.turing158.de5.net/file/StarFall-Forum/1787947346880_image-20240504140818609.webp)
 
 #### Modify email
 
-![image-20240504140829071](https://www.z4a.net/images/2024/05/04/image-20240504140829071.png)
+![image-20240504140829071](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342328_image-20240504140829071.webp)
 
 ### Others page
 
 When browsing the home page of others, you can see the topics posted by others, but you cannot edit or delete them
 
-![image-20240504140901162](https://www.z4a.net/images/2024/05/04/image-20240504140901162.png)
+![image-20240504140901162](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342803_image-20240504140901162.webp)
 
 ### Sign-in
 
 Check in every day to gain experience, check in for more days in a row, get more rewards, and see where you rank in the check-in leaderboard
 
-![image-20240504140959229](https://www.z4a.net/images/2024/05/04/image-20240504140959229.png)
+![image-20240504140959229](https://pic.turing158.de5.net/file/StarFall-Forum/1787947343684_image-20240504140959229.webp)
 
 Provide a variety of moods, so that you can record your mood and what you want to say every day
 
-![image-20240504141118695](https://www.z4a.net/images/2024/05/04/image-20240504141118695.png)
+![image-20240504141118695](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348882_image-20240504141118695.webp)
 
 ### Navigation bar avatar
 
 把鼠标移到导航栏的头像处，可以看到三个选项，设置、消息和退出
 
-![image-20240504141228691](https://www.z4a.net/images/2024/05/04/image-20240504141228691.png)
+![image-20240504141228691](https://pic.turing158.de5.net/file/StarFall-Forum/1787947354861_image-20240504141228691.webp)
 
 ### Communication message
 
 Through **WebSocket**, the forum has a complete chat system, you can chat with each player after adding friends
 
-![image-20240504141333614](https://www.z4a.net/images/2024/05/04/image-20240504141333614.png)
+![image-20240504141333614](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348097_image-20240504141333614.webp)
 
 ### Search system
 
 Players can search for topics through the search system, which can filter search categories, comprehensive, that is, search all categories
 
-![image-20240504141620704](https://www.z4a.net/images/2024/05/04/image-20240504141620704.png)
+![image-20240504141620704](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348825_image-20240504141620704.webp)
 
 ### Management system
 
 The management system can modify the information of each database, including public, theme, comment, user, etc., but also switch the black and white theme, and modify the page is very simple
 
-![image-20240504143832317](https://www.z4a.net/images/2024/05/04/image-20240504143832317.png)
+![image-20240504143832317](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342783_image-20240504143832317.webp)
 
 
 
@@ -289,17 +289,17 @@ _tips:启动Springboot后记得开启Redis服务，否则会报错！_
 
 布局为上中下，上为轮播图和公告，中为导航栏，下为内容展示
 
-![image-20240504134729695](https://www.z4a.net/images/2024/05/04/image-20240504134729695.png)
+![image-20240504134729695](https://pic.turing158.de5.net/file/StarFall-Forum/1787947350082_image-20240504134729695.webp)
 
 ### 登录\注册\忘记密码
 
 涉及到隐私数据的操作都需要输入动态图片验证码，以防暴力破解用户信息
 
-![image-20240504134922744](https://www.z4a.net/images/2024/05/04/image-20240504134922744.png)
+![image-20240504134922744](https://pic.turing158.de5.net/file/StarFall-Forum/1787947361358_image-20240504134922744.webp)
 
-![image-20240504135330654](https://www.z4a.net/images/2024/05/04/image-20240504135330654.png)
+![image-20240504135330654](https://pic.turing158.de5.net/file/StarFall-Forum/1787947349786_image-20240504135330654.webp)
 
-![image-20240504135345693](https://www.z4a.net/images/2024/05/04/image-20240504135345693.png)
+![image-20240504135345693](https://pic.turing158.de5.net/file/StarFall-Forum/1787947352747_image-20240504135345693.webp)
 
 ### 主题
 
@@ -307,31 +307,31 @@ _tips:启动Springboot后记得开启Redis服务，否则会报错！_
 
 点击主题的标题即可跳转至详细页面
 
-![image-20240504135719600](https://www.z4a.net/images/2024/05/04/image-20240504135719600.png)
+![image-20240504135719600](https://pic.turing158.de5.net/file/StarFall-Forum/1787947353305_image-20240504135719600.webp)
 
 ### 主题详细页面
 
 点击右边栏的头像即可跳转用户详细页面，大标题下面登录后可进行赞和踩
 
-![image-20240504140133716](https://www.z4a.net/images/2024/05/04/image-20240504140133716.png)
+![image-20240504140133716](https://pic.turing158.de5.net/file/StarFall-Forum/1787947353016_image-20240504140133716.webp)
 
 ### 主题评论
 
 用户登录后可对主题进行评论
 
-![image-20240504140325580](https://www.z4a.net/images/2024/05/04/image-20240504140325580.png)
+![image-20240504140325580](https://pic.turing158.de5.net/file/StarFall-Forum/1787947344060_image-20240504140325580.webp)
 
 ### 登录之后页面
 
 导航栏多出签到选项，如果为管理员，会再多出现管理选项
 
-![image-20240504135948864](https://www.z4a.net/images/2024/05/04/image-20240504135948864.png)
+![image-20240504135948864](https://pic.turing158.de5.net/file/StarFall-Forum/1787947351403_image-20240504135948864.webp)
 
 ### 个人主页
 
 可以看到自己的个人信息，以及发表的主题，已发表的主题可进行编辑和删除
 
-![image-20240504140513608](https://www.z4a.net/images/2024/05/04/image-20240504140513608.png)
+![image-20240504140513608](https://pic.turing158.de5.net/file/StarFall-Forum/1787947339076_image-20240504140513608.webp)
 
 ### 个人设置
 
@@ -339,58 +339,58 @@ _tips:启动Springboot后记得开启Redis服务，否则会报错！_
 
 可对自己的个人信息进行修改，包括头像
 
-![image-20240504140645294](https://www.z4a.net/images/2024/05/04/image-20240504140645294.png)
+![image-20240504140645294](https://pic.turing158.de5.net/file/StarFall-Forum/1787947343346_image-20240504140645294.webp)
 
 #### 修改头像
 
 头像的更改通过VueCropper的支持，可对头像进行剪裁后上传
 
-![image-20240504140736212](https://www.z4a.net/images/2024/05/04/image-20240504140736212.png)
+![image-20240504140736212](https://pic.turing158.de5.net/file/StarFall-Forum/1787947339631_image-20240504140736212.webp)
 
 #### 修改密码
 
-![image-20240504140818609](https://www.z4a.net/images/2024/05/04/image-20240504140818609.png)
+![image-20240504140818609](https://pic.turing158.de5.net/file/StarFall-Forum/1787947346880_image-20240504140818609.webp)
 
 #### 修改邮箱
 
-![image-20240504140829071](https://www.z4a.net/images/2024/05/04/image-20240504140829071.png)
+![image-20240504140829071](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342328_image-20240504140829071.webp)
 
 ### 他人主页
 
 在浏览他人的主页时，可以看到他人发表的主题，但不可进行编辑和删除
 
-![image-20240504140901162](https://www.z4a.net/images/2024/05/04/image-20240504140901162.png)
+![image-20240504140901162](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342803_image-20240504140901162.webp)
 
 ### 签到
 
 每天签到可获得经验，连续签到多天，可获得更多的奖励，可在签到排行榜看到自己在哪个排名
 
-![image-20240504140959229](https://www.z4a.net/images/2024/05/04/image-20240504140959229.png)
+![image-20240504140959229](https://pic.turing158.de5.net/file/StarFall-Forum/1787947343684_image-20240504140959229.webp)
 
 提供多种心情，让记录自己每一天的心情和想说的话
 
-![image-20240504141118695](https://www.z4a.net/images/2024/05/04/image-20240504141118695.png)
+![image-20240504141118695](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348882_image-20240504141118695.webp)
 
 ### 导航栏头像
 
 把鼠标移到导航栏的头像处，可以看到三个选项，设置、消息和退出
 
-![image-20240504141228691](https://www.z4a.net/images/2024/05/04/image-20240504141228691.png)
+![image-20240504141228691](https://pic.turing158.de5.net/file/StarFall-Forum/1787947354861_image-20240504141228691.webp)
 
 ### 通讯消息
 
 通过**WebSocket**，论坛有着完善的聊天系统，可以与各玩家添加好友后进行聊天
 
-![image-20240504141333614](https://www.z4a.net/images/2024/05/04/image-20240504141333614.png)
+![image-20240504141333614](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348097_image-20240504141333614.webp)
 
 ### 搜索系统
 
 玩家可通过搜索系统来进行对主题的搜索，可筛选搜索分类，综合，即搜所有分类
 
-![image-20240504141620704](https://www.z4a.net/images/2024/05/04/image-20240504141620704.png)
+![image-20240504141620704](https://pic.turing158.de5.net/file/StarFall-Forum/1787947348825_image-20240504141620704.webp)
 
 ### 管理系统
 
 管理系统可对各数据库的信息都进行修改，包括公共、主题、评论、用户等，还可切换黑白主题，修改页面非常的简洁
 
-![image-20240504143832317](https://www.z4a.net/images/2024/05/04/image-20240504143832317.png)
+![image-20240504143832317](https://pic.turing158.de5.net/file/StarFall-Forum/1787947342783_image-20240504143832317.webp)

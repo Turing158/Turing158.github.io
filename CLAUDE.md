@@ -32,12 +32,10 @@ npm run build:icons  # 生成 PWA 图标（从头像 URL 下载并生成多尺�
 
 **注意:** 本项目使用 `python` 命令（非 `python3`）。
 
-### 站点地图（手动运行）
-构建前需手动运行站点地图生成（未在 prebuild 中自动触发）：
-```bash
-node scripts/generate-sitemap.mjs
-```
-生成 `dist/sitemap.xml`，包含所有静态页面和文章页面的 URL。
+### 站点地图（构建时自动生成）
+`articles-plugin` 在 `closeBundle` 阶段写出 `dist/sitemap.xml`，包含所有静态页面和文章页面的 URL，`npm run build` 已覆盖，无需手动运行。
+
+`scripts/generate-sitemap.mjs` 是等价的独立脚本，仅在需要脱离构建单独生成时使用。
 
 ## 目录结构
 
@@ -203,9 +201,12 @@ src/
 ## SEO 系统
 
 使用 `@vueuse/head` 的 `useHead`（包装在 `src/composables/useSeo.ts`）：
-- 路由 `afterEach` 钩子中设置 `og:title` / `og:description` / `og:url` / `og:type`
+- 每个视图自行调用 `usePageSeo(title, description, url)` 设置 title / meta / OG / JSON-LD，标题与描述从 `pageTitle.*` 和 `seo.*` i18n 键取值，随语言切换响应式更新
+- 文章详情页用 `useArticleSeo(article)`，异步数据到位后自动更新
+- 404 / 错误页用 `useSeo({ noIndex: true })` 排除索引
+- 路由守卫只负责进度条，不再设置 `document.title`
 - 独立页面（standalone layout）跳过全局 SEO，由页面自行调用 `useHead`
-- 站点地图：`node scripts/generate-sitemap.mjs` 构建后手动生成
+- 站点地图：构建时由 `articles-plugin` 自动写入 `dist/sitemap.xml`
 
 ## 文章系统
 

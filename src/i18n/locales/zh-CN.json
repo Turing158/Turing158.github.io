@@ -5,7 +5,6 @@
     "projects": "项目",
     "releases": "发行",
     "tools": "工具",
-    "toolDetail": "工具详情",
     "about": "关于",
     "commits": "提交",
     "achievements": "成就"
@@ -28,6 +27,15 @@
     "starfallForum": "StarFall Minecraft Forum",
     "sfmcJar": "SFMC - Java Edition",
     "achievements": "成就"
+  },
+  "seo": {
+    "home": "Turing_ICE 的个人博客，分享技术文章、开发工具和学习笔记",
+    "articles": "查看所有技术文章和教程",
+    "projects": "开发中的项目、已完成项目和教程",
+    "releases": "各项目的发行版本、更新日志与下载资源",
+    "tools": "开发者工具集：JSON 格式化、Base64 编解码、正则测试、颜色转换等",
+    "about": "了解 Turing_ICE 的背景、技能和联系方式",
+    "achievements": "成就/徽章系统 — 探索所有隐藏成就"
   },
   "home": {
     "recentCommits": "最新提交",
@@ -775,7 +783,8 @@
     "collapse": "收起",
     "expand": "展开菜单",
     "cancel": "取消",
-    "confirm": "确认"
+    "confirm": "确认",
+    "retry": "重试"
   },
   "contextMenu": {
     "goBack": "返回上一页",
@@ -972,7 +981,6 @@
     "download": "下载 JAR",
     "github": "GitHub",
     "back": "前往博客",
-    "goToBlog": "前往博客",
     "footerNote": "由 Turing158 开发 · SFMC Java Edition",
     "demoText": "演示即将推出",
     "featuresTitle": "核心特性",

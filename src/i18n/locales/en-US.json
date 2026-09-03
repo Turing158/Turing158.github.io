@@ -82,8 +82,7 @@
     "readMore": "Read More",
     "noArticles": "No articles yet",
     "publishedAt": "Published at",
-    "back": "前往博客",
-    "goToBlog": "前往博客",
+    "back": "Back",
     "tagReset": "Reset",
     "noMatch": "No matching articles",
     "prev": "Previous",
@@ -714,7 +713,8 @@
     "collapse": "Collapse",
     "expand": "Open menu",
     "cancel": "Cancel",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "retry": "Retry"
   },
   "contextMenu": {
     "goBack": "Go Back",
@@ -784,6 +784,15 @@
     "starfallForum": "StarFall Minecraft Forum",
     "sfmcJar": "SFMC - Java Edition",
     "achievements": "Achievements"
+  },
+  "seo": {
+    "home": "Turing_ICE's personal blog — technical articles, developer tools and study notes",
+    "articles": "Browse all technical articles and tutorials",
+    "projects": "Projects in progress, completed projects and tutorials",
+    "releases": "Releases, changelogs and downloads across all projects",
+    "tools": "Developer toolbox: JSON formatter, Base64 codec, regex tester, color converter and more",
+    "about": "Learn about Turing_ICE's background, skills and contact info",
+    "achievements": "Achievement / badge system — discover every hidden achievement"
   },
   "pageReleases": {
     "title": "Release Detail",

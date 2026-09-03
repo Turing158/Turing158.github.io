@@ -87,14 +87,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useSeo } from '@/composables/useSeo'
 
 const router = useRouter()
+const { t } = useI18n()
 
-// SEO：404 页不应被索引（路由 afterEach 不再统一设置 meta）
-useSeo({ title: '页面未找到', url: '#/not-found', noIndex: true })
+// SEO：404 页不应被索引
+useSeo({
+  title: computed(() => t('pageTitle.notFound')),
+  url: '#/not-found',
+  noIndex: true,
+})
 
 // ─── 路由 ────────────────────────────────────────────
 function goHome() { router.push('/') }
@@ -203,7 +209,6 @@ function draw() {
   }
 
   // ── 蛇 ──
-  const head = state.snake[0]
   const gradient = ctx.createLinearGradient(0, 0, CANVAS_SIZE, CANVAS_SIZE)
   gradient.addColorStop(0, '#4d96ff')
   gradient.addColorStop(1, '#6bcb77')

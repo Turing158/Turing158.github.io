@@ -78,6 +78,7 @@ export function usePwaUpdate() {
   return {
     needRefresh,
     offlineReady,
+    checkForUpdate,
     triggerUpdate,
     dismissUpdate,
   }
