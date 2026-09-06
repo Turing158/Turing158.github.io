@@ -714,7 +714,8 @@
     "expand": "Open menu",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "retry": "Retry"
+    "retry": "Retry",
+    "reloadImage": "Reload image"
   },
   "contextMenu": {
     "goBack": "Go Back",
@@ -727,6 +728,20 @@
     "visitProject": "Visit Project",
     "projectCommits": "Project Commits",
     "copyProjectLink": "Copy Project Link"
+  },
+  "imageViewer": {
+    "title": "Image Viewer",
+    "zoomIn": "Zoom In",
+    "zoomOut": "Zoom Out",
+    "rotateLeft": "Rotate Left",
+    "rotateRight": "Rotate Right",
+    "reset": "Reset",
+    "scale": "Current Scale",
+    "prev": "Previous Image",
+    "next": "Next Image",
+    "openOriginal": "Open Original",
+    "loadFailed": "Failed to load image",
+    "close": "Close"
   },
   "time": {
     "secondsAgo": "{n} seconds ago",

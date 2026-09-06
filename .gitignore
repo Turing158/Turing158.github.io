@@ -3,6 +3,7 @@
 /.DS_Store
 *.local
 .claude/
+CLAUDE.md
 /src/generated
 /.playwright-mcp
 /scripts

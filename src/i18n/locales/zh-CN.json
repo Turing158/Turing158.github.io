@@ -784,7 +784,8 @@
     "expand": "展开菜单",
     "cancel": "取消",
     "confirm": "确认",
-    "retry": "重试"
+    "retry": "重试",
+    "reloadImage": "重新加载图片"
   },
   "contextMenu": {
     "goBack": "返回上一页",
@@ -797,6 +798,20 @@
     "visitProject": "前往项目",
     "projectCommits": "项目提交",
     "copyProjectLink": "复制项目链接"
+  },
+  "imageViewer": {
+    "title": "图片查看器",
+    "zoomIn": "放大",
+    "zoomOut": "缩小",
+    "rotateLeft": "向左旋转",
+    "rotateRight": "向右旋转",
+    "reset": "重置",
+    "scale": "当前缩放比例",
+    "prev": "上一张",
+    "next": "下一张",
+    "openOriginal": "查看原图",
+    "loadFailed": "图片加载失败",
+    "close": "关闭"
   },
   "notFound": {
     "title": "页面未找到",
