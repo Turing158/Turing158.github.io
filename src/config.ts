@@ -29,6 +29,7 @@ const DEVELOPING_REPOS = [
 
 // --- 评论代理 ---
 const GITALK_PROXY = 'https://gitalk.turing158.de5.net/github_access_token'
+const GITALK_CLIENT_ID = import.meta.env.VITE_GITALK_CLIENT_ID || '0275b8f48f2a7e0ac1b0'
 
 // --- 节假日 API ---
 const HOLIDAY_API_BASE = 'https://date.nager.at/api/v3/publicholidays'
@@ -53,6 +54,7 @@ export const config = {
     owner: GITEE_OWNER,
   },
   gitalk: {
+    clientID: GITALK_CLIENT_ID,
     proxy: GITALK_PROXY,
   },
   blog: {

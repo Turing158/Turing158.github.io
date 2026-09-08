@@ -13,6 +13,7 @@ export function useGitalk(containerId: string, slug: string, title: string) {
     container.innerHTML = ''
 
     const gitalk = new Gitalk({
+      clientID: config.gitalk.clientID,
       repo: config.github.repo,
       owner: config.github.owner,
       admin: [config.github.owner],
