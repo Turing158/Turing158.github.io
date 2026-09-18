@@ -37,10 +37,9 @@ const HOLIDAY_COUNTRY = 'CN'
 
 // --- Cline 推荐模型 API ---
 // 通过 Cloudflare Worker 代理（dev-docs/work.js 的 /cline/model/recommended）转发 Cline 接口，规避浏览器 CORS
-// - 本地开发走 Vite proxy（vite.config.ts 的 server.proxy 把 /api 转发到后端）
-// - 生产环境直连后端绝对地址
+// 浏览器直连 Worker 绝对地址；可用环境变量 VITE_CLINE_API_BASE 覆盖
 const CLINE_MODELS_API = import.meta.env.VITE_CLINE_API_BASE
-  ?? (import.meta.env.DEV ? '/api/cline/model/recommended' : 'https://api.turing158.dpdns.org/cline/model/recommended')
+  ?? 'https://api.turing158.dpdns.org/cline/model/recommended'
 
 // --- 缓存 TTL（毫秒） ---
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟

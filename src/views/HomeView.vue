@@ -5,30 +5,27 @@
       <div class="widget clock-widget">
         <ResponsiveTime class="clock-time" />
         <Divider />
-        <div v-if="!holidaysLoaded" class="holiday-loading loading-text">
-          <span class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </span>
-          {{ $t('home.loading') }}
-        </div>
-        <div v-else-if="holidaysError" class="holiday-loading">{{ $t('home.loadFailed') }}</div>
-        <div v-else-if="!countdown" class="holiday-loading">{{ $t('home.holidayNoMore') }}</div>
-        <div v-else class="holiday-content">
-          <div class="holiday-name">{{ countdown.holiday.name }}</div>
-          <div v-if="countdown.isToday" class="holiday-countdown">
-            <div class="holiday-today">{{ $t('home.holidayToday') }}</div>
-            <div class="holiday-greeting">{{ countdown.greeting }}</div>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="!holidaysLoaded" class="holiday-loading cube-anim">
+            <CubeLoader :text="$t('home.loading')" />
           </div>
-          <div v-else-if="countdown.hoursLeft !== undefined && countdown.hoursLeft > 0" class="holiday-countdown">
-            <div class="holiday-urgent">{{ $t('home.hoursLeft', { n: countdown.hoursLeft }) }}</div>
-            <div class="holiday-greeting">{{ countdown.greeting }}</div>
+          <div v-else-if="holidaysError" class="holiday-loading">{{ $t('home.loadFailed') }}</div>
+          <div v-else-if="!countdown" class="holiday-loading">{{ $t('home.holidayNoMore') }}</div>
+          <div v-else class="holiday-content">
+            <div class="holiday-name">{{ countdown.holiday.name }}</div>
+            <div v-if="countdown.isToday" class="holiday-countdown">
+              <div class="holiday-today">{{ $t('home.holidayToday') }}</div>
+              <div class="holiday-greeting">{{ countdown.greeting }}</div>
+            </div>
+            <div v-else-if="countdown.hoursLeft !== undefined && countdown.hoursLeft > 0" class="holiday-countdown">
+              <div class="holiday-urgent">{{ $t('home.hoursLeft', { n: countdown.hoursLeft }) }}</div>
+              <div class="holiday-greeting">{{ countdown.greeting }}</div>
+            </div>
+            <div v-else class="holiday-countdown">
+              <div class="holiday-days">{{ $t('home.daysLeft', { n: countdown.daysLeft }) }}</div>
+            </div>
           </div>
-          <div v-else class="holiday-countdown">
-            <div class="holiday-days">{{ $t('home.daysLeft', { n: countdown.daysLeft }) }}</div>
-          </div>
-        </div>
+        </Transition>
       </div>
 
       <!-- Profile Widget -->
@@ -52,7 +49,7 @@
         </div>
         <div v-if="profile" class="profile-stats">
           <a
-            class="profile-stat"
+            class="profile-stat px-fade"
             :href="`${githubProfileUrl}?tab=repositories`"
             target="_blank"
             rel="noopener"
@@ -61,7 +58,7 @@
             <span class="stat-label">{{ $t('home.repos') }}</span>
           </a>
           <a
-            class="profile-stat"
+            class="profile-stat px-fade"
             :href="`${githubProfileUrl}?tab=followers`"
             target="_blank"
             rel="noopener"
@@ -70,7 +67,7 @@
             <span class="stat-label">{{ $t('home.followers') }}</span>
           </a>
           <a
-            class="profile-stat"
+            class="profile-stat px-fade"
             :href="`${githubProfileUrl}?tab=following`"
             target="_blank"
             rel="noopener"
@@ -86,44 +83,41 @@
         <div class="widget-header">
           <div class="widget-title">📦 {{ $t('home.recentCommits') }}</div>
         </div>
-        <div v-if="commitsLoading" class="widget-content loading-text">
-          <span class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </span>
-          {{ $t('common.loading') }}
-        </div>
-        <div v-else-if="!hasGitHubConfig" class="widget-content">{{ $t('home.githubNotConfigured') }}</div>
-        <div v-else-if="recentCommits.length === 0" class="widget-content">{{ $t('home.noCommits') }}</div>
-        <div v-else class="commits-list">
-          <a
-            v-for="(commit, i) in recentCommits"
-            :key="i"
-            :href="commit.url"
-            target="_blank"
-            class="commit-card"
-            :title="commit.fullMessage"
-            :style="{ '--commit-index': i }"
-          >
-            <div class="commit-header">
-              <div class="commit-repo">
-                <span class="repo-icon">📁</span>
-                <span class="repo-name">{{ commit.repo }}</span>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="commitsLoading" class="widget-content cube-anim">
+            <CubeLoader :text="$t('common.loading')" />
+          </div>
+          <div v-else-if="!hasGitHubConfig" class="widget-content">{{ $t('home.githubNotConfigured') }}</div>
+          <div v-else-if="recentCommits.length === 0" class="widget-content">{{ $t('home.noCommits') }}</div>
+          <div v-else class="commits-list">
+            <a
+              v-for="(commit, i) in recentCommits"
+              :key="i"
+              :href="commit.url"
+              target="_blank"
+              class="commit-card px-fade"
+              :title="commit.fullMessage"
+              :style="{ '--commit-index': i }"
+            >
+              <div class="commit-header">
+                <div class="commit-repo">
+                  <span class="repo-icon">📁</span>
+                  <span class="repo-name">{{ commit.repo }}</span>
+                </div>
+                <div class="commit-date" :title="formatFullTime(commit.date)">
+                  {{ formatRelativeTime(commit.date) }}
+                </div>
               </div>
-              <div class="commit-date" :title="formatFullTime(commit.date)">
-                {{ formatRelativeTime(commit.date) }}
+              <div class="commit-msg" :title="commit.fullMessage">
+                {{ commit.message }}
               </div>
-            </div>
-            <div class="commit-msg" :title="commit.fullMessage">
-              {{ commit.message }}
-            </div>
-            <div class="commit-footer">
-              <span class="commit-hash">{{ commit.sha?.substring(0, 7) || 'unknown' }}</span>
-              <span class="commit-link-icon">↗</span>
-            </div>
-          </a>
-        </div>
+              <div class="commit-footer">
+                <span class="commit-hash">{{ commit.sha?.substring(0, 7) || 'unknown' }}</span>
+                <span class="commit-link-icon">↗</span>
+              </div>
+            </a>
+          </div>
+        </Transition>
       </div>
 
       <!-- Articles Widget -->
@@ -131,44 +125,41 @@
         <div class="widget-header">
           <div class="widget-title">📝 {{ $t('home.recentArticles') }}</div>
         </div>
-        <div v-if="loading" class="widget-content loading-text">
-          <span class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </span>
-          {{ $t('common.loading') }}
-        </div>
-        <div v-else-if="recentArticles.length === 0" class="widget-content">{{ $t('home.noArticles') }}</div>
-        <div v-else class="article-list">
-          <router-link
-            v-for="(article, index) in recentArticles"
-            :key="article.slug"
-            :to="`/article/${article.slug}`"
-            class="article-item"
-            :style="{ '--item-index': index }"
-          >
-            <div class="article-content">
-              <div class="article-title-row">
-                <span class="article-number">{{ String(index + 1).padStart(2, '0') }}</span>
-                <span class="article-title">{{ article.title }}</span>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="loading" class="widget-content cube-anim">
+            <CubeLoader :text="$t('common.loading')" />
+          </div>
+          <div v-else-if="recentArticles.length === 0" class="widget-content">{{ $t('home.noArticles') }}</div>
+          <div v-else class="article-list">
+            <router-link
+              v-for="(article, index) in recentArticles"
+              :key="article.slug"
+              :to="`/article/${article.slug}`"
+              class="article-item"
+              :style="{ '--item-index': index }"
+            >
+              <div class="article-content">
+                <div class="article-title-row">
+                  <span class="article-number">{{ String(index + 1).padStart(2, '0') }}</span>
+                  <span class="article-title">{{ article.title }}</span>
+                </div>
+                <div class="article-meta">
+                  <span class="article-date" :title="formatFullTime(article.date)">
+                    {{ formatRelativeTime(article.date) }}
+                  </span>
+                  <span v-if="article.tags && article.tags.length > 0" class="article-tag">
+                    {{ article.tags[0] }}
+                  </span>
+                </div>
               </div>
-              <div class="article-meta">
-                <span class="article-date" :title="formatFullTime(article.date)">
-                  {{ formatRelativeTime(article.date) }}
-                </span>
-                <span v-if="article.tags && article.tags.length > 0" class="article-tag">
-                  {{ article.tags[0] }}
-                </span>
-              </div>
-            </div>
-            <div class="article-arrow">→</div>
-          </router-link>
-          <router-link to="/articles" class="view-all">
-            <span>{{ $t('home.viewAll') }}</span>
-            <span class="view-all-arrow">→</span>
-          </router-link>
-        </div>
+              <div class="article-arrow">→</div>
+            </router-link>
+            <router-link to="/articles" class="view-all">
+              <span>{{ $t('home.viewAll') }}</span>
+              <span class="view-all-arrow">→</span>
+            </router-link>
+          </div>
+        </Transition>
       </div>
 
       <!-- Gramophone Widget (Comments) -->
@@ -186,48 +177,45 @@
         <div class="widget-header">
           <div class="widget-title">🦊 {{ $t('home.recentGiteeActivity') }}</div>
         </div>
-        <div v-if="giteeLoading" class="widget-content loading-text">
-          <span class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </span>
-          {{ $t('common.loading') }}
-        </div>
-        <div v-else-if="giteeError" class="widget-content">{{ $t('home.loadFailed') }}</div>
-        <div v-else-if="giteeActivities.length === 0" class="widget-content">{{ $t('home.noGiteeActivity') }}</div>
-        <div v-else class="activity-list">
-          <a
-            v-for="(act, i) in giteeActivities"
-            :key="act.id"
-            :href="act.url"
-            target="_blank"
-            rel="noopener"
-            class="activity-item gitee-item"
-            :style="{ '--activity-index': i }"
-          >
-            <div class="activity-icon">{{ act.icon }}</div>
-            <div class="activity-body">
-              <div class="activity-text">
-                <span class="activity-action">{{ act.action }}</span>
-                <span class="activity-repo">{{ act.repo }}</span>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="giteeLoading" class="widget-content cube-anim">
+            <CubeLoader :text="$t('common.loading')" />
+          </div>
+          <div v-else-if="giteeError" class="widget-content">{{ $t('home.loadFailed') }}</div>
+          <div v-else-if="giteeActivities.length === 0" class="widget-content">{{ $t('home.noGiteeActivity') }}</div>
+          <div v-else class="activity-list">
+            <a
+              v-for="(act, i) in giteeActivities"
+              :key="act.id"
+              :href="act.url"
+              target="_blank"
+              rel="noopener"
+              class="activity-item gitee-item px-fade"
+              :style="{ '--activity-index': i }"
+            >
+              <div class="activity-icon">{{ act.icon }}</div>
+              <div class="activity-body">
+                <div class="activity-text">
+                  <span class="activity-action">{{ act.action }}</span>
+                  <span class="activity-repo">{{ act.repo }}</span>
+                </div>
+                <div class="activity-time" :title="formatFullTime(act.date)">
+                  {{ formatRelativeTime(act.date) }}
+                </div>
               </div>
-              <div class="activity-time" :title="formatFullTime(act.date)">
-                {{ formatRelativeTime(act.date) }}
-              </div>
-            </div>
-            <div class="activity-arrow">↗</div>
-          </a>
-          <a
-            :href="giteeProfileUrl"
-            target="_blank"
-            rel="noopener"
-            class="view-all"
-          >
-            <span>{{ $t('home.viewMoreGiteeActivity') }}</span>
-            <span class="view-all-arrow">→</span>
-          </a>
-        </div>
+              <div class="activity-arrow">↗</div>
+            </a>
+            <a
+              :href="giteeProfileUrl"
+              target="_blank"
+              rel="noopener"
+              class="view-all"
+            >
+              <span>{{ $t('home.viewMoreGiteeActivity') }}</span>
+              <span class="view-all-arrow">→</span>
+            </a>
+          </div>
+        </Transition>
       </div>
 
       <!-- GitHub Activity Widget -->
@@ -235,48 +223,45 @@
         <div class="widget-header">
           <div class="widget-title">📊 {{ $t('home.recentActivity') }}</div>
         </div>
-        <div v-if="activityLoading" class="widget-content loading-text">
-          <span class="loading-dots">
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-            <div class="loading-dot"></div>
-          </span>
-          {{ $t('common.loading') }}
-        </div>
-        <div v-else-if="activityError" class="widget-content">{{ $t('home.loadFailed') }}</div>
-        <div v-else-if="activities.length === 0" class="widget-content">{{ $t('home.noActivity') }}</div>
-        <div v-else class="activity-list">
-          <a
-            v-for="(act, i) in activities"
-            :key="act.id"
-            :href="act.url"
-            target="_blank"
-            rel="noopener"
-            class="activity-item"
-            :style="{ '--activity-index': i }"
-          >
-            <div class="activity-icon" :class="`type-${act.type}`">{{ act.icon }}</div>
-            <div class="activity-body">
-              <div class="activity-text">
-                <span class="activity-action">{{ act.action }}</span>
-                <span class="activity-repo">{{ act.repo }}</span>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="activityLoading" class="widget-content cube-anim">
+            <CubeLoader :text="$t('common.loading')" />
+          </div>
+          <div v-else-if="activityError" class="widget-content">{{ $t('home.loadFailed') }}</div>
+          <div v-else-if="activities.length === 0" class="widget-content">{{ $t('home.noActivity') }}</div>
+          <div v-else class="activity-list">
+            <a
+              v-for="(act, i) in activities"
+              :key="act.id"
+              :href="act.url"
+              target="_blank"
+              rel="noopener"
+              class="activity-item px-fade"
+              :style="{ '--activity-index': i }"
+            >
+              <div class="activity-icon" :class="`type-${act.type}`">{{ act.icon }}</div>
+              <div class="activity-body">
+                <div class="activity-text">
+                  <span class="activity-action">{{ act.action }}</span>
+                  <span class="activity-repo">{{ act.repo }}</span>
+                </div>
+                <div class="activity-time" :title="formatFullTime(act.date)">
+                  {{ formatRelativeTime(act.date) }}
+                </div>
               </div>
-              <div class="activity-time" :title="formatFullTime(act.date)">
-                {{ formatRelativeTime(act.date) }}
-              </div>
-            </div>
-            <div class="activity-arrow">↗</div>
-          </a>
-          <a
-            :href="githubProfileUrl"
-            target="_blank"
-            rel="noopener"
-            class="view-all"
-          >
-            <span>{{ $t('home.viewMoreActivity') }}</span>
-            <span class="view-all-arrow">→</span>
-          </a>
-        </div>
+              <div class="activity-arrow">↗</div>
+            </a>
+            <a
+              :href="githubProfileUrl"
+              target="_blank"
+              rel="noopener"
+              class="view-all"
+            >
+              <span>{{ $t('home.viewMoreActivity') }}</span>
+              <span class="view-all-arrow">→</span>
+            </a>
+          </div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -287,6 +272,7 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Divider } from 'animal-island-vue'
 import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { useArticles } from '@/composables/useArticles'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
@@ -700,7 +686,7 @@ function mapGiteeEvent(ev: any): ActivityItem | null {
 }
 
 async function fetchGiteeTimeline(): Promise<any[]> {
-  const target = `/api/gitee/contribution`
+  const target = 'https://api.turing158.dpdns.org/gitee/contribution'
   const sources = [
     target,
     `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`,
@@ -778,10 +764,10 @@ onMounted(async () => {
 
 .widget {
   background: var(--bg-card);
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   padding: 24px;
   box-shadow: 0 2px 12px var(--shadow);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -878,7 +864,10 @@ onMounted(async () => {
   width: 72px;
   height: 72px;
   margin-bottom: 12px;
-  border-radius: 50%;
+  /* 1 个像素网格单位 = 72px / 16 = 4.5px，环宽即 1 单位 */
+  padding: 4.5px;
+  background: var(--accent);
+  clip-path: var(--pxc-circle);
   overflow: hidden;
   cursor: pointer;
 
@@ -907,8 +896,7 @@ onMounted(async () => {
 .profile-avatar {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
-  border: 3px solid var(--accent);
+  clip-path: var(--pxc-circle-in);
   display: block;
 }
 
@@ -986,16 +974,15 @@ onMounted(async () => {
   align-items: center;
   gap: 2px;
   padding: 8px 4px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
   text-decoration: none;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 
   &:hover {
     transform: translateY(-3px);
-    border-color: var(--accent);
     box-shadow: 0 6px 14px var(--shadow);
 
     .stat-num {
@@ -1035,12 +1022,12 @@ onMounted(async () => {
   gap: 10px;
   padding: 16px;
   background: var(--bg-secondary);
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
-  overflow: hidden;
+  /* 原 overflow: hidden 会裁掉外扩的 px-fade 叠加层；卡片内并无越界内容，移除 */
   cursor: pointer;
   animation: commit-fade-in 0.5s ease forwards;
   animation-delay: calc(var(--commit-index) * 0.08s);
@@ -1062,7 +1049,6 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 20px var(--shadow);
-    border-color: var(--accent);
 
     &::before {
       transform: scaleX(1);
@@ -1131,8 +1117,8 @@ onMounted(async () => {
   flex-shrink: 0;
   padding: 2px 8px;
   background: var(--bg-card);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .commit-msg {
@@ -1159,8 +1145,8 @@ onMounted(async () => {
   color: var(--text-secondary);
   background: var(--bg-card);
   padding: 3px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  --pxs: 2px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: all 0.3s ease;
 }
 
@@ -1184,7 +1170,7 @@ onMounted(async () => {
   align-items: center;
   gap: 16px;
   padding: 16px 12px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
   text-decoration: none;
   transition: all 0.3s ease;
   position: relative;
@@ -1291,8 +1277,8 @@ onMounted(async () => {
   display: inline-block;
   padding: 2px 8px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.7rem;
   color: var(--accent);
   font-weight: 500;
@@ -1318,7 +1304,7 @@ onMounted(async () => {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--accent);
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   transition: all 0.3s ease;
   text-decoration: none;
 
@@ -1392,11 +1378,11 @@ onMounted(async () => {
   gap: 14px;
   padding: 12px 14px;
   background: var(--bg-secondary);
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   text-decoration: none;
   position: relative;
-  overflow: hidden;
+  /* 原 overflow: hidden 会裁掉外扩的 px-fade 叠加层；卡片内并无越界内容，移除 */
   cursor: pointer;
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   animation: activity-fade-in 0.5s ease forwards;
@@ -1418,7 +1404,6 @@ onMounted(async () => {
 
   &:hover {
     transform: translateY(-2px);
-    border-color: var(--accent);
     box-shadow: 0 6px 16px var(--shadow);
 
     &::before {
@@ -1460,8 +1445,8 @@ onMounted(async () => {
   justify-content: center;
   font-size: 1.1rem;
   background: var(--bg-card);
-  border-radius: 10px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: transform 0.3s ease;
 }
 

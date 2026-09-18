@@ -1,9 +1,9 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** 浏览量 API 基址，未配置时按开发/生产自动选择（见 src/api/viewCount.ts） */
+  /** 浏览量 API 基址，未配置时使用默认后端地址（见 src/api/viewCount.ts） */
   readonly VITE_API_BASE?: string
-  /** Cline 模型 API 基址，未配置时按开发/生产自动选择（见 src/config.ts） */
+  /** Cline 模型 API 基址，未配置时使用默认 Worker 地址（见 src/config.ts） */
   readonly VITE_CLINE_API_BASE?: string
 }
 
@@ -29,6 +29,8 @@ declare module 'gray-matter' {
 
 declare module 'gitalk' {
   interface GitalkConfig {
+    clientID?: string
+    clientSecret?: string
     repo: string
     owner: string
     admin: string[]

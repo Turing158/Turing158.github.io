@@ -1,6 +1,6 @@
 <template>
   <div
-    class="blog-input"
+    class="blog-input px-fade"
     :class="{
       'is-textarea': type === 'textarea',
       'is-number': type === 'number',
@@ -280,22 +280,28 @@ defineExpose({
   align-items: stretch;
   width: 100%;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  --px-frame-fade: var(--px-frame-accent-soft);
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 
-  &:hover:not(.is-disabled) {
-    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  }
-
   &:focus-within {
-    border-color: var(--accent);
+    --px-frame-fade: var(--px-frame-accent);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+
+    &::after {
+      opacity: 1;
+    }
   }
 
   &.is-disabled {
     opacity: 0.5;
     cursor: not-allowed;
+
+    /* 压过工具类 .px-fade:hover::after，禁用态不淡入 */
+    &::after {
+      opacity: 0;
+    }
   }
 
   &.has-prefix {
@@ -447,7 +453,7 @@ textarea.blog-input-field {
 
   &::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
     transition: background 0.2s;
   }
 

@@ -6,6 +6,7 @@
     "releases": "Releases",
     "tools": "Tools",
     "about": "About",
+    "friends": "Friends",
     "commits": "Commits",
     "achievements": "Achievements"
   },
@@ -88,6 +89,11 @@
     "prev": "Previous",
     "next": "Next",
     "perPage": "Per page",
+    "sortBy": "Sort by",
+    "sortNewest": "Newest",
+    "sortOldest": "Oldest",
+    "sortViews": "Most viewed",
+    "sortComments": "Most commented",
     "views": "views",
     "readingTime": "{time} min read"
   },
@@ -153,6 +159,36 @@
     "contact": "Contact",
     "email": "Email"
   },
+  "friends": {
+    "listTitle": "My Friends",
+    "applyTitle": "Apply for a Friend Link",
+    "empty": "No friend links yet — let's exchange links!",
+    "loadFailed": "Failed to load friend links, please try again later",
+    "retry": "Retry",
+    "prev": "Prev",
+    "next": "Next",
+    "unnamed": "Unnamed Site",
+    "applyName": "Name",
+    "applyNamePlaceholder": "Your site name",
+    "applyHead": "Avatar",
+    "applyHeadPlaceholder": "Avatar image URL",
+    "applyLink": "Link",
+    "applyLinkPlaceholder": "https://example.com",
+    "applyMore": "More details (optional)",
+    "applyDescLabel": "Intro",
+    "applyDescPlaceholder": "Say something about your site",
+    "applyTagsLabel": "Tags",
+    "applyTagsPlaceholder": "Search or type a custom tag",
+    "applyTagsHint": "Up to 5 tags, 10 characters each",
+    "applySubmit": "Submit Application",
+    "applySubmitting": "Submitting…",
+    "applyPreview": "How your card will look",
+    "applySuccess": "Application submitted! It will show up here once approved.",
+    "applyMissing": "Please fill in name, avatar and link",
+    "applyDescTooLong": "Intro cannot exceed 50 characters",
+    "applyFailed": "Submission failed, please try again later",
+    "applyNetworkError": "Network error, please try again later"
+  },
   "theme": {
     "system": "System",
     "systemLight": "Light Theme",
@@ -167,15 +203,13 @@
     "description": "Common online tools, ready to use.",
     "viewDetails": "View details",
     "viewDetailsFor": "View details for {name}",
-    "expandDetailNavigationFor": "Expand detail page navigation for {name}",
-    "jumpToDetail": "Open",
-    "jumpToDetailFor": "Open details for {name} in a new tab",
-    "switchToDetail": "Switch",
-    "switchToDetailFor": "Switch to details for {name} in this page",
     "backToTools": "Back to tools",
     "notFoundTitle": "Tool not found",
     "notFoundDescription": "Sorry, we couldn't find that tool. Return to the tools collection to choose another one.",
     "workspaceLabel": "Tool workspace",
+    "dialogNavLabel": "Tool quick actions",
+    "dialogNavSwitch": "Switch",
+    "dialogNavJump": "Jump",
     "copied": "Copied!",
     "dragToReorder": "Long-press to drag and reorder tools",
     "resetOrder": "Reset order",
@@ -715,7 +749,9 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "retry": "Retry",
-    "reloadImage": "Reload image"
+    "reloadImage": "Reload image",
+    "redstoneDivider": "Redstone dust pixel divider",
+    "railDivider": "Minecraft rail pixel divider"
   },
   "contextMenu": {
     "goBack": "Go Back",
@@ -791,6 +827,7 @@
     "tools": "Tools",
     "toolDetail": "Tool Detail",
     "about": "About",
+    "friends": "Friend Links",
     "commits": "Commits",
     "responsiveTimeDemo": "Responsive Time Component Demo",
     "notFound": "Page Not Found",
@@ -807,6 +844,7 @@
     "releases": "Releases, changelogs and downloads across all projects",
     "tools": "Developer toolbox: JSON formatter, Base64 codec, regex tester, color converter and more",
     "about": "Learn about Turing_ICE's background, skills and contact info",
+    "friends": "Friend links — blogroll of Turing_ICE's blog",
     "achievements": "Achievement / badge system — discover every hidden achievement"
   },
   "pageReleases": {
@@ -851,6 +889,10 @@
     "select": {
       "noData": "No data",
       "loading": "Loading..."
+    },
+    "tagSelect": {
+      "empty": "No matching tags",
+      "create": "Add"
     }
   },
   "sfmc": {

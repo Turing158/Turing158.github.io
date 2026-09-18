@@ -133,7 +133,7 @@ function formatFullTime(timestamp: number): string {
   position: relative;
   display: flex;
   flex-direction: column;
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   padding: 20px;
   overflow: hidden;
   cursor: default;
@@ -148,7 +148,7 @@ function formatFullTime(timestamp: number): string {
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     border: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
-    border-radius: inherit;
+
     transition: background 0.4s ease, border-color 0.4s ease;
   }
 
@@ -223,12 +223,12 @@ function formatFullTime(timestamp: number): string {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: color-mix(in srgb, var(--bg-secondary) 70%, transparent);
   font-size: 1.5rem;
   transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
               box-shadow 0.4s ease;
-  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+  border: 1px solid transparent; border-image: var(--px-frame-muted) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .card-title-group {
@@ -274,7 +274,7 @@ function formatFullTime(timestamp: number): string {
   gap: 5px;
   font-size: 0.75rem;
   padding: 4px 10px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   line-height: 1.4;
   font-weight: 600;
 }

@@ -15,7 +15,7 @@
       <p class="page-desc">{{ $t('tools.description') }}</p>
       <button
         v-if="orderChanged"
-        class="tools-reset-btn"
+        class="tools-reset-btn px-fade"
         :title="$t('tools.resetOrder')"
         @click="resetOrder"
       >{{ $t('tools.resetOrder') }}</button>
@@ -25,7 +25,7 @@
       <div
         v-for="(tool, index) in tools"
         :key="tool.component"
-        class="tool-card"
+        class="tool-card px-fade"
         :class="{
           'card-visible': cardVisibleStates[tool.component],
           'is-dragging': draggingComponent === tool.component,
@@ -45,7 +45,7 @@
         <h3 class="tool-name">{{ tool.name }}</h3>
         <p class="tool-desc">{{ tool.description }}</p>
         <div class="tool-tags">
-          <span v-for="tag in tool.tags" :key="tag" class="tool-tag">{{ tag }}</span>
+          <span v-for="tag in tool.tags" :key="tag" class="tool-tag px-fade">{{ tag }}</span>
         </div>
       </div>
     </div>
@@ -73,47 +73,10 @@
       @open="onDialogOpen"
       @close="onDialogClose"
     >
+
+      <!-- 弹窗右上角快捷操作：「切换」当前标签页前往该工具页，「跳转」新标签页打开 -->
       <template #before-close>
-        <div
-          v-if="activeTool"
-          class="tool-detail-launcher"
-          :class="{ 'is-open': detailActionsOpen }"
-        >
-          <button
-            type="button"
-            class="tool-detail-launcher-trigger"
-            :aria-label="$t('tools.expandDetailNavigationFor', { name: activeTool.name })"
-            :aria-expanded="detailActionsOpen"
-            @click="detailActionsOpen = !detailActionsOpen"
-            @blur="detailActionsOpen = false"
-          >
-            <SidebarIcon name="externalLink" :size="15" />
-          </button>
-          <div class="tool-detail-launcher-actions">
-            <RouterLink
-              :to="activeToolDetailRoute"
-              class="tool-detail-launcher-action tool-detail-launcher-action--jump"
-              target="_blank"
-              rel="noopener noreferrer"
-              :aria-label="$t('tools.jumpToDetailFor', { name: activeTool.name })"
-              @click="detailActionsOpen = false"
-            >
-              <span class="tool-detail-launcher-label">
-                {{ $t('tools.jumpToDetail') }}
-              </span>
-            </RouterLink>
-            <RouterLink
-              :to="activeToolDetailRoute"
-              class="tool-detail-launcher-action tool-detail-launcher-action--switch"
-              :aria-label="$t('tools.switchToDetailFor', { name: activeTool.name })"
-              @click="detailActionsOpen = false"
-            >
-              <span class="tool-detail-launcher-label">
-                {{ $t('tools.switchToDetail') }}
-              </span>
-            </RouterLink>
-          </div>
-        </div>
+        <ToolDialogActions @switch="onDialogNavSwitch" @jump="onDialogNavJump" />
       </template>
 
       <template v-if="activeTool" #title>
@@ -122,15 +85,17 @@
       </template>
 
       <!-- 延迟挂载：先让 Dialog 壳完成首帧，再加载工具内容 -->
-      <div v-if="activeTool && !contentReady" class="tool-content-placeholder" aria-hidden="true">
-        <div class="tool-content-spinner" />
-      </div>
-      <component
-        :is="currentComponent"
-        v-else-if="activeTool && contentReady"
-        :separator="randomSeparator"
-        @request-separator-edit="onToolRequestSeparatorEdit"
-      />
+      <Transition name="loader-pop" mode="out-in" appear>
+        <div v-if="activeTool && !contentReady" class="tool-content-placeholder cube-anim" aria-hidden="true">
+          <CubeLoader :size="28" />
+        </div>
+        <component
+          :is="currentComponent"
+          v-else-if="activeTool && contentReady"
+          :separator="randomSeparator"
+          @request-separator-edit="onToolRequestSeparatorEdit"
+        />
+      </Transition>
     </BlogDialog>
 
     <!-- 分隔符编辑弹窗（随机数 / 随机字符串 共用） -->
@@ -148,12 +113,14 @@
 import { ref, computed, nextTick, onMounted, onUnmounted, watch, defineAsyncComponent, type Component } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
+import ToolDialogActions from '@/components/tools/ToolDialogActions.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { toolKeys } from '@/data/tools'
-import { useRoute, useRouter, type RouteLocationRaw } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 // 分隔符编辑弹窗：低频使用，异步加载
 const SeparatorEditorDialog = defineAsyncComponent(
@@ -269,7 +236,6 @@ const tools = computed<Tool[]>(() =>
 
 const activeTool = ref<Tool | null>(null)
 const dialogOpen = ref(false)
-const detailActionsOpen = ref(false)
 const contentReady = ref(false)
 const showCards = ref(false)
 const cardVisibleStates = ref<Record<string, boolean>>({})
@@ -284,16 +250,6 @@ let contentReadyTimer: ReturnType<typeof setTimeout> | null = null
 const currentComponent = computed(() => {
   if (!activeTool.value) return null
   return componentMap[activeTool.value.component] || null
-})
-
-const activeToolDetailRoute = computed<RouteLocationRaw>(() => {
-  const tool = activeTool.value
-  if (!tool) return { name: 'tools' }
-  const meta = toolKeys.find((item) => item.component === tool.component)
-  return {
-    name: 'tool-detail',
-    params: { id: meta?.key ?? tool.component },
-  }
 })
 
 // ── 拖拽重排（长按 0.5s 进入,拖动过程实时预览重排,松手持久化）──
@@ -574,7 +530,6 @@ function openTool(tool: Tool) {
     return
   }
   activeTool.value = tool
-  detailActionsOpen.value = false
   contentReady.value = false
   dialogOpen.value = true
   scheduleContentMount()
@@ -595,10 +550,27 @@ function onDialogOpen() {
 
 function onDialogClose() {
   cancelDeferredContent()
-  detailActionsOpen.value = false
   contentReady.value = false
   activeTool.value = null
   // 分隔符编辑在关闭时已被销毁，无需手动清理
+}
+
+// ── 弹窗右上角快捷操作：「切换」当前标签页前往该工具页，「跳转」新标签页打开 ──
+function resolveToolDetail() {
+  const component = activeTool.value?.component
+  const meta = component ? toolKeys.find((k) => k.component === component) : null
+  if (!meta) return null
+  return router.resolve({ name: 'tool-detail', params: { id: meta.key } })
+}
+
+function onDialogNavSwitch() {
+  const resolved = resolveToolDetail()
+  if (resolved) router.push(resolved)
+}
+
+function onDialogNavJump() {
+  const resolved = resolveToolDetail()
+  if (resolved) window.open(resolved.href, '_blank', 'noopener')
 }
 
 const route = useRoute()
@@ -700,9 +672,9 @@ onUnmounted(() => {
 .tool-card {
   position: relative;
   background: var(--bg-card);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 24px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
   opacity: 0;
@@ -719,7 +691,6 @@ onUnmounted(() => {
 .tool-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 20px var(--shadow);
-  border-color: var(--accent);
 }
 
 .tool-icon {
@@ -750,9 +721,9 @@ onUnmounted(() => {
   background: var(--bg-secondary);
   color: var(--accent);
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s;
   cursor: default;
 }
@@ -760,7 +731,6 @@ onUnmounted(() => {
 .tool-tag:hover {
   background: var(--accent);
   color: var(--bg-card);
-  border-color: var(--accent);
   transform: scale(1.08);
 }
 
@@ -772,19 +742,6 @@ onUnmounted(() => {
   justify-content: center;
 }
 
-.tool-content-spinner {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  animation: tool-spin 0.7s linear infinite;
-}
-
-@keyframes tool-spin {
-  to { transform: rotate(360deg); }
-}
-
 /* Modal title */
 .modal-icon {
   font-size: 1.5rem;
@@ -793,154 +750,6 @@ onUnmounted(() => {
 .modal-title-text {
   font-size: 1.2rem;
   color: var(--text-primary);
-}
-
-/* Dialog 详情页入口：从圆形图标中心向左右展开为连体操作组 */
-.tool-detail-launcher {
-  position: absolute;
-  top: 14px;
-  /* 展开后为两侧按钮预留空间，右端不遮挡关闭按钮 */
-  right: 94px;
-  z-index: 10;
-  width: 32px;
-  height: 32px;
-  overflow: visible;
-}
-
-.tool-detail-launcher-trigger,
-.tool-detail-launcher-action {
-  height: 32px;
-  border: 1px solid var(--border);
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  font: inherit;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.tool-detail-launcher-trigger {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  width: 32px;
-  padding: 0;
-  place-items: center;
-  border-radius: 50%;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease,
-    border-radius 0.2s ease,
-    opacity 0.28s ease;
-}
-
-.tool-detail-launcher-actions {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  display: flex;
-  height: 32px;
-  width: 128px;
-  align-items: stretch;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  clip-path: inset(0 48px round 16px);
-  transform: translateX(-50%);
-  transform-origin: center;
-  will-change: clip-path, opacity;
-  transition:
-    clip-path 0.3s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.3s ease,
-    visibility 0s linear 0.3s;
-}
-
-.tool-detail-launcher-action {
-  display: inline-flex;
-  flex: 0 0 64px;
-  width: 64px;
-  padding: 0 8px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0;
-  overflow: hidden;
-  font-size: 0.78rem;
-  font-weight: 600;
-  line-height: 1;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    color 0.2s ease,
-    background 0.2s ease,
-    border-color 0.2s ease;
-}
-
-.tool-detail-launcher-label {
-  opacity: 0;
-  transform: translateX(6px);
-  will-change: transform, opacity;
-  transition:
-    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.12s ease;
-}
-
-.tool-detail-launcher-action--switch .tool-detail-launcher-label {
-  transform: translateX(-6px);
-}
-
-.tool-detail-launcher-action--jump {
-  border-radius: 16px 0 0 16px;
-}
-
-.tool-detail-launcher-action--switch {
-  border-left: 0;
-  border-radius: 0 16px 16px 0;
-}
-
-.tool-detail-launcher:hover .tool-detail-launcher-actions,
-.tool-detail-launcher:focus-within .tool-detail-launcher-actions,
-.tool-detail-launcher.is-open .tool-detail-launcher-actions {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  clip-path: inset(0 round 16px);
-  transition-delay: 0s;
-}
-
-.tool-detail-launcher:hover .tool-detail-launcher-label,
-.tool-detail-launcher:focus-within .tool-detail-launcher-label,
-.tool-detail-launcher.is-open .tool-detail-launcher-label {
-  opacity: 1;
-  transform: translateX(0);
-  transition-delay: 0.08s;
-}
-
-.tool-detail-launcher:hover .tool-detail-launcher-trigger,
-.tool-detail-launcher:focus-within .tool-detail-launcher-trigger,
-.tool-detail-launcher.is-open .tool-detail-launcher-trigger {
-  border-color: transparent;
-  background: transparent;
-  color: transparent;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.tool-detail-launcher-trigger:hover,
-.tool-detail-launcher-action:hover {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--bg-card);
-}
-
-.tool-detail-launcher-trigger:focus-visible,
-.tool-detail-launcher-action:focus-visible {
-  z-index: 3;
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 /* 工具表单共享样式 —— 子组件继承 */
@@ -964,8 +773,8 @@ onUnmounted(() => {
 
 .tool-output {
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 14px;
   font-size: 0.85rem;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
@@ -995,8 +804,8 @@ onUnmounted(() => {
   font-size: 0.75rem;
   color: var(--text-secondary);
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 4px 12px;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s;
@@ -1004,7 +813,6 @@ onUnmounted(() => {
 
 .tools-reset-btn:hover {
   color: var(--accent);
-  border-color: var(--accent);
   background: var(--bg-secondary);
 }
 
@@ -1018,7 +826,7 @@ onUnmounted(() => {
   justify-content: center;
   width: 22px;
   height: 22px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   color: var(--text-secondary);
   cursor: grab;
   opacity: 0.55;

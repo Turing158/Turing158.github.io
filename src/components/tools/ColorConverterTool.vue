@@ -178,7 +178,7 @@ function copyColor(type: string) {
   width: 120px;
   height: 120px;
   border: none;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   cursor: pointer;
   background: none;
   opacity: 0;
@@ -190,7 +190,7 @@ function copyColor(type: string) {
 .color-swatch {
   width: 120px;
   height: 120px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   border: 4px solid var(--border);
   box-shadow:
     0 8px 24px rgba(0, 0, 0, 0.12),
@@ -203,7 +203,7 @@ function copyColor(type: string) {
     content: '';
     position: absolute;
     inset: -8px;
-    border-radius: 50%;
+    clip-path: var(--pxc-circle);
     background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3), transparent 50%);
     opacity: 0;
     transition: opacity 0.3s ease;
@@ -211,7 +211,7 @@ function copyColor(type: string) {
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.08), inset 0 2px 4px rgba(255, 255, 255, 0.15);
-    border-color: var(--accent);
+    /* 原 border-image-source 在圆形、无九宫格基座的元素上只渲染出四个角点，移除 */
     &::before { opacity: 1; }
   }
   &:active { transform: scale(0.98); }

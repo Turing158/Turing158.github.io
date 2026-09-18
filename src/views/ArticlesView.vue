@@ -2,147 +2,161 @@
   <div class="articles-view">
     <h1 class="page-title">{{ $t('articles.title') }}</h1>
 
-    <div v-if="loading" class="status loading-text">
-      <span>{{ $t('common.loading') }}</span>
-      <span class="loading-dots">
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-      </span>
+    <Transition name="loader-pop" mode="out-in" appear>
+      <div v-if="loading" class="status cube-anim">
+        <CubeLoader :text="$t('common.loading')" />
+      </div>
+      <div v-else-if="articles.length === 0" class="status">{{ $t('articles.noArticles') }}</div>
 
-    </div>
-    <div v-else-if="articles.length === 0" class="status">{{ $t('articles.noArticles') }}</div>
-
-    <div v-else>
-      <!-- 标签筛选区 -->
-      <div class="tag-filter">
-        <div class="tag-filter-list">
-          <button
-            v-for="tag in allTags"
-            :key="tag"
-            class="tag-filter-item"
-            :class="{ 'tag-filter-item--active': selectedTags.includes(tag) }"
-            @click="toggleTag(tag)"
-          >
-            {{ tag }}
-          </button>
-          <Transition name="reset-btn">
+      <div v-else>
+        <!-- 排序切换 -->
+        <div class="sort-bar">
+          <span class="sort-label">{{ $t('articles.sortBy') }}</span>
+          <div class="sort-tabs" role="tablist">
             <button
-              v-if="selectedTags.length > 0"
-              class="tag-filter-reset"
-              @click="selectedTags = []"
+              v-for="option in sortOptions"
+              :key="option.value"
+              role="tab"
+              class="sort-tab px-fade px-fade-alt"
+              :class="{ 'sort-tab--active': sortBy === option.value }"
+              :aria-selected="sortBy === option.value"
+              @click="sortBy = option.value"
             >
-              {{ $t('articles.tagReset') }}
+              {{ option.label }}
             </button>
-          </Transition>
-        </div>
-      </div>
-
-      <!-- 文章列表 -->
-      <TransitionGroup
-        v-if="showCards"
-        name="article-list"
-        tag="div"
-        class="articles-list"
-        appear
-      >
-        <router-link
-          v-for="(article, index) in pagedArticles"
-          :key="article.slug"
-          :to="`/article/${article.slug}`"
-          class="article-card"
-          :style="{ '--delay': index * 60 + 'ms' }"
-        >
-          <div class="article-card-content">
-            <h2 class="article-card-title">{{ article.title }}</h2>
-            <p class="article-card-desc">{{ article.description }}</p>
-            <div class="article-card-meta">
-              <span class="article-card-date" :title="formatFullTime(article.date)">{{ formatRelativeTime(article.date) }}</span>
-              <span v-if="article.readingTime" class="article-card-reading-time" :title="`预计阅读 ${article.readingTime} 分钟`">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <polyline points="12 6 12 12 16 14"></polyline>
-                </svg>
-                {{ $t('articles.readingTime', { time: article.readingTime }) }}
-              </span>
-              <!-- 浏览量 -->
-              <span class="article-card-views">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                  <circle cx="12" cy="12" r="3"></circle>
-                </svg>
-                <template v-if="viewCountsLoading">
-                  <span class="views-spinner" />
-                </template>
-                <template v-else-if="viewCounts[article.slug] !== undefined">
-                  {{ formatViewCount(viewCounts[article.slug]) }}
-                </template>
-                <template v-else>
-                  ---
-                </template>
-              </span>
-              <span v-for="tag in article.tags" :key="tag" class="tag">{{ tag }}</span>
-              <!-- 评论计数 -->
-              <span
-                v-if="commentCounts[article.slug] !== undefined"
-                class="article-card-comments"
-                :title="`${commentCounts[article.slug]} 条评论`"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                {{ commentCounts[article.slug] }}
-              </span>
-            </div>
           </div>
-        </router-link>
-      </TransitionGroup>
+        </div>
 
-      <!-- 无匹配提示 -->
-      <div v-if="filteredArticles.length === 0" class="status">
-        {{ $t('articles.noMatch') }}
-      </div>
-
-      <!-- 分页 -->
-      <div v-if="totalPages > 1" class="pagination">
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
+        <!-- 标签筛选区 -->
+        <div class="tag-filter">
+          <div class="tag-filter-list">
+            <button
+              v-for="tag in allTags"
+              :key="tag"
+              class="tag-filter-item px-fade px-fade-alt"
+              :class="{ 'tag-filter-item--active': selectedTags.includes(tag) }"
+              @click="toggleTag(tag)"
+            >
+              {{ tag }}
+            </button>
+            <Transition name="reset-btn">
+              <button
+                v-if="selectedTags.length > 0"
+                class="tag-filter-reset px-fade"
+                @click="selectedTags = []"
+              >
+                {{ $t('articles.tagReset') }}
+              </button>
+            </Transition>
+          </div>
+        </div>
+  
+        <!-- 文章列表 -->
+        <TransitionGroup
+          v-if="showCards"
+          name="article-list"
+          tag="div"
+          class="articles-list"
+          appear
         >
-          {{ $t('articles.prev') }}
-        </button>
-
-        <div class="pagination-pages">
-          <button
-            v-for="page in pageNumbers"
-            :key="page"
-            class="pagination-page"
-            :class="{ 'pagination-page--active': page === currentPage }"
-            @click="currentPage = page"
+          <router-link
+            v-for="(article, index) in pagedArticles"
+            :key="article.slug"
+            :to="`/article/${article.slug}`"
+            class="article-card"
+            :style="{ '--delay': index * 60 + 'ms' }"
           >
-            {{ page }}
-          </button>
+            <div class="article-card-content">
+              <h2 class="article-card-title">{{ article.title }}</h2>
+              <p class="article-card-desc">{{ article.description }}</p>
+              <div class="article-card-meta">
+                <span class="article-card-date" :title="formatFullTime(article.date)">{{ formatRelativeTime(article.date) }}</span>
+                <span v-if="article.readingTime" class="article-card-reading-time" :title="`预计阅读 ${article.readingTime} 分钟`">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  {{ $t('articles.readingTime', { time: article.readingTime }) }}
+                </span>
+                <!-- 浏览量 -->
+                <span class="article-card-views">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                  <template v-if="viewCountsLoading">
+                    <CubeLoader inline :size="12" />
+                  </template>
+                  <template v-else-if="viewCounts[article.slug] !== undefined">
+                    {{ formatViewCount(viewCounts[article.slug]) }}
+                  </template>
+                  <template v-else>
+                    ---
+                  </template>
+                </span>
+                <span v-for="tag in article.tags" :key="tag" class="tag px-fade">{{ tag }}</span>
+                <!-- 评论计数 -->
+                <span
+                  v-if="commentCounts[article.slug] !== undefined"
+                  class="article-card-comments"
+                  :title="`${commentCounts[article.slug]} 条评论`"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  {{ commentCounts[article.slug] }}
+                </span>
+              </div>
+            </div>
+          </router-link>
+        </TransitionGroup>
+  
+        <!-- 无匹配提示 -->
+        <div v-if="filteredArticles.length === 0" class="status">
+          {{ $t('articles.noMatch') }}
         </div>
-
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-        >
-          {{ $t('articles.next') }}
-        </button>
-
-        <div class="pagination-size">
-          <span>{{ $t('articles.perPage') }}</span>
-          <BlogSelect
-            v-model="pageSizeOption"
-            :options="pageSizeOptions"
-            :clearable="false"
-          />
+  
+        <!-- 分页 -->
+        <div v-if="totalPages > 1" class="pagination">
+          <button
+            class="pagination-btn px-fade"
+            :disabled="currentPage === 1"
+            @click="currentPage--"
+          >
+            {{ $t('articles.prev') }}
+          </button>
+  
+          <div class="pagination-pages">
+            <button
+              v-for="page in pageNumbers"
+              :key="page"
+              class="pagination-page px-fade px-fade-alt"
+              :class="{ 'pagination-page--active': page === currentPage }"
+              @click="currentPage = page"
+            >
+              {{ page }}
+            </button>
+          </div>
+  
+          <button
+            class="pagination-btn px-fade"
+            :disabled="currentPage === totalPages"
+            @click="currentPage++"
+          >
+            {{ $t('articles.next') }}
+          </button>
+  
+          <div class="pagination-size">
+            <span>{{ $t('articles.perPage') }}</span>
+            <BlogSelect
+              v-model="pageSizeOption"
+              :options="pageSizeOptions"
+              :clearable="false"
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 
@@ -156,11 +170,13 @@ import { useAppStore } from '@/stores/app'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useGitalkCounts } from '@/composables/useGitalkCount'
 import { useViewCounts } from '@/composables/useViewCount'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { formatViewCount } from '@/utils/formatViewCount'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import BlogSelect from '@/components/common/BlogSelect.vue'
+import { articleTime } from '@/utils/articleDate'
 
 const { t } = useI18n()
 
@@ -214,6 +230,34 @@ const filteredArticles = computed(() => {
   )
 })
 
+// ── 排序 ──
+type SortKey = 'newest' | 'oldest' | 'views' | 'comments'
+
+const sortBy = ref<SortKey>('newest')
+
+const sortOptions = computed(() => [
+  { value: 'newest' as SortKey, label: t('articles.sortNewest') },
+  { value: 'oldest' as SortKey, label: t('articles.sortOldest') },
+  { value: 'views' as SortKey, label: t('articles.sortViews') },
+  { value: 'comments' as SortKey, label: t('articles.sortComments') },
+])
+
+// 排序后的文章（按解析后的时间戳比较，避免字符串比较对非 ISO 格式失效；
+// 浏览量/评论数未加载到的按 0 处理，加载完成后会响应式地重新排序）
+const sortedArticles = computed(() => {
+  const list = [...filteredArticles.value]
+  switch (sortBy.value) {
+    case 'oldest':
+      return list.sort((a, b) => articleTime(a.date) - articleTime(b.date))
+    case 'views':
+      return list.sort((a, b) => (viewCounts.value[b.slug] ?? 0) - (viewCounts.value[a.slug] ?? 0))
+    case 'comments':
+      return list.sort((a, b) => (commentCounts.value[b.slug] ?? 0) - (commentCounts.value[a.slug] ?? 0))
+    default:
+      return list.sort((a, b) => articleTime(b.date) - articleTime(a.date))
+  }
+})
+
 // 分页
 const currentPage = ref(1)
 const pageSizeOptions = [
@@ -225,14 +269,14 @@ const pageSizeOptions = [
 const pageSizeOption = ref(pageSizeOptions[1])
 const pageSize = computed(() => Number(pageSizeOption.value.value))
 
-// 筛选变化时重置到第一页
-watch(filteredArticles, () => {
+// 筛选/排序变化时重置到第一页
+watch([filteredArticles, sortBy], () => {
   currentPage.value = 1
 })
 
 // 每页条数变化时，若当前页超出总页数则跳到最后一页
 watch(pageSizeOption, () => {
-  const lastPage = Math.max(1, Math.ceil(filteredArticles.value.length / pageSize.value))
+  const lastPage = Math.max(1, Math.ceil(sortedArticles.value.length / pageSize.value))
   if (currentPage.value > lastPage) {
     currentPage.value = lastPage
   }
@@ -240,14 +284,14 @@ watch(pageSizeOption, () => {
 
 // 总页数
 const totalPages = computed(() => {
-  if (filteredArticles.value.length === 0) return 1
-  return Math.ceil(filteredArticles.value.length / pageSize.value)
+  if (sortedArticles.value.length === 0) return 1
+  return Math.ceil(sortedArticles.value.length / pageSize.value)
 })
 
 // 当前页的文章
 const pagedArticles = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
-  return filteredArticles.value.slice(start, start + pageSize.value)
+  return sortedArticles.value.slice(start, start + pageSize.value)
 })
 
 // 页码列表（简单显示所有页码）
@@ -371,6 +415,78 @@ onUnmounted(() => {
   font-size: 1.1rem;
 }
 
+/* ── 排序切换 ─────────────────────────────────── */
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.sort-label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.sort-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sort-tab {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  padding: 4px 14px;
+  --pxs: 4px; clip-path: var(--pxc);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px var(--shadow);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &--active {
+    background: var(--accent);
+    color: #fff;
+    /* 原为 border-image-source 切换；叠加层常显 accent，hover 时与 accent-hover 交叉淡化 */
+    --px-frame-fade: var(--px-frame-accent);
+    --px-frame-fade-alt: var(--px-frame-accent-hover);
+
+    &::after {
+      opacity: 1;
+    }
+
+    &:hover::after {
+      opacity: 0;
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
+
+    &:hover {
+      background: var(--accent-hover);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
 /* ── 标签筛选 ─────────────────────────────────── */
 .tag-filter {
   margin-bottom: 24px;
@@ -386,16 +502,15 @@ onUnmounted(() => {
 .tag-filter-item {
   background: var(--bg-card);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   padding: 4px 14px;
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   font-size: 0.8rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     color: var(--accent);
-    border-color: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 2px 8px var(--shadow);
   }
@@ -407,11 +522,24 @@ onUnmounted(() => {
   &--active {
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
+    /* 原为 border-image-source 切换；叠加层常显 accent，hover 时与 accent-hover 交叉淡化 */
+    --px-frame-fade: var(--px-frame-accent);
+    --px-frame-fade-alt: var(--px-frame-accent-hover);
+
+    &::after {
+      opacity: 1;
+    }
+
+    &:hover::after {
+      opacity: 0;
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
 
     &:hover {
       background: var(--accent-hover);
-      border-color: var(--accent-hover);
       color: #fff;
       transform: translateY(-2px);
       box-shadow: 0 2px 8px var(--shadow);
@@ -426,16 +554,15 @@ onUnmounted(() => {
 .tag-filter-reset {
   background: transparent;
   color: var(--text-secondary);
-  border: 1px dashed var(--text-secondary);
+  border: 1px solid transparent; border-image: var(--px-frame-text-secondary) 6 / calc(2 * var(--pxs)) repeat;
   padding: 4px 14px;
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   font-size: 0.8rem;
   cursor: pointer;
   transition: color 0.2s, border-color 0.2s, border-style 0.2s, transform 0.2s, box-shadow 0.2s;
 
   &:hover {
     color: var(--accent);
-    border-color: var(--accent);
     border-style: solid;
     transform: translateY(-2px);
     box-shadow: 0 2px 8px var(--shadow);
@@ -472,9 +599,9 @@ onUnmounted(() => {
 
 .article-card {
   background: var(--bg-card);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 24px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 8px var(--shadow);
   transition: transform 0.2s, box-shadow 0.2s;
 
@@ -537,9 +664,9 @@ onUnmounted(() => {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+  border: 1px solid transparent; border-image: var(--px-frame-accent-faint) 6 / calc(2 * var(--pxs)) stretch;
   transition: background 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
   cursor: default;
 
@@ -550,25 +677,8 @@ onUnmounted(() => {
 
   &:hover {
     background: color-mix(in srgb, var(--accent) 14%, transparent);
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 12%, transparent);
-  }
-
-  .views-spinner {
-    display: inline-block;
-    width: 10px;
-    height: 10px;
-    border: 2px solid color-mix(in srgb, var(--accent) 30%, transparent);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: views-spin 0.6s linear infinite;
-  }
-}
-
-@keyframes views-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 
@@ -597,16 +707,15 @@ onUnmounted(() => {
   background: var(--bg-secondary);
   color: var(--accent);
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
   font-weight: 500;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: default;
 
   &:hover {
     transform: scale(1.08) translateY(-1px);
-    border-color: var(--accent);
     box-shadow: 0 2px 8px var(--shadow);
   }
 }
@@ -624,21 +733,25 @@ onUnmounted(() => {
 .pagination-btn {
   background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   padding: 6px 16px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
     color: var(--accent);
-    border-color: var(--accent);
   }
 
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  /* 禁用态不淡入（压过工具类 .px-fade:hover::after，与原 hover:not(:disabled) 行为一致） */
+  &:disabled::after {
+    opacity: 0;
   }
 }
 
@@ -650,10 +763,10 @@ onUnmounted(() => {
 .pagination-page {
   background: var(--bg-card);
   color: var(--text-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -663,17 +776,29 @@ onUnmounted(() => {
 
   &:hover {
     color: var(--accent);
-    border-color: var(--accent);
   }
 
   &--active {
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
+    /* 原为 border-image-source 切换；叠加层常显 accent，hover 时与 accent-hover 交叉淡化 */
+    --px-frame-fade: var(--px-frame-accent);
+    --px-frame-fade-alt: var(--px-frame-accent-hover);
+
+    &::after {
+      opacity: 1;
+    }
+
+    &:hover::after {
+      opacity: 0;
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
 
     &:hover {
       background: var(--accent-hover);
-      border-color: var(--accent-hover);
       color: #fff;
     }
   }
@@ -691,15 +816,11 @@ onUnmounted(() => {
 .pagination-select {
   background: var(--bg-card);
   color: var(--text-primary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   padding: 4px 8px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   font-size: 0.8rem;
   cursor: pointer;
   outline: none;
-
-  &:hover {
-    border-color: var(--accent);
-  }
 }
 </style>

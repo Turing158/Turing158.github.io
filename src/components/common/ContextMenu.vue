@@ -73,8 +73,8 @@ function handleItemClick(item: ContextMenuItem) {
   min-width: 180px;
   padding: 6px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   box-shadow: 0 8px 32px var(--shadow-strong), 0 2px 8px var(--shadow);
   backdrop-filter: blur(12px);
   user-select: none;
@@ -110,7 +110,7 @@ function handleItemClick(item: ContextMenuItem) {
   height: 1px;
   margin: 4px 10px;
   background: var(--border);
-  border-radius: 1px;
+  --pxs: 2px; clip-path: var(--pxc);
 }
 
 /* ── 菜单项 ── */
@@ -121,7 +121,10 @@ function handleItemClick(item: ContextMenuItem) {
   width: 100%;
   padding: 10px 12px;
   border: none;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
+  position: relative;
+  /* isolation + ::before z-index:-1：背景层压在文字之下、限于元素自身层叠上下文 */
+  isolation: isolate;
   background: transparent;
   color: var(--text-primary);
   font-family: inherit;
@@ -129,10 +132,30 @@ function handleItemClick(item: ContextMenuItem) {
   font-weight: 500;
   text-align: left;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: color 0.15s ease;
+
+  /* hover 背景：透明度 0→1 + 缩放 0.9→1 弹入 */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    clip-path: var(--pxc);
+    background: var(--accent);
+    opacity: 0;
+    transform: scale(0.9);
+    transition:
+      opacity 0.15s ease,
+      transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:hover::before,
+  &:focus-visible::before {
+    opacity: 1;
+    transform: scale(1);
+  }
 
   &:hover {
-    background: var(--accent);
     color: #fff;
 
     .item-icon {
@@ -144,8 +167,11 @@ function handleItemClick(item: ContextMenuItem) {
     transform: scale(0.98);
   }
 
-  &--danger:hover {
+  &--danger::before {
     background: #e53e3e;
+  }
+
+  &--danger:hover {
     color: #fff;
 
     .item-icon {

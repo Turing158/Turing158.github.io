@@ -81,12 +81,12 @@
           {{ results.length }} {{ $t('tools.randomGenerator.numbers') }}
         </span>
       </div>
-      <div class="results-display" :class="{ 'is-generating': isGenerating }">
+      <div class="results-display px-fade" :class="{ 'is-generating': isGenerating }">
         <TransitionGroup name="number-pop" tag="div" class="numbers-grid">
           <div
             v-for="(num, index) in displayResults"
             :key="`${num}-${index}`"
-            class="number-ball"
+            class="number-ball px-fade"
             :title="$t('tools.randomGenerator.clickToCopy')"
             :style="{ '--ball-index': index }"
             @click="copyOne(num)"
@@ -245,8 +245,8 @@ function cancelCopyAllLongPress() {
   gap: 14px;
   padding: 16px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 .config-row {
   display: flex;
@@ -320,18 +320,21 @@ function cancelCopyAllLongPress() {
   color: var(--accent);
   background: var(--bg-secondary);
   padding: 2px 8px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
 }
 .results-display {
   min-height: 80px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 12px;
   background: var(--bg-card);
 }
 .results-display.is-generating {
-  border-color: var(--accent);
   box-shadow: 0 0 12px rgba(var(--accent), 0.15);
+}
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.results-display.is-generating::after {
+  opacity: 1;
 }
 .numbers-grid {
   display: flex;
@@ -345,9 +348,9 @@ function cancelCopyAllLongPress() {
   min-width: 40px;
   height: 40px;
   padding: 0 8px;
-  border-radius: 20px;
+  --pxs: 4px; clip-path: var(--pxc);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.85rem;
   font-weight: 600;
@@ -359,7 +362,6 @@ function cancelCopyAllLongPress() {
   transform: scale(1.1);
   background: var(--accent);
   color: var(--bg-card);
-  border-color: var(--accent);
 }
 .empty-state {
   display: flex;

@@ -59,6 +59,12 @@ const routes: RouteRecordRaw[] = [
     meta: { titleKey: 'pageTitle.achievements' },
   },
   {
+    path: '/friends',
+    name: 'friends',
+    component: () => import('@/views/FriendsView.vue'),
+    meta: { titleKey: 'pageTitle.friends' },
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('@/views/AboutView.vue'),

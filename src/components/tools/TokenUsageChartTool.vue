@@ -23,14 +23,14 @@
       <span class="tool-info-text">{{ $t('tools.tokenUsageChart.formatHint') }}</span>
       <span class="tool-info-spacer" />
       <span class="tool-info-download-label">{{ $t('tools.tokenUsageChart.downloadScript') }}</span>
-      <button type="button" class="tool-info-btn" @click="downloadScript('py')">py</button>
-      <button type="button" class="tool-info-btn" @click="downloadScript('js')">js</button>
+      <button type="button" class="tool-info-btn px-fade" @click="downloadScript('py')">py</button>
+      <button type="button" class="tool-info-btn px-fade" @click="downloadScript('js')">js</button>
     </div>
 
     <!-- ── Part 1: 文件上传区 ── -->
     <label class="tool-label">{{ $t('tools.tokenUsageChart.uploadLabel') }}</label>
     <div
-      class="upload-zone"
+      class="upload-zone px-fade"
       :class="{ 'is-dragover': isDragover, 'has-files': files.length > 0 }"
       @click="triggerFileInput"
       @dragenter.prevent="isDragover = true"
@@ -80,7 +80,7 @@
 
       <!-- 文件列表 -->
       <div v-else class="file-list">
-        <div v-for="file in files" :key="file.name" class="file-item">
+        <div v-for="file in files" :key="file.name" class="file-item px-fade">
           <svg class="file-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
               d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
@@ -163,21 +163,21 @@
         <div class="style-row">
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.primaryColor') }}</label>
-            <input type="color" v-model="styleOptions.primaryColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.primaryColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.bgColor') }}</label>
-            <input type="color" v-model="styleOptions.bgColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.bgColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.fontColor') }}</label>
-            <input type="color" v-model="styleOptions.fontColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.fontColor" class="color-input" /></span>
           </div>
         </div>
         <div class="style-row style-row--2">
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.cardBgColor') }}</label>
-            <input type="color" v-model="styleOptions.cardBgColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.cardBgColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.cardOpacity') }}</label>
@@ -197,7 +197,7 @@
           <div class="style-orientation">
             <button
               type="button"
-              class="style-orientation-btn"
+              class="style-orientation-btn px-fade px-fade-alt"
               :class="{ active: styleOptions.orientation === 'landscape' }"
               @click="styleOptions.orientation = 'landscape'"
             >
@@ -209,7 +209,7 @@
             </button>
             <button
               type="button"
-              class="style-orientation-btn"
+              class="style-orientation-btn px-fade px-fade-alt"
               :class="{ active: styleOptions.orientation === 'portrait' }"
               @click="styleOptions.orientation = 'portrait'"
             >
@@ -221,7 +221,7 @@
             </button>
             <button
               type="button"
-              class="style-orientation-btn style-orientation-btn--custom"
+              class="style-orientation-btn style-orientation-btn--custom px-fade px-fade-alt"
               :class="{ active: styleOptions.orientation === 'custom' }"
               @click="styleOptions.orientation = 'custom'"
             >
@@ -251,19 +251,19 @@
           <div class="style-module-toggles">
             <button
               type="button"
-              class="style-module-btn"
+              class="style-module-btn px-fade"
               :class="{ active: styleOptions.showUsageModule }"
               @click="toggleModule('usage', !styleOptions.showUsageModule)"
             >{{ $t('tools.tokenUsageChart.moduleUsage') }}</button>
             <button
               type="button"
-              class="style-module-btn"
+              class="style-module-btn px-fade"
               :class="{ active: styleOptions.showContributionModule }"
               @click="toggleModule('contribution', !styleOptions.showContributionModule)"
             >{{ $t('tools.tokenUsageChart.moduleContribution') }}</button>
             <button
               type="button"
-              class="style-module-btn"
+              class="style-module-btn px-fade"
               :class="{ active: styleOptions.showChartModule }"
               @click="toggleModule('chart', !styleOptions.showChartModule)"
             >{{ $t('tools.tokenUsageChart.moduleChart') }}</button>
@@ -289,7 +289,7 @@
             <div class="style-align-toggles">
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageCardTitleAlign === 'left' }"
                 @click="styleOptions.usageCardTitleAlign = 'left'"
               >
@@ -302,7 +302,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageCardTitleAlign === 'center' }"
                 @click="styleOptions.usageCardTitleAlign = 'center'"
               >
@@ -315,7 +315,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageCardTitleAlign === 'right' }"
                 @click="styleOptions.usageCardTitleAlign = 'right'"
               >
@@ -336,7 +336,7 @@
             <div class="style-align-toggles">
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageTitleAlign === 'left' }"
                 @click="styleOptions.usageTitleAlign = 'left'"
               >
@@ -349,7 +349,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageTitleAlign === 'center' }"
                 @click="styleOptions.usageTitleAlign = 'center'"
               >
@@ -362,7 +362,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageTitleAlign === 'right' }"
                 @click="styleOptions.usageTitleAlign = 'right'"
               >
@@ -388,7 +388,7 @@
             <div class="style-align-toggles">
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageDataAlign === 'left' }"
                 @click="styleOptions.usageDataAlign = 'left'"
               >
@@ -400,7 +400,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageDataAlign === 'center' }"
                 @click="styleOptions.usageDataAlign = 'center'"
               >
@@ -412,7 +412,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.usageDataAlign === 'right' }"
                 @click="styleOptions.usageDataAlign = 'right'"
               >
@@ -533,7 +533,7 @@
             <div class="style-align-toggles">
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.contributionCardTitleAlign === 'left' }"
                 @click="styleOptions.contributionCardTitleAlign = 'left'"
               >
@@ -546,7 +546,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.contributionCardTitleAlign === 'center' }"
                 @click="styleOptions.contributionCardTitleAlign = 'center'"
               >
@@ -559,7 +559,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.contributionCardTitleAlign === 'right' }"
                 @click="styleOptions.contributionCardTitleAlign = 'right'"
               >
@@ -577,15 +577,15 @@
         <div class="style-row">
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.monthLabelColor') }}</label>
-            <input type="color" v-model="styleOptions.monthLabelColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.monthLabelColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.weekdayLabelColor') }}</label>
-            <input type="color" v-model="styleOptions.weekdayLabelColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.weekdayLabelColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.gridEmptyColor') }}</label>
-            <input type="color" v-model="styleOptions.gridEmptyColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.gridEmptyColor" class="color-input" /></span>
           </div>
         </div>
         <div class="style-field style-field--row">
@@ -595,7 +595,7 @@
           </label>
           <template v-if="styleOptions.showDateRange">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.dateRangeFontColor') }}</label>
-            <input type="color" v-model="styleOptions.dateRangeFontColor" class="color-input color-input--inline-row" />
+            <span class="color-input-wrap color-input-wrap--inline-row px-fade"><input type="color" v-model="styleOptions.dateRangeFontColor" class="color-input color-input--inline-row" /></span>
           </template>
         </div>
         <div class="style-field style-field--row">
@@ -624,7 +624,7 @@
             <div class="style-align-toggles">
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.chartCardTitleAlign === 'left' }"
                 @click="styleOptions.chartCardTitleAlign = 'left'"
               >
@@ -637,7 +637,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.chartCardTitleAlign === 'center' }"
                 @click="styleOptions.chartCardTitleAlign = 'center'"
               >
@@ -650,7 +650,7 @@
               </button>
               <button
                 type="button"
-                class="style-align-btn"
+                class="style-align-btn px-fade px-fade-alt"
                 :class="{ active: styleOptions.chartCardTitleAlign === 'right' }"
                 @click="styleOptions.chartCardTitleAlign = 'right'"
               >
@@ -883,11 +883,11 @@
         <div class="style-row style-row--2">
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.chartDateFontColor') }}</label>
-            <input type="color" v-model="styleOptions.chartDateFontColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.chartDateFontColor" class="color-input" /></span>
           </div>
           <div class="style-field">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.chartValueFontColor') }}</label>
-            <input type="color" v-model="styleOptions.chartValueFontColor" class="color-input" />
+            <span class="color-input-wrap px-fade"><input type="color" v-model="styleOptions.chartValueFontColor" class="color-input" /></span>
           </div>
         </div>
         <div class="style-field style-field--row">
@@ -897,7 +897,7 @@
           </label>
           <template v-if="styleOptions.showLegend">
             <label class="tool-label">{{ $t('tools.tokenUsageChart.legendFontColor') }}</label>
-            <input type="color" v-model="styleOptions.legendFontColor" class="color-input color-input--inline-row" />
+            <span class="color-input-wrap color-input-wrap--inline-row px-fade"><input type="color" v-model="styleOptions.legendFontColor" class="color-input color-input--inline-row" /></span>
           </template>
         </div>
       </fieldset>
@@ -1411,8 +1411,8 @@ function applyStyle() {
   column-gap: 10px;
   row-gap: 8px;
   padding: 10px 14px;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame-accent-soft) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: color-mix(in srgb, var(--accent) 8%, var(--bg-secondary));
 }
 
@@ -1447,15 +1447,14 @@ function applyStyle() {
   font-weight: 600;
   color: var(--accent);
   background: var(--bg-card);
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border));
-  border-radius: 6px;
+  border: 1px solid transparent; border-image: var(--px-frame-accent-soft) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 2px; clip-path: var(--pxc);
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     background: var(--accent);
     color: var(--bg-card);
-    border-color: var(--accent);
   }
 
   &:active {
@@ -1466,8 +1465,9 @@ function applyStyle() {
 // ── 上传区 ──
 .upload-zone {
   position: relative;
-  border: 2px dashed var(--border);
-  border-radius: 12px;
+  border: 2px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) repeat;
+  --pxs: 3px; clip-path: var(--pxc);
+  --px-fade-inset: 2px;
   padding: 48px 24px;
   min-height: 200px;
   display: flex;
@@ -1478,15 +1478,17 @@ function applyStyle() {
   transition: border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
 
   &:hover {
-    border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 6%, var(--bg-secondary));
   }
 
   &.is-dragover {
-    border-color: var(--accent);
-    border-style: solid;
     background: color-mix(in srgb, var(--accent) 10%, var(--bg-secondary));
     transform: scale(1.01);
+  }
+
+  /* 拖入悬停常显 accent 帧（原为 border-image-source 切换） */
+  &.is-dragover::after {
+    opacity: 1;
   }
 
   &.has-files {
@@ -1545,14 +1547,11 @@ function applyStyle() {
   align-items: center;
   gap: 10px;
   padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --px-frame-fade: var(--px-frame-accent-soft);
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-card);
   transition: border-color 0.2s ease, background 0.2s ease;
-
-  &:hover {
-    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  }
 }
 
 .file-icon {
@@ -1586,7 +1585,7 @@ function applyStyle() {
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
@@ -1605,8 +1604,8 @@ function applyStyle() {
 
 // ── 预览区 ──
 .preview-zone {
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   min-height: 240px;
   background: var(--bg-secondary);
   display: flex;
@@ -1662,8 +1661,8 @@ function applyStyle() {
 }
 
 .style-section {
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 14px;
   margin: 0;
   display: flex;
@@ -1811,14 +1810,17 @@ function applyStyle() {
   gap: 4px;
   padding: 10px 8px;
   height: 72px; // 固定高度，确保嵌入输入框时不变形
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  /* ::after 常显 accent（激活态），::before 淡入 accent-soft（非激活 hover），两态交叉淡化 */
+  --px-frame-fade: var(--px-frame-accent);
+  --px-frame-fade-alt: var(--px-frame-accent-soft);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
   transition: all 0.2s;
   box-sizing: border-box;
-  overflow: hidden;
+  /* 原 overflow: hidden 会裁掉外扩的叠加层；内部浮层 inset 6px 并不越界，移除 */
 
   svg {
     opacity: 0.7;
@@ -1837,7 +1839,6 @@ function applyStyle() {
 
   &.active {
     background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
-    border-color: var(--accent);
     color: var(--accent);
 
     svg {
@@ -1845,8 +1846,21 @@ function applyStyle() {
     }
   }
 
+  &.active::after {
+    opacity: 1;
+  }
+
+  /* 非激活 hover 只淡入 accent-soft（压过工具类对 ::after 的 hover 淡入） */
+  &:hover:not(.active)::after {
+    opacity: 0;
+  }
+
+  /* 激活态 hover 保持 accent（压过工具类对 ::before 的 hover 淡入） */
+  &.active:hover::before {
+    opacity: 0;
+  }
+
   &:hover:not(.active) {
-    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
     color: var(--text-primary);
   }
 }
@@ -1880,7 +1894,7 @@ function applyStyle() {
     font-size: 0.85rem;
     text-align: center;
     padding: 0 6px;
-    border-radius: 6px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 }
 
@@ -1908,8 +1922,11 @@ function applyStyle() {
   align-items: center;
   gap: 4px;
   padding: 8px 4px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  /* ::after 常显 accent（激活态），::before 淡入 accent-soft（非激活 hover），两态交叉淡化 */
+  --px-frame-fade: var(--px-frame-accent);
+  --px-frame-fade-alt: var(--px-frame-accent-soft);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1926,7 +1943,6 @@ function applyStyle() {
 
   &.active {
     background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
-    border-color: var(--accent);
     color: var(--accent);
 
     svg {
@@ -1934,8 +1950,21 @@ function applyStyle() {
     }
   }
 
+  &.active::after {
+    opacity: 1;
+  }
+
+  /* 非激活 hover 只淡入 accent-soft（压过工具类对 ::after 的 hover 淡入） */
+  &:hover:not(.active)::after {
+    opacity: 0;
+  }
+
+  /* 激活态 hover 保持 accent（压过工具类对 ::before 的 hover 淡入） */
+  &.active:hover::before {
+    opacity: 0;
+  }
+
   &:hover:not(.active) {
-    border-color: color-mix(in srgb, var(--accent) 40%, var(--border));
     color: var(--text-primary);
   }
 }
@@ -1943,8 +1972,8 @@ function applyStyle() {
 .style-module-btn {
   padding: 8px 6px;
   font-size: 0.82rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
@@ -1952,38 +1981,56 @@ function applyStyle() {
 
   &.active {
     background: color-mix(in srgb, var(--accent) 12%, var(--bg-secondary));
-    border-color: var(--accent);
     color: var(--accent);
     font-weight: 600;
   }
 }
 
-.color-input {
-  width: 100%;
-  height: 38px;
-  padding: 0;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  cursor: pointer;
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.style-module-btn.active::after {
+  opacity: 1;
+}
 
-  &:hover {
-    border-color: var(--accent);
+/* input[type=color] 是替换元素无伪元素：accent hover 叠加层挂在外层包裹上 */
+.color-input-wrap {
+  display: block;
+  width: 100%;
+
+  &--inline-row {
+    width: 56px;
+    flex-shrink: 0;
   }
 
   &--inline {
     width: 22px;
     height: 22px;
     margin-left: auto;
-    border-radius: 4px;
     flex-shrink: 0;
+  }
+}
+
+.color-input {
+  /* 块级化：inline-block 会让 .color-input-wrap 的行盒多出 1px 下沉，
+     px-fade 叠加层（inset -1px）就会比输入框底边低 2px */
+  display: block;
+  width: 100%;
+  height: 38px;
+  padding: 0;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  background: var(--bg-secondary);
+  cursor: pointer;
+
+  &--inline {
+    width: 100%;
+    height: 22px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 
   &--inline-row {
-    width: 56px;
+    width: 100%;
     height: 28px;
-    flex-shrink: 0;
-    border-radius: 6px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 }
 
@@ -1995,7 +2042,7 @@ function applyStyle() {
   color: var(--text-primary);
   cursor: pointer;
   padding: 0;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: transparent;
   transition: all 0.2s;
   position: relative;
@@ -2016,8 +2063,8 @@ function applyStyle() {
     width: 18px;
     height: 18px;
     margin: 0;
-    border: 2px solid var(--border);
-    border-radius: 4px;
+    border: 2px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+    --pxs: 2px; clip-path: var(--pxc);
     background: transparent;
     cursor: pointer;
     position: relative;
@@ -2032,7 +2079,7 @@ function applyStyle() {
       content: '';
       position: absolute;
       inset: 2px;
-      border-radius: 2px;
+      --pxs: 2px; clip-path: var(--pxc);
       background: var(--swatch, var(--accent));
       transform: scale(0);
       transition: transform 0.15s ease;
@@ -2063,7 +2110,7 @@ function applyStyle() {
   padding: 0;
   margin: 0;
   border: none;
-  border-radius: 2px;
+  --pxs: 2px; clip-path: var(--pxc);
   background: var(--swatch, var(--accent));
   box-sizing: border-box;
   opacity: 0;
@@ -2083,12 +2130,12 @@ function applyStyle() {
 
   &::-webkit-color-swatch {
     border: none;
-    border-radius: 2px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 
   &::-moz-color-swatch {
     border: none;
-    border-radius: 2px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 }
 

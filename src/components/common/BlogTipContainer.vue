@@ -51,9 +51,9 @@ function onMouseLeave(tip: (typeof tips.value)[number]) {
   justify-content: center;
   gap: 10px;
   padding: 10px 18px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--accent);
-  border: 2px solid var(--border);
+  border: 2px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 6px 20px var(--shadow);
   font-size: 0.9rem;
   color: #f1f1f1;
@@ -77,7 +77,7 @@ function onMouseLeave(tip: (typeof tips.value)[number]) {
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: #f1f1f1;
   color: var(--accent);
   font-size: 0.7rem;
@@ -87,16 +87,16 @@ function onMouseLeave(tip: (typeof tips.value)[number]) {
 
 // type variants — only border color differs
 .blog-tip-info {
-  border-color: var(--accent);
+  border-image-source: var(--px-frame-accent);
 }
 .blog-tip-success {
-  border-color: #4caf50;
+  border-image-source: var(--px-frame-tip-success);
 }
 .blog-tip-warning {
-  border-color: #ff9800;
+  border-image-source: var(--px-frame-tip-warning);
 }
 .blog-tip-error {
-  border-color: #e74c3c;
+  border-image-source: var(--px-frame-tip-error);
 }
 
 @keyframes blog-tip-in {

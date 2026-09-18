@@ -69,8 +69,8 @@ const dashOffset = computed(() => {
   gap: 20px;
   padding: 20px 24px;
   background: var(--bg-card);
-  border-radius: 16px;
-  border: 1px solid var(--border);
+  --pxs: 4px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .progress-ring-wrap {

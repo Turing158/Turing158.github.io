@@ -182,48 +182,49 @@
         <span class="header-icon">⬇</span>
         <h2 class="forum-section-title">{{ t('forum.downloadTitle') }}</h2>
       </div>
-      <div v-if="downloadLoading" class="download-loading">
-        <span class="download-spinner"></span>
-        <span>{{ t('forum.downloadLoading') }}</span>
-      </div>
-      <div v-else-if="downloadError" class="download-error">
-        <span>{{ t('forum.downloadFailed') }}</span>
-      </div>
-      <div v-else class="download-list">
-        <div
-          v-for="(release, index) in latestReleases"
-          :key="release.repo"
-          class="download-card"
-          :class="release.repo === 'StarFall-Vue' ? 'download-vue' : 'download-spring'"
-          :style="{ '--delay': index * 100 + 'ms' }"
-        >
-          <div class="download-header">
-            <span class="download-repo-badge" :class="release.repo === 'StarFall-Vue' ? 'badge-vue' : 'badge-spring'">
-              {{ release.repo === 'StarFall-Vue' ? 'V' : 'S' }}
-            </span>
-            <div class="download-info">
-              <h3 class="download-repo-name">{{ release.repo }}</h3>
-              <span class="download-tag">{{ release.tag_name }}</span>
+      <Transition name="loader-pop" mode="out-in" appear>
+        <div v-if="downloadLoading" class="download-loading cube-anim">
+          <CubeLoader :size="20" :text="t('forum.downloadLoading')" />
+        </div>
+        <div v-else-if="downloadError" class="download-error">
+          <span>{{ t('forum.downloadFailed') }}</span>
+        </div>
+        <div v-else class="download-list">
+          <div
+            v-for="(release, index) in latestReleases"
+            :key="release.repo"
+            class="download-card"
+            :class="release.repo === 'StarFall-Vue' ? 'download-vue' : 'download-spring'"
+            :style="{ '--delay': index * 100 + 'ms' }"
+          >
+            <div class="download-header">
+              <span class="download-repo-badge" :class="release.repo === 'StarFall-Vue' ? 'badge-vue' : 'badge-spring'">
+                {{ release.repo === 'StarFall-Vue' ? 'V' : 'S' }}
+              </span>
+              <div class="download-info">
+                <h3 class="download-repo-name">{{ release.repo }}</h3>
+                <span class="download-tag">{{ release.tag_name }}</span>
+              </div>
+            </div>
+            <div v-if="release.assets.length > 0" class="download-assets">
+              <a
+                v-for="asset in release.assets"
+                :key="asset.browser_download_url"
+                :href="asset.browser_download_url"
+                target="_blank"
+                rel="noopener"
+                class="forum-btn forum-btn-primary forum-btn--small"
+              >
+                {{ asset.name }}
+                <ExternalLinkIcon />
+              </a>
+            </div>
+            <div v-else class="download-no-assets">
+              {{ t('forum.downloadNoAssets') }}
             </div>
           </div>
-          <div v-if="release.assets.length > 0" class="download-assets">
-            <a
-              v-for="asset in release.assets"
-              :key="asset.browser_download_url"
-              :href="asset.browser_download_url"
-              target="_blank"
-              rel="noopener"
-              class="forum-btn forum-btn-primary forum-btn--small"
-            >
-              {{ asset.name }}
-              <ExternalLinkIcon />
-            </a>
-          </div>
-          <div v-else class="download-no-assets">
-            {{ t('forum.downloadNoAssets') }}
-          </div>
         </div>
-      </div>
+      </Transition>
     </section>
 
     <!-- 鸣谢 -->
@@ -315,6 +316,7 @@ import { config } from '@/config'
 import { useGitalk } from '@/composables/useGitalk'
 import axios from 'axios'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 
 const FRONTEND_REPO = 'StarFall-vue'
 const BACKEND_REPO = 'StarFall-SpringBoot'
@@ -1288,15 +1290,6 @@ function toggleLang() {
     font-size: 14px;
   }
 
-  .download-spinner {
-    width: 20px;
-    height: 20px;
-    border: 2px solid @border-light;
-    border-top-color: @text-accent;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
   .download-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -1415,10 +1408,6 @@ function toggleLang() {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
 }
 
 // ===== 鸣谢 =====

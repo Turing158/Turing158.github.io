@@ -14,7 +14,7 @@
           <label
             v-for="opt in algoOptions"
             :key="opt.value"
-            class="sha-radio-item"
+            class="sha-radio-item px-fade"
             :class="{ 'is-checked': selectedAlgo === opt.value }"
           >
             <input
@@ -164,8 +164,8 @@ function clear() {
   align-items: center;
   gap: 4px;
   padding: 4px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  --pxs: 2px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   cursor: pointer;
   font-size: 0.85rem;
   color: var(--text-secondary);
@@ -174,7 +174,10 @@ function clear() {
 .sha-radio-item.is-checked {
   background: var(--accent);
   color: var(--bg-card);
-  border-color: var(--accent);
+}
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.sha-radio-item.is-checked::after {
+  opacity: 1;
 }
 .sha-radio-input {
   display: none;
@@ -192,9 +195,9 @@ function clear() {
 .sha-algo-tag {
   flex-shrink: 0;
   padding: 4px 8px;
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent);

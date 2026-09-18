@@ -2,7 +2,7 @@
   <div class="blog-select" :class="{ 'is-disabled': disabled }">
     <div
       ref="triggerRef"
-      class="blog-select-trigger"
+      class="blog-select-trigger px-fade"
       :class="{ 'is-open': visible, 'is-disabled': disabled }"
       tabindex="0"
       role="combobox"
@@ -450,26 +450,32 @@ defineExpose({
   padding: 10px 14px;
   min-height: 42px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   cursor: pointer;
   user-select: none;
+  --px-frame-fade: var(--px-frame-accent-soft);
   transition:
     border-color 0.25s ease,
     box-shadow 0.25s ease;
 
-  &:hover:not(.is-disabled) {
-    border-color: color-mix(in srgb, var(--accent) 30%, var(--border));
-  }
-
   &.is-open {
-    border-color: var(--accent);
+    --px-frame-fade: var(--px-frame-accent);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 12%, transparent);
+
+    &::after {
+      opacity: 1;
+    }
   }
 
   &.is-disabled {
     opacity: 0.5;
     cursor: not-allowed;
+
+    /* 压过工具类 .px-fade:hover::after，禁用态不淡入 */
+    &::after {
+      opacity: 0;
+    }
   }
 }
 
@@ -522,7 +528,7 @@ defineExpose({
   justify-content: center;
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -559,8 +565,8 @@ defineExpose({
 .blog-select-dropdown {
   z-index: 10001;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   box-shadow:
     0 4px 16px var(--shadow),
     0 8px 40px color-mix(in srgb, var(--text-primary) 8%);
@@ -577,7 +583,7 @@ defineExpose({
 
   &::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
     transition: background 0.2s;
   }
 
@@ -587,16 +593,35 @@ defineExpose({
 }
 
 .blog-select-option {
+  position: relative;
+  /* isolation + ::before z-index:-1：hover 背景层压在文字之下 */
+  isolation: isolate;
   padding: 9px 14px;
   cursor: pointer;
   color: var(--text-primary);
   font-size: 0.9rem;
-  transition:
-    background 0.2s ease,
-    padding-left 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: padding-left 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* hover 背景：透明度 0→1 + 缩放 0.9→1 弹入 */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: color-mix(in srgb, var(--accent) 6%, transparent);
+    opacity: 0;
+    transform: scale(0.9);
+    transition:
+      opacity 0.15s ease,
+      transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  &:hover::before {
+    opacity: 1;
+    transform: scale(1);
+  }
 
   &:hover {
-    background: color-mix(in srgb, var(--accent) 6%, transparent);
     padding-left: 18px;
   }
 

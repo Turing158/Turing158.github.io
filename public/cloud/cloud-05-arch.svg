@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="490" height="266" viewBox="0 0 490 266" fill="none" shape-rendering="crispEdges" role="img" aria-labelledby="title desc">
+<title id="title">05 拱形云 / arch</title>
+<desc id="desc">Original block-style pixel cloud. Transparent background; 14-unit square grid; editable vector rectangles.</desc>
+<g id="cloud-05" transform="translate(28 28)">
+  <g fill="#B6C7DA">
+    <rect x="112" y="28" width="154" height="42"/>
+    <rect x="42" y="70" width="336" height="42"/>
+    <rect x="0" y="112" width="434" height="56"/>
+    <rect x="350" y="168" width="42" height="14"/>
+    <rect x="42" y="168" width="224" height="42"/>
+  </g>
+  <g fill="#D4E0EC">
+    <rect x="112" y="14" width="154" height="42"/>
+    <rect x="42" y="56" width="336" height="42"/>
+    <rect x="0" y="98" width="434" height="56"/>
+    <rect x="350" y="154" width="42" height="14"/>
+    <rect x="42" y="154" width="224" height="42"/>
+  </g>
+  <g fill="#EEF4FA">
+    <rect x="112" y="0" width="154" height="42"/>
+    <rect x="42" y="42" width="336" height="42"/>
+    <rect x="0" y="84" width="434" height="56"/>
+    <rect x="350" y="140" width="42" height="14"/>
+    <rect x="42" y="140" width="224" height="42"/>
+  </g>
+  <g fill="#D4E0EC">
+    <rect x="308" y="70" width="70" height="42"/>
+    <rect x="154" y="126" width="112" height="28"/>
+  </g>
+  <g fill="#FFFFFF">
+    <rect x="112" y="0" width="140" height="28"/>
+    <rect x="42" y="42" width="112" height="28"/>
+    <rect x="0" y="84" width="70" height="14"/>
+  </g>
+</g>
+</svg>

@@ -189,8 +189,8 @@ function goHome() {
 
   details {
     background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+    --pxs: 3px; clip-path: var(--pxc);
     padding: 12px;
   }
 
@@ -205,7 +205,7 @@ function goHome() {
     margin: 0;
     padding: 12px;
     background: var(--code-bg);
-    border-radius: 4px;
+    --pxs: 2px; clip-path: var(--pxc);
     font-size: 0.85rem;
     overflow-x: auto;
     white-space: pre-wrap;
@@ -228,7 +228,7 @@ function goHome() {
   padding: 12px 24px;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
   transition: all 0.25s ease;
 
   &--secondary {
@@ -299,7 +299,7 @@ function goHome() {
 
 .floating-shape {
   position: absolute;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   opacity: 0.08;
   background: var(--accent);
 }

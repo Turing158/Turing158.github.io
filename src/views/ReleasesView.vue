@@ -2,92 +2,93 @@
   <div class="releases-view">
     <h1 class="page-title">{{ $t('releases.title') }}</h1>
 
-    <div v-if="loading" class="loading-container">
-      <div class="loading-spinner"></div>
-      <span class="loading-text">{{ $t('common.loading') }}</span>
-    </div>
+    <Transition name="loader-pop" mode="out-in" appear>
+      <div v-if="loading" class="loading-container cube-anim">
+        <CubeLoader :text="$t('common.loading')" />
+      </div>
 
-    <div v-else-if="error" class="error-container">
-      <span class="error-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <line x1="12" y1="8" x2="12" y2="12" />
-          <line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
-      </span>
-      <p class="error-text">{{ $t('releases.loadFailed') }}</p>
-    </div>
+      <div v-else-if="error" class="error-container">
+        <span class="error-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+        </span>
+        <p class="error-text">{{ $t('releases.loadFailed') }}</p>
+      </div>
 
-    <div v-else class="releases-grid">
-      <TransitionGroup name="release-card" tag="div" class="releases-grid-inner" appear>
-        <div
-          v-for="(release, index) in displayedReleases"
-          :key="release.repo"
-          class="release-card"
-          :style="{ '--delay': index * 80 + 'ms' }"
-        >
-          <!-- 第一行：标题 + 版本标签 -->
-          <div class="card-header">
-            <span class="repo-name">{{ release.repo }}</span>
-            <div class="header-tags">
-              <span class="tag tag-version">{{ release.tag_name }}</span>
-              <span v-if="release.prerelease" class="tag tag-prerelease">
-                {{ $t('releases.prerelease') }}
+      <div v-else class="releases-grid">
+        <TransitionGroup name="release-card" tag="div" class="releases-grid-inner" appear>
+          <div
+            v-for="(release, index) in displayedReleases"
+            :key="release.repo"
+            class="release-card"
+            :style="{ '--delay': index * 80 + 'ms' }"
+          >
+            <!-- 第一行：标题 + 版本标签 -->
+            <div class="card-header">
+              <span class="repo-name">{{ release.repo }}</span>
+              <div class="header-tags">
+                <span class="tag tag-version">{{ release.tag_name }}</span>
+                <span v-if="release.prerelease" class="tag tag-prerelease">
+                  {{ $t('releases.prerelease') }}
+                </span>
+              </div>
+            </div>
+  
+            <!-- 第二行：作者 + 发行于 + 时间 + 按钮 -->
+            <div class="card-footer">
+              <a
+                :href="release.author.html_url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="author-link"
+              >
+                <img
+                  :src="release.author.avatar_url"
+                  :alt="release.author.login"
+                  class="author-avatar"
+                />
+                <span class="author-name">{{ release.author.login }}</span>
+              </a>
+              <span class="release-time-wrap">
+                <span class="release-prefix">{{ $t('releases.publishedAt') }}</span>
+                <time
+                  class="release-time"
+                  :title="formatFullTime(release.published_at)"
+                >
+                  {{ formatRelativeTime(release.published_at) }}
+                </time>
               </span>
+              <div class="card-actions">
+                <Button
+                  v-if="release.assets.length > 0"
+                  size="small"
+                  @click="open(release.assets[0].browser_download_url)"
+                >
+                  {{ $t('releases.download') }}
+                  <ExternalLinkIcon />
+                </Button>
+                <Button
+                  v-if="getStandalonePage(release.repo)"
+                  size="small"
+                  @click="goToStandalone(getStandalonePage(release.repo)!)"
+                >
+                  {{ $t('releases.page') }}
+                </Button>
+                <Button
+                  size="small"
+                  @click="goToDetail(release.repo)"
+                >
+                  {{ $t('releases.more') }}
+                </Button>
+              </div>
             </div>
           </div>
-
-          <!-- 第二行：作者 + 发行于 + 时间 + 按钮 -->
-          <div class="card-footer">
-            <a
-              :href="release.author.html_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="author-link"
-            >
-              <img
-                :src="release.author.avatar_url"
-                :alt="release.author.login"
-                class="author-avatar"
-              />
-              <span class="author-name">{{ release.author.login }}</span>
-            </a>
-            <span class="release-time-wrap">
-              <span class="release-prefix">{{ $t('releases.publishedAt') }}</span>
-              <time
-                class="release-time"
-                :title="formatFullTime(release.published_at)"
-              >
-                {{ formatRelativeTime(release.published_at) }}
-              </time>
-            </span>
-            <div class="card-actions">
-              <Button
-                v-if="release.assets.length > 0"
-                size="small"
-                @click="open(release.assets[0].browser_download_url)"
-              >
-                {{ $t('releases.download') }}
-                <ExternalLinkIcon />
-              </Button>
-              <Button
-                v-if="getStandalonePage(release.repo)"
-                size="small"
-                @click="goToStandalone(getStandalonePage(release.repo)!)"
-              >
-                {{ $t('releases.page') }}
-              </Button>
-              <Button
-                size="small"
-                @click="goToDetail(release.repo)"
-              >
-                {{ $t('releases.more') }}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </TransitionGroup>
-    </div>
+        </TransitionGroup>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -101,6 +102,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
@@ -225,24 +227,6 @@ onUnmounted(() => {
   padding: 64px 0;
 }
 
-.loading-spinner {
-  width: 36px;
-  height: 36px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.loading-text {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
 // 错误状态
 .error-container {
   display: flex;
@@ -271,9 +255,9 @@ onUnmounted(() => {
 // 卡片
 .release-card {
   background: var(--bg-card);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 8px var(--shadow);
   display: flex;
   flex-direction: column;
@@ -312,7 +296,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -362,7 +346,7 @@ onUnmounted(() => {
 .author-avatar {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   flex-shrink: 0;
   transition: box-shadow 0.2s ease;
   position: relative;

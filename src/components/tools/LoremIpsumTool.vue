@@ -10,7 +10,7 @@
       <button
         v-for="mode in modes"
         :key="mode.key"
-        class="li-mode-btn"
+        class="li-mode-btn px-fade"
         :class="{ active: activeMode === mode.key }"
         @click="activeMode = mode.key"
       >
@@ -38,7 +38,7 @@
       <button
         v-for="lang in languages"
         :key="lang.key"
-        class="li-mode-btn"
+        class="li-mode-btn px-fade"
         :class="{ active: activeLanguage === lang.key }"
         @click="activeLanguage = lang.key"
       >
@@ -254,8 +254,8 @@ function clear() {
 
 .li-mode-btn {
   padding: 6px 14px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-card);
   color: var(--text-secondary);
   font-size: 0.85rem;
@@ -264,14 +264,17 @@ function clear() {
 }
 
 .li-mode-btn:hover {
-  border-color: var(--accent);
   color: var(--text-primary);
 }
 
 .li-mode-btn.active {
   background: var(--accent);
   color: #fff;
-  border-color: var(--accent);
+}
+
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.li-mode-btn.active::after {
+  opacity: 1;
 }
 
 .li-amount {

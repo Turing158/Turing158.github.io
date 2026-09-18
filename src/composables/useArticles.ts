@@ -11,6 +11,7 @@ import {
   addBlankTargetToLinks,
   enhanceCodeBlocks,
 } from '@/utils/htmlPostProcess'
+import { articleTime } from '@/utils/articleDate'
 
 const GITHUB_OWNER = config.github.owner
 const GITHUB_REPO = config.github.repo
@@ -57,7 +58,8 @@ async function loadGitHubArticles(): Promise<Article[]> {
       content,
       htmlFile: '',
       title: data.title || slug,
-      date: typeof data.date === 'object' ? String(data.date) : (data.date || ''),
+      // 与构建插件一致：Date 对象序列化为 ISO 字符串
+      date: data.date instanceof Date ? data.date.toISOString() : (data.date || ''),
       tags: data.tags || [],
       description: data.description || '',
       cover: data.cover,
@@ -65,7 +67,7 @@ async function loadGitHubArticles(): Promise<Article[]> {
     })
   }
 
-  articles.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  articles.sort((a, b) => articleTime(b.date) - articleTime(a.date))
   return articles
 }
 
@@ -139,7 +141,7 @@ export function useArticles() {
           for (const a of articles) merged.set(a.slug, a)
           for (const a of githubArticles) merged.set(a.slug, a)
           const result = Array.from(merged.values())
-          result.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+          result.sort((a, b) => articleTime(b.date) - articleTime(a.date))
           store.setArticles(result)
         }
       } catch (e: any) {

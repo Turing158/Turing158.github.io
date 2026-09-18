@@ -1,5 +1,8 @@
 <template>
   <div class="main-layout">
+    <!-- 顶部天空背景：压在页面背景之上、所有内容之下（独立页不渲染 MainLayout，自然排除） -->
+    <SkyBackground />
+
     <!-- 移动端遮罩层：侧边栏展开时显示 -->
     <transition name="overlay-fade">
       <div
@@ -64,7 +67,7 @@
         <div class="theme-switcher">
           <!-- 系统按钮 -->
           <button
-            class="theme-btn theme-btn--system"
+            class="theme-btn theme-btn--system px-fade"
             :class="{ active: systemMode }"
             :title="$t('theme.system')"
             :aria-label="$t('theme.system')"
@@ -77,7 +80,7 @@
           <button
             v-for="t in lightThemes"
             :key="t.value"
-            class="theme-btn"
+            class="theme-btn px-fade"
             :class="{ active: systemMode ? systemLightTheme === t.value : currentTheme === t.value }"
             :data-theme="t.value"
             :title="$t(t.labelKey)"
@@ -89,7 +92,7 @@
           </button>
           <!-- 暗色主题按钮 -->
           <button
-            class="theme-btn"
+            class="theme-btn px-fade"
             :class="{ active: systemMode ? systemDarkTheme === 'dark' : currentTheme === 'dark' }"
             :data-theme="'dark'"
             :title="$t('theme.dark')"
@@ -100,11 +103,11 @@
             <SidebarIcon name="dark" :size="18" />
           </button>
         </div>
-        <button class="lang-btn" @click="toggleLang">
+        <button class="lang-btn px-fade" @click="toggleLang">
           <SidebarIcon name="lang" :size="16" />
           <span>{{ $t('common.switchLang') }}</span>
         </button>
-        <button class="collapse-btn" :aria-label="$t('common.collapse')" @click="isCollapsed = true">
+        <button class="collapse-btn px-fade" :aria-label="$t('common.collapse')" @click="isCollapsed = true">
           <SidebarIcon name="chevronLeft" :size="16" class="collapse-icon" />
           <span class="collapse-text">{{ $t('common.collapse') }}</span>
         </button>
@@ -134,7 +137,7 @@
         </router-view>
         <ArticleTOCDrawer v-if="isArticleDetail" :headings="tocHeadings" @update:openState="isTocOpen = $event" />
       </div>
-      <FooterStats />
+      <VillageFooter />
     </main>
 
     <SearchDialog ref="searchDialogRef" />
@@ -149,7 +152,8 @@ import { useTheme, type ThemeName } from '@/composables/useTheme'
 import { useAchievements } from '@/composables/useAchievements'
 import { setLocale } from '@/i18n'
 import ArticleTOCDrawer from '@/components/article/ArticleTOCDrawer.vue'
-import FooterStats from '@/components/common/FooterStats.vue'
+import VillageFooter from '@/components/common/VillageFooter.vue'
+import SkyBackground from '@/components/common/SkyBackground.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import SearchDialog from '@/components/search/SearchDialog.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
@@ -360,6 +364,7 @@ const navItems = computed(() => {
     { path: '/projects', icon: 'projects', labelKey: 'nav.projects', activeNames: ['projects', 'commits'] },
     { path: '/releases', icon: 'releases', labelKey: 'nav.releases', activeNames: ['releases', 'release-detail'] },
     { path: '/tools', icon: 'tools', labelKey: 'nav.tools', activeNames: ['tools', 'tool-detail'] },
+    { path: '/friends', icon: 'link', labelKey: 'nav.friends', activeNames: ['friends'] },
     { path: '/about', icon: 'about', labelKey: 'nav.about', activeNames: ['about'] },
   ]
 
@@ -416,6 +421,9 @@ const toggleLang = () => {
 .main-layout {
   display: flex;
   min-height: 100vh;
+  /* 建立层叠上下文：让天空背景（z-index: -1）压在本布局的页面背景之上、全部内容之下 */
+  position: relative;
+  z-index: 0;
 }
 
 .sidebar {
@@ -429,8 +437,8 @@ const toggleLang = () => {
   height: 100vh;
   height: 100dvh;
   z-index: 100;
-  transition: transform 0.3s ease;
-  box-shadow: 2px 0 8px var(--shadow);
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-right: 2px solid var(--px-ink);
 
   &.collapsed {
     transform: translateX(-100%);
@@ -440,41 +448,38 @@ const toggleLang = () => {
 .sidebar-header {
   padding: 32px 24px 24px;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.14);
 }
 
 .avatar-wrap {
   position: relative;
   display: inline-flex;
-  border-radius: 50%;
-  padding: 3px;
-  background: linear-gradient(
-    135deg,
-    var(--text-sidebar-active),
-    transparent 60%
-  );
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  padding: 4px;
+  background: var(--text-sidebar-active);
+  clip-path: var(--pxc-circle);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-  &:hover {
-    transform: translateY(-2px) scale(1.04);
-  }
+.avatar-wrap:hover {
+  transform: translateY(-2px) scale(1.05);
 }
 
 .avatar {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
   display: block;
   object-fit: cover;
-  border: 2px solid var(--bg-sidebar);
+  clip-path: var(--pxc-circle);
+  box-shadow: inset 0 0 0 2px var(--bg-sidebar);
 }
 
 .blog-name {
-  color: var(--text-sidebar);
-  font-size: 1.1rem;
-  margin-top: 12px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  color: var(--text-sidebar-active);
+  font-family: var(--font-pixel);
+  font-size: 1rem;
+  margin-top: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -489,10 +494,10 @@ const toggleLang = () => {
 
 .typewriter-cursor {
   display: inline-block;
-  width: 2px;
+  width: 6px;
   height: 1em;
   background: var(--text-sidebar-active);
-  margin-left: 2px;
+  margin-left: 3px;
   animation: blink-cursor 0.8s step-end infinite;
   vertical-align: text-bottom;
   contain: content;
@@ -509,27 +514,25 @@ const toggleLang = () => {
   padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   overflow-y: auto;
+}
 
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
 
-  &::-webkit-scrollbar-track {
-    background: var(--accent);
-    border-radius: 0 10px 10px 0;
-  }
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
 
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 2px;
-  }
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+}
 
-  &::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.25);
-  }
-
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .nav-link {
@@ -538,74 +541,83 @@ const toggleLang = () => {
   align-items: center;
   gap: 12px;
   padding: 11px 14px;
-  border-radius: 10px;
+  --pxs: 3px;
+  clip-path: var(--pxc);
   color: var(--text-sidebar);
   font-size: 0.95rem;
   flex-shrink: 0;
   overflow: hidden;
-  transition: background-color 0.25s ease, color 0.25s ease;
+  /* isolation + ::before z-index:-1：hover 背景层压在内容之下 */
+  isolation: isolate;
+  transition: color 0.2s ease;
 
-  // 悬浮时的填充背景 — 用伪元素做缩放淡入，避免重排
+  /* hover 背景：透明度 0→1 + 缩放 0.9→1 弹入 */
   &::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-color: rgba(255, 255, 255, 0.08);
+    z-index: -1;
+    background: rgba(255, 255, 255, 0.08);
     opacity: 0;
-    transition: opacity 0.25s ease;
-  }
-
-  &:hover {
-    color: var(--text-sidebar-active);
-
-    &::before {
-      opacity: 1;
-    }
-
-    .nav-icon {
-      color: var(--text-sidebar-active);
-      transform: scale(1.18) rotate(-4deg);
-    }
-
-    .nav-text {
-      transform: translateX(3px);
-    }
-  }
-
-  // 点击：图标按下回弹
-  &:active .nav-icon {
-    transform: scale(0.85) rotate(0deg);
-  }
-
-  &.active {
-    color: var(--text-sidebar-active);
-    font-weight: 600;
-    background-color: rgba(255, 255, 255, 0.12);
-
-    .nav-indicator {
-      transform:translateY(-50%) scaleY(1);
-      opacity: 1;
-    }
-
-    .nav-icon {
-      color: var(--text-sidebar-active);
-    }
+    transform: scale(0.9);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 }
 
-// 左侧高亮指示条
+.nav-link:hover {
+  color: var(--text-sidebar-active);
+}
+
+.nav-link:hover:not(.active)::before {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.nav-link:hover .nav-icon {
+  color: var(--text-sidebar-active);
+  transform: scale(1.12) rotate(-4deg);
+}
+
+.nav-link:hover .nav-text {
+  transform: translateX(3px);
+}
+
+.nav-link:active .nav-icon {
+  transform: scale(0.85);
+}
+
+.nav-link.active {
+  color: var(--accent-ink);
+  font-weight: 700;
+  background-color: var(--text-sidebar-active);
+}
+
+.nav-link.active .nav-indicator {
+  opacity: 0;
+}
+
+.nav-link.active .nav-icon {
+  color: var(--accent-ink);
+}
+
 .nav-indicator {
   position: absolute;
   left: 0;
   top: 50%;
-  width: 3px;
+  width: 4px;
   height: 60%;
-  border-radius: 0 3px 3px 0;
   background: var(--text-sidebar-active);
   transform: translateY(-50%) scaleY(0);
   transform-origin: center;
   opacity: 0;
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+}
+
+.nav-link:hover .nav-indicator {
+  transform: translateY(-50%) scaleY(1);
+  opacity: 1;
 }
 
 .nav-icon {
@@ -628,7 +640,6 @@ const toggleLang = () => {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-// 搜索触发按钮 — 复用 .nav-link 样式，重置 button 默认值
 .search-trigger {
   cursor: pointer;
   background: none;
@@ -640,14 +651,12 @@ const toggleLang = () => {
   line-height: inherit;
 }
 
-// 外部链接导航项 — 复用 .nav-link 样式，重置 <a> 默认值
 .hub-link {
   cursor: pointer;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
 }
 
-// 外部链接图标 — 右侧的小箭头，悬浮时增强
 .nav-external {
   position: relative;
   z-index: 1;
@@ -668,7 +677,7 @@ const toggleLang = () => {
 .sidebar-footer {
   padding: 16px;
   padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px dashed rgba(255, 255, 255, 0.14);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -677,109 +686,88 @@ const toggleLang = () => {
 .theme-switcher {
   display: flex;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 .theme-btn {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+  --pxs: 3px;
+  clip-path: var(--pxc);
   border: 2px solid transparent;
+  --px-fade-inset: 2px;
+  --px-frame-fade: var(--px-frame-sidebar-active);
   color: var(--text-sidebar);
   cursor: pointer;
-  transition: background 0.25s ease, border-color 0.25s ease,
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.25s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s ease;
+}
 
-  // 图标默认 transform 过渡
-  :deep(svg) {
-    display: block;
-    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
+/* 主题按钮平时无边框（px-fade 只应随 .active 淡入，压过工具类 :hover 淡入） */
+.theme-btn:not(.active)::after {
+  opacity: 0;
+}
 
-  // 系统按钮
-  &--system {
-    &:not(.active) {
-      background: rgba(148, 163, 184, 0.2); // slate-400
-      &:hover {
-        background: rgba(148, 163, 184, 0.35);
-      }
-    }
-  }
+.theme-btn :deep(svg) {
+  display: block;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
 
-  // 非 active 状态 - 使用对应主题色
-  &:not(.active) {
-    // Forest 主题按钮
-    &[data-theme="forest"] {
-      background: rgba(74, 124, 89, 0.25); // forest accent: #4a7c59
-      &:hover {
-        background: rgba(74, 124, 89, 0.45);
-      }
-    }
+.theme-btn--system:not(.active) {
+  background: rgba(148, 163, 184, 0.2);
+}
 
-    // Ocean 主题按钮
-    &[data-theme="ocean"] {
-      background: rgba(42, 111, 151, 0.25); // ocean accent: #2a6f97
-      &:hover {
-        background: rgba(42, 111, 151, 0.45);
-      }
-    }
+.theme-btn--system:not(.active):hover {
+  background: rgba(148, 163, 184, 0.35);
+}
 
-    // Sunset 主题按钮
-    &[data-theme="sunset"] {
-      background: rgba(192, 85, 51, 0.25); // sunset accent: #c05533
-      &:hover {
-        background: rgba(192, 85, 51, 0.45);
-      }
-    }
+.theme-btn:not(.active)[data-theme="forest"] { background: rgba(79, 138, 69, 0.4); }
+.theme-btn:not(.active)[data-theme="forest"]:hover { background: rgba(79, 138, 69, 0.6); }
 
-    // Dark 主题按钮
-    &[data-theme="dark"] {
-      background: rgba(15, 23, 42, 0.3); // dark accent: #0f172a
-      &:hover {
-        background: rgba(15, 23, 42, 0.5);
-      }
-    }
+.theme-btn:not(.active)[data-theme="ocean"] { background: rgba(46, 131, 168, 0.4); }
+.theme-btn:not(.active)[data-theme="ocean"]:hover { background: rgba(46, 131, 168, 0.6); }
 
-    &:hover {
-      transform: translateY(-2px);
+.theme-btn:not(.active)[data-theme="sunset"] { background: rgba(198, 95, 56, 0.4); }
+.theme-btn:not(.active)[data-theme="sunset"]:hover { background: rgba(198, 95, 56, 0.6); }
 
-      :deep(svg) {
-        transform: scale(1.18) rotate(-6deg);
-      }
-    }
+.theme-btn:not(.active)[data-theme="dark"] { background: rgba(13, 19, 27, 0.5); }
+.theme-btn:not(.active)[data-theme="dark"]:hover { background: rgba(13, 19, 27, 0.75); }
 
-    &:active {
-      transform: translateY(0) scale(0.94);
+.theme-btn:not(.active):hover {
+  transform: translateY(-2px);
+}
 
-      :deep(svg) {
-        transform: scale(0.85) rotate(0deg);
-      }
-    }
-  }
+.theme-btn:not(.active):hover :deep(svg) {
+  transform: scale(1.12) rotate(-6deg);
+}
 
-  // active 状态
-  &.active {
-    border-color: var(--text-sidebar-active);
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--text-sidebar-active);
+.theme-btn:not(.active):active {
+  transform: translateY(1px) scale(0.94);
+}
 
-    &:hover {
-      :deep(svg) {
-        transform: scale(1.12) rotate(6deg);
-      }
-    }
+.theme-btn:not(.active):active :deep(svg) {
+  transform: scale(0.85);
+}
 
-    &:active {
-      transform: scale(0.94);
+.theme-btn.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-sidebar-active);
+}
 
-      :deep(svg) {
-        transform: scale(0.85);
-      }
-    }
-  }
+/* 原为 border-image 简写整块切换（底图从无到有，瞬间出现），改由 px-fade 叠加层淡入 */
+.theme-btn.active::after {
+  opacity: 1;
+}
+
+.theme-btn.active:hover :deep(svg) {
+  transform: scale(1.1) rotate(6deg);
+}
+
+.theme-btn.active:active {
+  transform: scale(0.92);
 }
 
 .lang-btn,
@@ -789,73 +777,65 @@ const toggleLang = () => {
   justify-content: center;
   gap: 8px;
   padding: 9px 16px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  --pxs: 3px;
+  clip-path: var(--pxc);
+  border: 2px solid transparent; border-image: var(--px-frame-on-dark) 6 / calc(2 * var(--pxs)) stretch;
+  --px-fade-inset: 2px;
+  --px-frame-fade: var(--px-frame-sidebar-active);
   background: transparent;
   color: var(--text-sidebar);
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease,
-    transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-  :deep(svg) {
-    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--text-sidebar-active);
-    color: var(--text-sidebar-active);
-    transform: translateY(-2px);
-  }
-
-  &:active {
-    background: rgba(255, 255, 255, 0.05);
-    transform: translateY(0) scale(0.96);
-  }
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-// 语言按钮：hover 图标旋转，点击图标按压
-.lang-btn {
-  &:hover :deep(svg) {
-    transform: scale(1.18) rotate(-8deg);
-  }
-
-  &:active :deep(svg) {
-    transform: scale(0.85) rotate(0deg);
-  }
+.lang-btn :deep(svg),
+.collapse-btn :deep(svg) {
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-// 折叠按钮：hover 图标左移，点击图标按压回弹
-.collapse-btn {
-  &:hover :deep(svg) {
-    transform: translateX(-4px) scale(1.1);
-  }
+.lang-btn:hover,
+.collapse-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-sidebar-active);
+  transform: translateY(-2px);
+}
 
-  &:active :deep(svg) {
-    transform: translateX(2px) scale(0.88);
-  }
+.lang-btn:active,
+.collapse-btn:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+.lang-btn:hover :deep(svg) {
+  transform: scale(1.12) rotate(-8deg);
+}
+
+.collapse-btn:hover :deep(svg) {
+  transform: translateX(-4px) scale(1.1);
 }
 
 .collapse-icon {
   transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-// =============================================
-// 展开按钮：贴边 + 长按拖动 + 显隐动画
-// =============================================
+.collapse-btn:hover .collapse-icon {
+  transform: translateX(-4px) scale(1.1);
+}
+
+.collapse-btn:active .collapse-icon {
+  transform: translateX(2px) scale(0.88);
+}
+
 .expand-btn {
   position: fixed;
   left: 0;
   z-index: 101;
-  width: 36px;
-  height: 52px;
-  border-radius: 0 14px 14px 0;
+  width: 38px;
+  height: 54px;
   border: none;
-  background: var(--bg-sidebar);
-  color: var(--text-sidebar);
+  background: var(--px-ink);
+  color: var(--bg-card);
   cursor: pointer;
-  box-shadow: 2px 4px 12px var(--shadow);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -863,57 +843,41 @@ const toggleLang = () => {
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
-
-  // 默认隐藏状态
-  transform: translateX(-100%);
+  /* 右缘贴视口的像素阶梯圆角（与 ToolsView 工具详情悬浮条的切法一致），左缘贴屏幕保持直角 */
+  clip-path: polygon(0 0, calc(100% - 4px) 0, calc(100% - 4px) 2px, calc(100% - 2px) 2px, calc(100% - 2px) 4px, 100% 4px, 100% calc(100% - 4px), calc(100% - 2px) calc(100% - 4px), calc(100% - 2px) calc(100% - 2px), calc(100% - 4px) calc(100% - 2px), calc(100% - 4px) 100%, 0 100%);
+  transform: translateX(-101%);
   opacity: 0;
   pointer-events: none;
-
-  // 显隐过渡动画
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-    opacity 0.25s ease,
-    background 0.25s ease,
-    color 0.25s ease,
-    box-shadow 0.25s ease,
-    width 0.2s ease,
-    height 0.2s ease;
-
-  // 可见状态
-  &.is-visible {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  // hover 效果
-  &:hover {
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 2px 6px 16px var(--shadow);
-  }
-
-  &:active {
-    transform: translateX(0) scale(0.96);
-  }
-
-  // 长按蓄力中：按钮微微放大 + 阴影增强
-  &.is-longpress {
-    width: 40px;
-    height: 56px;
-    box-shadow: 2px 8px 20px var(--shadow);
-  }
-
-  // 拖动中：放大 + 高亮 + 禁用过渡（跟手）
-  &.is-dragging {
-    width: 40px;
-    height: 56px;
-    background: var(--accent);
-    color: #fff;
-    box-shadow: 2px 8px 24px var(--shadow);
-    cursor: grabbing;
-  }
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, background 0.2s ease, width 0.2s ease, height 0.2s ease;
 }
-// =============================================
+
+.expand-btn.is-visible {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.expand-btn:hover {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.expand-btn:active {
+  transform: translateX(0) scaleX(0.94);
+}
+
+.expand-btn.is-longpress {
+  width: 42px;
+  height: 58px;
+}
+
+.expand-btn.is-dragging {
+  width: 42px;
+  height: 58px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: grabbing;
+}
 
 .content {
   flex: 1;
@@ -925,54 +889,43 @@ const toggleLang = () => {
   position: relative;
   overflow-x: hidden;
   min-width: 0;
-
-  &.content-expanded {
-    margin-left: 0;
-  }
-
-  // 页面内容区：占据剩余空间，允许内部滚动
-  .content-scroll {
-    flex: 1;
-    min-width: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-
-    > :first-child {
-      min-height: 100%;
-    }
-  }
 }
 
-/* 桌面端：为悬浮目录留出右侧空间，避免遮挡文章 */
-@media (min-width: 1024px) {
-  /* 只在目录打开时才留出空间 */
-  .content.content-with-toc {
-    padding-right: 292px; /* 260px TOC + 32px gap */
-  }
+.content.content-expanded {
+  margin-left: 0;
+}
+
+.content .content-scroll {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.content .content-scroll > :first-child {
+  min-height: 100%;
 }
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 .page-enter-from {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(12px);
 }
 
 .page-leave-to {
   opacity: 0;
-  transform: translateY(-12px);
+  transform: translateY(-8px);
 }
 
-/* 移动端遮罩层 */
 .sidebar-overlay {
   position: fixed;
   inset: 0;
   z-index: 99;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(2px);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 .overlay-fade-enter-active,
@@ -985,24 +938,27 @@ const toggleLang = () => {
   opacity: 0;
 }
 
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    &:not(.collapsed) {
-      transform: translateX(0);
-    }
-    &.collapsed {
-      transform: translateX(-100%);
-    }
-  }
-
-  .content {
-    margin-left: 0;
-    flex-direction: column;
-    &.content-expanded {
-      margin-left: 0;
-    }
+@media (min-width: 1024px) {
+  .content.content-with-toc {
+    padding-right: 292px;
   }
 }
 
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+  }
+  .sidebar.collapsed {
+    transform: translateX(-100%);
+  }
+  .content {
+    margin-left: 0;
+  }
+  .content.content-expanded {
+    margin-left: 0;
+  }
+}
 </style>

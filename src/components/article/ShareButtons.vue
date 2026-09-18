@@ -238,7 +238,7 @@ onUnmounted(() => {
   width: 40px;
   height: 40px;
   border: none;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
@@ -301,7 +301,7 @@ onUnmounted(() => {
     font-size: 0.75rem;
     font-weight: 500;
     white-space: nowrap;
-    border-radius: 4px;
+    --pxs: 2px; clip-path: var(--pxc);
     opacity: 0;
     visibility: hidden;
     transition: all 0.2s ease;
@@ -340,7 +340,7 @@ onUnmounted(() => {
 
 .qr-modal {
   background: var(--bg-card);
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   width: 320px;
   max-width: 90vw;
   overflow: hidden;
@@ -382,7 +382,7 @@ onUnmounted(() => {
   font-size: 1.5rem;
   color: var(--text-secondary);
   cursor: pointer;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -402,7 +402,7 @@ onUnmounted(() => {
 .qr-code {
   width: 200px;
   height: 200px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   margin-bottom: 16px;
 }
 

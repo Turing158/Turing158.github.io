@@ -71,12 +71,12 @@
           {{ results.length }} {{ $t('tools.randomString.items') }}
         </span>
       </div>
-      <div class="results-display" :class="{ 'is-generating': isGenerating }">
+      <div class="results-display px-fade" :class="{ 'is-generating': isGenerating }">
         <TransitionGroup name="number-pop" tag="div" class="strings-list">
           <div
             v-for="(str, index) in displayResults"
             :key="`${str}-${index}`"
-            class="string-pill"
+            class="string-pill px-fade"
             :title="$t('tools.randomGenerator.clickToCopy')"
             @click="copyOne(str)"
           >
@@ -246,8 +246,8 @@ function cancelCopyAllLongPress() {
   gap: 14px;
   padding: 16px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 .config-row {
   display: flex;
@@ -283,23 +283,27 @@ function cancelCopyAllLongPress() {
 .results-title { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 .results-count {
   font-size: 0.75rem; color: var(--accent);
-  background: var(--bg-secondary); padding: 2px 8px; border-radius: 10px;
+  background: var(--bg-secondary); padding: 2px 8px; --pxs: 3px; clip-path: var(--pxc);
 }
 .results-display {
-  min-height: 80px; border: 1px solid var(--border);
-  border-radius: 8px; padding: 12px; background: var(--bg-card);
+  min-height: 80px; border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc); padding: 12px; background: var(--bg-card);
 }
 .results-display.is-generating {
-  border-color: var(--accent); box-shadow: 0 0 12px rgba(var(--accent), 0.15);
+  box-shadow: 0 0 12px rgba(var(--accent), 0.15);
+}
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.results-display.is-generating::after {
+  opacity: 1;
 }
 .strings-list { display: flex; flex-wrap: wrap; gap: 8px; }
 .string-pill {
   display: inline-flex;
   align-items: center;
   padding: 6px 14px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.8rem;
   color: var(--accent);
@@ -310,7 +314,6 @@ function cancelCopyAllLongPress() {
   transform: scale(1.05);
   background: var(--accent);
   color: var(--bg-card);
-  border-color: var(--accent);
 }
 .empty-state {
   display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 20px;

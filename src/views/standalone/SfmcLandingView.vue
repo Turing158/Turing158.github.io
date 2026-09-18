@@ -275,35 +275,37 @@
           </div>
           <div class="download-right">
             <div class="download-box">
-              <p v-if="loading" class="download-status">
-                <span class="loading-dots">{{ t('sfmc.loadingRelease') }}</span>
-              </p>
-              <template v-if="release">
-                <div class="version-info">
-                  <span class="version-badge">{{ release.tag_name }}</span>
-                  <span class="version-date">{{ formatDate(release.published_at) }}</span>
+              <Transition name="loader-pop" mode="out-in" appear>
+                <p v-if="loading" class="download-status cube-anim">
+                  <CubeLoader inline :size="16" :text="t('sfmc.loadingRelease')" />
+                </p>
+                <div v-else-if="release">
+                  <div class="version-info">
+                    <span class="version-badge">{{ release.tag_name }}</span>
+                    <span class="version-date">{{ formatDate(release.published_at) }}</span>
+                  </div>
+                  <div class="download-buttons">
+                    <a
+                      v-for="asset in downloadAssets"
+                      :key="asset.name"
+                      :href="asset.browser_download_url"
+                      class="sf-btn sf-btn-primary"
+                    >
+                      <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                      {{ asset.label }}
+                      <span class="btn-tag">{{ formatSize(asset.size) }}</span>
+                    </a>
+                  </div>
                 </div>
-                <div class="download-buttons">
-                  <a
-                    v-for="asset in downloadAssets"
-                    :key="asset.name"
-                    :href="asset.browser_download_url"
-                    class="sf-btn sf-btn-primary"
-                  >
-                    <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    {{ asset.label }}
-                    <span class="btn-tag">{{ formatSize(asset.size) }}</span>
+                <div v-else>
+                  <p class="download-status error">{{ t('sfmc.releaseError') }}</p>
+                  <a :href="releasesUrl" target="_blank" rel="noopener" class="sf-btn sf-btn-primary">
+                    <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    {{ t('sfmc.allReleases') }}
+                    <ExternalLinkIcon />
                   </a>
                 </div>
-              </template>
-              <template v-else>
-                <p class="download-status error">{{ t('sfmc.releaseError') }}</p>
-                <a :href="releasesUrl" target="_blank" rel="noopener" class="sf-btn sf-btn-primary">
-                  <svg class="btn-icon-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                  {{ t('sfmc.allReleases') }}
-                  <ExternalLinkIcon />
-                </a>
-              </template>
+              </Transition>
             </div>
           </div>
         </div>
@@ -412,6 +414,7 @@ import { config } from '@/config'
 import { useLatestRelease } from '@/composables/useLatestRelease'
 import { useGitalk } from '@/composables/useGitalk'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 
 const REPO = 'StarFall-Minecraft-Launcher'
 const STORAGE_KEY = 'sfmc-notice-dismissed'
@@ -1642,20 +1645,6 @@ onMounted(() => {
   &.error {
     color: @accent-orange;
   }
-}
-
-.loading-dots {
-  &::after {
-    content: '...';
-    animation: loadingDots 1.5s steps(4, end) infinite;
-  }
-}
-
-@keyframes loadingDots {
-  0%, 25% { content: ''; }
-  50% { content: '.'; }
-  75% { content: '..'; }
-  100% { content: '...'; }
 }
 
 .version-info {

@@ -12,6 +12,7 @@ import 'animal-island-vue/style'
 import './styles/variables.css'
 import './styles/animal-island-theme.css'
 import './styles/global.css'
+import './styles/cube-loader.css'
 // 必须在 github-markdown-light.css / github.css 之后，用于覆盖其写死的浅色取值
 import './styles/markdown-dark.css'
 import './styles/gitalk-theme.css'
@@ -53,8 +54,8 @@ function printConsoleArt() {
 
   console.info(
     '%c Blog %c Turing_ICE ',
-    'background:#546e7a;color:#fff;padding:3px 6px;border-radius:3px 0 0 3px;font-size:12px;font-weight:bold;',
-    'background:#1565c0;color:#fff;padding:3px 6px;border-radius:0 3px 3px 0;font-size:12px;font-weight:bold;'
+    'background:#546e7a;color:#fff;padding:3px 6px;font-size:12px;font-weight:bold;',
+    'background:#1565c0;color:#fff;padding:3px 6px;font-size:12px;font-weight:bold;'
   )
 
   console.info(

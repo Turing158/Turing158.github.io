@@ -22,7 +22,7 @@
       <button
         v-for="cat in categories"
         :key="cat.key"
-        class="category-tab"
+        class="category-tab px-fade"
         :class="{ active: activeCategory === cat.key }"
         @click="activeCategory = cat.key"
       >
@@ -145,8 +145,8 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  border-radius: 24px;
-  border: 1px solid var(--border);
+  --pxs: 4px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
@@ -154,14 +154,16 @@ onMounted(async () => {
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: var(--accent);
     color: var(--text-primary);
   }
 
   &.active {
     background: var(--accent);
     color: var(--bg-card);
-    border-color: var(--accent);
+    /* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+    &::after {
+      opacity: 1;
+    }
     font-weight: 600;
   }
 }
@@ -175,7 +177,7 @@ onMounted(async () => {
   opacity: 0.8;
   background: var(--bg-secondary);
   padding: 1px 7px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
 
   .category-tab.active & {
     background: rgba(255, 255, 255, 0.2);

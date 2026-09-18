@@ -19,7 +19,7 @@
           v-for="preset in presets"
           :key="preset.label"
           type="button"
-          class="separator-chip"
+          class="separator-chip px-fade"
           :class="{ 'is-active': localValue === preset.value }"
           @click="localValue = preset.value"
         >{{ preset.label }}</button>
@@ -128,8 +128,8 @@ function confirm() {
 }
 .separator-chip {
   padding: 4px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  --pxs: 2px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-card);
   color: var(--text-primary);
   font-size: 0.85rem;
@@ -139,13 +139,16 @@ function confirm() {
 .separator-chip.is-active {
   background: var(--accent);
   color: var(--bg-card);
-  border-color: var(--accent);
+}
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.separator-chip.is-active::after {
+  opacity: 1;
 }
 .separator-preview {
   padding: 8px 12px;
   background: var(--bg-secondary);
-  border-radius: 6px;
-  border: 1px solid var(--border);
+  --pxs: 2px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 .separator-preview-label {
   font-size: 0.8rem;

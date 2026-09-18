@@ -1,7 +1,7 @@
 <template>
   <div v-if="tool" class="tool-detail-view">
     <div class="tool-detail-header">
-      <button type="button" class="tool-back-button" @click="goBack">
+      <button type="button" class="tool-back-button px-fade" @click="goBack">
         <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="m15 18-6-6 6-6" />
         </svg>
@@ -35,7 +35,7 @@
     </div>
     <h1>{{ $t('tools.notFoundTitle') }}</h1>
     <p>{{ $t('tools.notFoundDescription') }}</p>
-    <button type="button" class="tool-back-button tool-back-button--primary" @click="goBackToTools">
+    <button type="button" class="tool-back-button tool-back-button--primary px-fade px-fade-alt" @click="goBackToTools">
       {{ $t('tools.backToTools') }}
     </button>
   </div>
@@ -138,8 +138,8 @@ function goBackToTools() {
   gap: 6px;
   min-height: 44px;
   padding: 8px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-card);
   color: var(--text-secondary);
   font: inherit;
@@ -151,8 +151,12 @@ function goBackToTools() {
 .tool-back-button:hover,
 .tool-back-button:focus-visible {
   color: var(--accent);
-  border-color: var(--accent);
   background: var(--bg-secondary);
+}
+
+/* hover 淡入走工具类；focus-visible 键盘聚焦也要淡入 accent 帧 */
+.tool-back-button:focus-visible::after {
+  opacity: 1;
 }
 
 .tool-back-button:focus-visible {
@@ -166,8 +170,8 @@ function goBackToTools() {
   gap: 20px;
   padding: 24px;
   margin-bottom: 20px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-card);
   box-shadow: 0 4px 16px var(--shadow);
 }
@@ -178,7 +182,7 @@ function goBackToTools() {
   width: 64px;
   height: 64px;
   place-items: center;
-  border-radius: 14px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
   font-size: 2.2rem;
 }
@@ -219,8 +223,8 @@ function goBackToTools() {
 
 .tool-detail-tag {
   padding: 3px 10px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 4px; clip-path: var(--pxc);
   background: var(--bg-secondary);
   color: var(--accent);
   font-size: 0.75rem;
@@ -229,8 +233,8 @@ function goBackToTools() {
 
 .tool-workspace {
   padding: 24px;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-card);
   box-shadow: 0 2px 10px var(--shadow);
 }
@@ -251,8 +255,7 @@ function goBackToTools() {
   height: 64px;
   margin-bottom: 18px;
   place-items: center;
-  border: 1px solid var(--border);
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: var(--bg-secondary);
   color: var(--text-secondary);
 }
@@ -270,15 +273,31 @@ function goBackToTools() {
   line-height: 1.6;
 }
 
+/* 原为 border-image-source 整块切换；叠加层 ::after 常显 accent，hover/聚焦时与
+   accent-hover（::before，--px-frame-fade-alt）交叉淡化 */
 .tool-back-button--primary {
-  border-color: var(--accent);
   background: var(--accent);
   color: #fff;
+  --px-frame-fade: var(--px-frame-accent);
+  --px-frame-fade-alt: var(--px-frame-accent-hover);
+}
+
+.tool-back-button--primary::after {
+  opacity: 1;
+}
+
+.tool-back-button--primary:hover::after,
+.tool-back-button--primary:focus-visible::after {
+  opacity: 0;
+}
+
+.tool-back-button--primary:hover::before,
+.tool-back-button--primary:focus-visible::before {
+  opacity: 1;
 }
 
 .tool-back-button--primary:hover,
 .tool-back-button--primary:focus-visible {
-  border-color: var(--accent-hover);
   background: var(--accent-hover);
   color: #fff;
 }
@@ -301,7 +320,7 @@ function goBackToTools() {
     flex-basis: 48px;
     width: 48px;
     height: 48px;
-    border-radius: 10px;
+    --pxs: 3px; clip-path: var(--pxc);
     font-size: 1.7rem;
   }
 

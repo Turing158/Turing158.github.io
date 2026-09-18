@@ -27,144 +27,141 @@
     <h1 class="page-title">{{ repoName }}</h1>
 
     <!-- 加载 / 错误 / 空 -->
-    <div v-if="loading" class="status-wrap loading-text">
-      <span class="loading-dots">
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-      </span>
-      <span>{{ $t('pageCommits.loading') }}</span>
-    </div>
-    <div v-else-if="error" class="status-wrap status-error">
-      <span>{{ $t('pageCommits.loadFailed') }}</span>
-      <Button size="small" @click="fetchCommits">{{ $t('pageCommits.retry') }}</Button>
-    </div>
-    <div v-else-if="commits.length === 0" class="status-wrap">
-      <span>{{ $t('pageCommits.noCommits') }}</span>
-    </div>
+    <Transition name="loader-pop" mode="out-in" appear>
+      <div v-if="loading" class="status-wrap cube-anim">
+        <CubeLoader :text="$t('pageCommits.loading')" />
+      </div>
+      <div v-else-if="error" class="status-wrap status-error">
+        <span>{{ $t('pageCommits.loadFailed') }}</span>
+        <Button size="small" @click="fetchCommits">{{ $t('pageCommits.retry') }}</Button>
+      </div>
+      <div v-else-if="commits.length === 0" class="status-wrap">
+        <span>{{ $t('pageCommits.noCommits') }}</span>
+      </div>
 
-    <!-- 提交树 -->
-    <div v-else class="timeline">
-      <div
-        v-for="(commit, index) in commits"
-        :key="commit.sha"
-        class="tl-row"
-      >
-        <!-- 左侧：纯图形列 -->
-        <div class="tl-graph">
-          <!-- 主干竖线（始终在中心） -->
-          <div
-            v-if="index > 0"
-            class="tl-spine tl-spine--top"
-          />
-          <div
-            v-if="index < commits.length - 1"
-            class="tl-spine tl-spine--bottom"
-          />
-
-          <!-- 分支曲线 SVG：从上方某处弯曲汇入当前节点 -->
-          <svg
-            v-for="curve in incomingCurves(index)"
-            :key="'curve-' + curve.fromRow"
-            class="tl-curve"
-            :style="{
-              top: curve.svgTop + 'px',
-              left: '0px',
-              width: curve.svgW + 'px',
-              height: curve.svgH + 'px',
-            }"
-            :viewBox="`0 0 ${curve.svgW} ${curve.svgH}`"
-            preserveAspectRatio="none"
-          >
-            <path :d="curve.d" fill="none" class="tl-curve-path" />
-          </svg>
-
-          <!-- 节点圆点 -->
-          <div
-            class="tl-dot"
-            :class="{ 'tl-dot--merge': isMerge(commit) }"
-          />
-        </div>
-
-        <!-- 右侧：提交信息 -->
-        <div class="tl-card">
-          <div class="tl-msg">
-            <span class="tl-msg-text">{{ firstLine(commit.commit.message) }}</span>
-            <button
-              v-if="hasMoreLines(commit.commit.message)"
-              class="tl-expand-btn"
-              :class="{ 'tl-expand-btn--open': isExpanded(commit.sha) }"
-              @click="toggleExpand(commit.sha)"
+      <!-- 提交树 -->
+      <div v-else class="timeline">
+        <div
+          v-for="(commit, index) in commits"
+          :key="commit.sha"
+          class="tl-row"
+        >
+          <!-- 左侧：纯图形列 -->
+          <div class="tl-graph">
+            <!-- 主干竖线（始终在中心） -->
+            <div
+              v-if="index > 0"
+              class="tl-spine tl-spine--top"
+            />
+            <div
+              v-if="index < commits.length - 1"
+              class="tl-spine tl-spine--bottom"
+            />
+  
+            <!-- 分支曲线 SVG：从上方某处弯曲汇入当前节点 -->
+            <svg
+              v-for="curve in incomingCurves(index)"
+              :key="'curve-' + curve.fromRow"
+              class="tl-curve"
+              :style="{
+                top: curve.svgTop + 'px',
+                left: '0px',
+                width: curve.svgW + 'px',
+                height: curve.svgH + 'px',
+              }"
+              :viewBox="`0 0 ${curve.svgW} ${curve.svgH}`"
+              preserveAspectRatio="none"
             >
-              <span class="tl-expand-icon">▾</span>
-              <span class="tl-expand-label">{{ isExpanded(commit.sha) ? $t('pageCommits.collapse') : $t('pageCommits.expand') }}</span>
-            </button>
+              <path :d="curve.d" fill="none" class="tl-curve-path" />
+            </svg>
+  
+            <!-- 节点圆点 -->
+            <div
+              class="tl-dot"
+              :class="{ 'tl-dot--merge': isMerge(commit) }"
+            />
           </div>
-
-          <!-- 完整消息（展开时显示，去掉第一行） -->
-          <transition name="msg-expand">
-            <div v-if="isExpanded(commit.sha) && hasMoreLines(commit.commit.message)" class="tl-msg-full">
-              <pre class="tl-msg-content">{{ restLines(commit.commit.message) }}</pre>
+  
+          <!-- 右侧：提交信息 -->
+          <div class="tl-card px-fade">
+            <div class="tl-msg">
+              <span class="tl-msg-text">{{ firstLine(commit.commit.message) }}</span>
+              <button
+                v-if="hasMoreLines(commit.commit.message)"
+                class="tl-expand-btn px-fade"
+                :class="{ 'tl-expand-btn--open': isExpanded(commit.sha) }"
+                @click="toggleExpand(commit.sha)"
+              >
+                <span class="tl-expand-icon">▾</span>
+                <span class="tl-expand-label">{{ isExpanded(commit.sha) ? $t('pageCommits.collapse') : $t('pageCommits.expand') }}</span>
+              </button>
             </div>
-          </transition>
-
-          <div class="tl-meta">
-            <a
-              v-if="commit.committer?.login"
-              :href="`https://github.com/${commit.committer.login}`"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="tl-avatar-link"
-            >
-              <img
-                v-if="commit.committer?.avatar_url"
-                :src="commit.committer.avatar_url"
-                class="tl-avatar"
-                loading="lazy"
-              />
-              <span v-else class="tl-avatar tl-avatar--ph">
-                {{ initials(commit) }}
+  
+            <!-- 完整消息（展开时显示，去掉第一行） -->
+            <transition name="msg-expand">
+              <div v-if="isExpanded(commit.sha) && hasMoreLines(commit.commit.message)" class="tl-msg-full">
+                <pre class="tl-msg-content">{{ restLines(commit.commit.message) }}</pre>
+              </div>
+            </transition>
+  
+            <div class="tl-meta">
+              <a
+                v-if="commit.committer?.login"
+                :href="`https://github.com/${commit.committer.login}`"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tl-avatar-link"
+              >
+                <img
+                  v-if="commit.committer?.avatar_url"
+                  :src="commit.committer.avatar_url"
+                  class="tl-avatar"
+                  loading="lazy"
+                />
+                <span v-else class="tl-avatar tl-avatar--ph">
+                  {{ initials(commit) }}
+                </span>
+              </a>
+              <template v-else>
+                <img
+                  v-if="commit.committer?.avatar_url"
+                  :src="commit.committer.avatar_url"
+                  class="tl-avatar"
+                  loading="lazy"
+                />
+                <span v-else class="tl-avatar tl-avatar--ph">
+                  {{ initials(commit) }}
+                </span>
+              </template>
+              <a
+                v-if="commit.committer?.login"
+                :href="`https://github.com/${commit.committer.login}`"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="tl-author-link"
+              >
+                {{ commit.committer?.login || commit.commit.committer?.name || 'Unknown' }}
+              </a>
+              <span v-else class="tl-author">
+                {{ commit.committer?.login || commit.commit.committer?.name || 'Unknown' }}
               </span>
-            </a>
-            <template v-else>
-              <img
-                v-if="commit.committer?.avatar_url"
-                :src="commit.committer.avatar_url"
-                class="tl-avatar"
-                loading="lazy"
-              />
-              <span v-else class="tl-avatar tl-avatar--ph">
-                {{ initials(commit) }}
-              </span>
-            </template>
-            <a
-              v-if="commit.committer?.login"
-              :href="`https://github.com/${commit.committer.login}`"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="tl-author-link"
-            >
-              {{ commit.committer?.login || commit.commit.committer?.name || 'Unknown' }}
-            </a>
-            <span v-else class="tl-author">
-              {{ commit.committer?.login || commit.commit.committer?.name || 'Unknown' }}
-            </span>
-            <span class="tl-sep">{{ $t('pageCommits.committedAt') }}</span>
-            <time
-              class="tl-date"
-              :datetime="commit.commit.committer?.date"
-              :title="formatFullTime(commit.commit.committer?.date || '')"
-            >
-              {{ formatRelativeTime(commit.commit.committer?.date || '') }}
-            </time>
-            <Button type="primary" size="small" class="tl-btn" @click="openCommit(commit.sha)">
-              {{ $t('pageCommits.visit') }}
-              <ExternalLinkIcon />
-            </Button>
+              <span class="tl-sep">{{ $t('pageCommits.committedAt') }}</span>
+              <time
+                class="tl-date"
+                :datetime="commit.commit.committer?.date"
+                :title="formatFullTime(commit.commit.committer?.date || '')"
+              >
+                {{ formatRelativeTime(commit.commit.committer?.date || '') }}
+              </time>
+              <Button type="primary" size="small" class="tl-btn" @click="openCommit(commit.sha)">
+                {{ $t('pageCommits.visit') }}
+                <ExternalLinkIcon />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Transition>
 
     <!-- 更多提交 -->
     <div class="more-commits">
@@ -186,6 +183,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
@@ -463,7 +461,7 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   padding: 0;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
 
   .back-icon {
     transition: transform 0.2s ease;
@@ -542,7 +540,7 @@ onUnmounted(() => {
   transform: translate(-50%, 0);
   width: 12px;
   height: 12px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: var(--accent);
   z-index: 2;
   flex-shrink: 0;
@@ -579,14 +577,14 @@ onUnmounted(() => {
   justify-content: center;
   padding: 5px 5px 10px 8px;
   gap: 8px;
-  border: var(--border) solid 1px;
-  border-radius: 5px;
+  background: var(--bg-card);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 2px; clip-path: var(--pxc);
   margin: 5px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .tl-card:hover {
-  border-color: var(--accent);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -608,7 +606,7 @@ onUnmounted(() => {
 .tl-avatar {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   flex-shrink: 0;
   object-fit: cover;
 
@@ -628,7 +626,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   text-decoration: none;
   cursor: pointer;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   outline-offset: 2px;
 
   &:hover .tl-avatar {
@@ -694,8 +692,8 @@ onUnmounted(() => {
 	  align-items: center;
 	  gap: 4px;
 	  padding: 2px 8px;
-	  border: 1px solid var(--border);
-	  border-radius: 6px;
+	  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+	  --pxs: 2px; clip-path: var(--pxc);
 	  background: var(--bg-secondary);
 	  color: var(--text-secondary);
 	  font-size: 0.75rem;
@@ -708,12 +706,14 @@ onUnmounted(() => {
 	  &:hover {
 	    background: var(--bg-card);
 	    color: var(--accent);
-	    border-color: var(--accent);
 	  }
 
 	  &--open {
 	    color: var(--accent);
-	    border-color: var(--accent);
+	    /* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+	    &::after {
+	      opacity: 1;
+	    }
 	  }
 	}
 
@@ -731,8 +731,8 @@ onUnmounted(() => {
 	  margin-top: 4px;
 	  padding: 10px 14px;
 	  background: var(--bg-secondary);
-	  border-radius: 8px;
-	  border: 1px solid var(--border);
+	  --pxs: 3px; clip-path: var(--pxc);
+	  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 	  overflow: hidden;
 	}
 

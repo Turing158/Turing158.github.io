@@ -213,7 +213,7 @@ const crackTimeText = computed(() => {
   cursor: pointer;
   color: var(--text-secondary);
   padding: 6px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   display: flex;
   align-items: center;
   transition: color 0.2s, background 0.2s;
@@ -241,7 +241,7 @@ const crackTimeText = computed(() => {
   font-size: 0.85rem;
   font-weight: 700;
   padding: 2px 10px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
 }
 
 .level-weak {
@@ -263,13 +263,13 @@ const crackTimeText = computed(() => {
 .ps-bar-track {
   height: 8px;
   background: var(--bg-secondary);
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   overflow: hidden;
 }
 
 .ps-bar-fill {
   height: 100%;
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   transition: width 0.3s ease, background 0.3s ease;
 }
 
@@ -296,8 +296,8 @@ const crackTimeText = computed(() => {
   gap: 8px;
   padding: 8px 12px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .ps-crack-label {
@@ -319,8 +319,8 @@ const crackTimeText = computed(() => {
   gap: 6px;
   padding: 12px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .ps-check-title {

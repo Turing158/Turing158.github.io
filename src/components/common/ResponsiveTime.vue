@@ -53,15 +53,14 @@ const formattedMinutes = computed(() => padZero(currentTime.value.getMinutes()))
   width: fit-content;
   max-width: max-content;
   padding: 16px 36px;
-  border: 3px solid #d4cfc3;
-  border-radius: 18px;
+  border: 3px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 4px; clip-path: var(--pxc);
   background: linear-gradient(180deg, #fff, #f8f8f0);
   animation: time-fade-up 0.5s ease-out;
   transition: padding 0.2s;
 
   // 适应主题色
   background: linear-gradient(180deg, var(--bg-primary, #fff), var(--bg-secondary, #f8f8f0));
-  border-color: var(--border, #d4cfc3);
 }
 
 .responsive-time__date {

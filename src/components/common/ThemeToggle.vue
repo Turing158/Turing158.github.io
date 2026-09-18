@@ -71,7 +71,7 @@ onBeforeUnmount(() => {
   <div class="theme-toggle" ref="containerRef">
     <!-- 系统模式切换按钮 -->
     <button
-      class="theme-toggle__btn theme-toggle__btn--system"
+      class="theme-toggle__btn theme-toggle__btn--system px-fade"
       :class="{ 'is-active': systemMode }"
       @click="toggleSystemMode"
       :aria-label="systemMode ? '关闭系统模式' : '开启系统模式'"
@@ -189,7 +189,7 @@ onBeforeUnmount(() => {
     width: 36px;
     height: 36px;
     border: none;
-    border-radius: 10px;
+    --pxs: 3px; clip-path: var(--pxc);
     background: var(--bg-secondary);
     color: var(--text-primary);
     cursor: pointer;
@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
       height: 32px;
       padding: 0 10px;
       gap: 6px;
-      border-radius: 8px;
+      --pxs: 3px; clip-path: var(--pxc);
       font-size: 12px;
       font-weight: 500;
       background: var(--bg-secondary);
@@ -230,7 +230,9 @@ onBeforeUnmount(() => {
       &.is-active {
         background: var(--accent);
         color: #fff;
-        border-color: var(--accent);
+        /* 原为 border-image-source（宿主无 border-image 简写，只渲染出四个角点）；
+           改为淡入完整强调色描边 */
+        &::after { opacity: 1; }
 
         &:hover {
           background: var(--accent-hover);
@@ -241,7 +243,7 @@ onBeforeUnmount(() => {
     &--switch {
       width: 40px;
       height: 40px;
-      border-radius: 50%;
+      clip-path: var(--pxc-circle);
       background: var(--toggle-bg);
 
       &:hover {
@@ -261,7 +263,7 @@ onBeforeUnmount(() => {
     &--selector {
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      --pxs: 3px; clip-path: var(--pxc);
     }
   }
 
@@ -291,8 +293,8 @@ onBeforeUnmount(() => {
     top: calc(100% + 8px);
     right: 0;
     background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+    --pxs: 3px; clip-path: var(--pxc);
     padding: 6px;
     min-width: 140px;
     box-shadow: var(--shadow-strong);
@@ -306,7 +308,7 @@ onBeforeUnmount(() => {
     width: 100%;
     padding: 8px 10px;
     border: none;
-    border-radius: 8px;
+    --pxs: 3px; clip-path: var(--pxc);
     background: transparent;
     color: var(--text-primary);
     font-size: 13px;

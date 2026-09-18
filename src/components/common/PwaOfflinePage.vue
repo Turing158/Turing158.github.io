@@ -134,7 +134,7 @@ async function retryConnection() {
     gap: 8px;
     padding: 14px 32px;
     border: none;
-    border-radius: 12px;
+    --pxs: 3px; clip-path: var(--pxc);
     background: var(--accent);
     color: #fff;
     font-size: 16px;
@@ -178,7 +178,7 @@ async function retryConnection() {
 
   &__circle {
     position: absolute;
-    border-radius: 50%;
+    clip-path: var(--pxc-circle);
     opacity: 0.1;
 
     &--1 {

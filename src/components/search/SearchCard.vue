@@ -14,7 +14,7 @@
       </span>
       <span v-for="tag in result.tags" :key="tag" class="tag" v-html="highlight(tag, query)" />
     </div>
-    <span class="card-type-badge">{{ $t('search.typeArticle') }}</span>
+    <span class="card-type-badge px-fade">{{ $t('search.typeArticle') }}</span>
   </router-link>
 
   <!-- 项目卡片 -->
@@ -46,18 +46,18 @@
         <ExternalLinkIcon />
       </Button>
     </div>
-    <span class="card-type-badge">{{ $t('search.typeProject') }}</span>
+    <span class="card-type-badge px-fade">{{ $t('search.typeProject') }}</span>
     <!-- 长按平台选择弹窗 -->
     <BlogDialog v-model="showPlatformDialog" :title="dialogTitle" :width="360" :show-close="true" :close-on-click-overlay="true">
       <div class="platform-dialog-content">
-        <button class="platform-btn platform-btn--github" @click="openGithub">
+        <button class="platform-btn platform-btn--github px-fade" @click="openGithub">
           <svg class="platform-btn__icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
           <span>GitHub</span>
           <ExternalLinkIcon />
         </button>
-        <button class="platform-btn platform-btn--gitee" @click="openGitee">
+        <button class="platform-btn platform-btn--gitee px-fade" @click="openGitee">
           <img class="platform-btn__icon" src="https://gitee.com/favicon.ico" alt="Gitee" />
           <span>Gitee</span>
           <ExternalLinkIcon />
@@ -114,7 +114,7 @@
         </Button>
       </div>
     </div>
-    <span class="card-type-badge">{{ $t('search.typeRelease') }}</span>
+    <span class="card-type-badge px-fade">{{ $t('search.typeRelease') }}</span>
   </div>
 
   <!-- 工具卡片：点击在当前页面路由跳转到工具详情页 -->
@@ -132,7 +132,7 @@
     <div v-if="result.tags.length > 0" class="card-tech">
       <span v-for="tag in result.tags" :key="tag" class="tech-tag" v-html="highlight(tag, query)" />
     </div>
-    <span class="card-type-badge">{{ $t('search.typeTool') }}</span>
+    <span class="card-type-badge px-fade">{{ $t('search.typeTool') }}</span>
   </router-link>
 </template>
 
@@ -236,9 +236,9 @@ function openGitee() {
 /* ======================== */
 .search-card {
   background: var(--bg-card);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 8px var(--shadow);
   display: flex;
   flex-direction: column;
@@ -286,7 +286,7 @@ function openGitee() {
 :deep(.search-highlight) {
   background: color-mix(in srgb, var(--accent) 25%, transparent);
   color: var(--accent);
-  border-radius: 2px;
+  --pxs: 2px; clip-path: var(--pxc);
   padding: 0 2px;
 }
 
@@ -315,7 +315,7 @@ function openGitee() {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -344,7 +344,7 @@ function openGitee() {
   display: inline-flex;
   align-items: center;
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
   font-weight: 500;
   white-space: nowrap;
@@ -382,10 +382,11 @@ function openGitee() {
   font-size: 0.7rem;
   font-weight: 600;
   padding: 2px 8px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: color-mix(in srgb, var(--accent) 12%, transparent);
   color: var(--text-secondary);
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  border: 1px solid transparent; border-image: var(--px-frame-accent-faint) 6 / calc(2 * var(--pxs)) stretch;
+  --px-frame-fade: var(--px-frame-accent);
   line-height: 1.4;
   letter-spacing: 0.02em;
   user-select: none;
@@ -396,7 +397,6 @@ function openGitee() {
   &:hover{
     transform: scale(1.1) translateY(-1px);
     color: var(--accent);
-    border-color: var(--accent);
     background: color-mix(in srgb, var(--accent) 20%, transparent);
     box-shadow: 0 2px 8px var(--shadow);
   }
@@ -418,8 +418,8 @@ function openGitee() {
   justify-content: center;
   gap: 10px;
   padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 1rem;
@@ -432,7 +432,7 @@ function openGitee() {
     height: 22px;
     flex-shrink: 0;
     object-fit: contain;
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 
   &:hover {
@@ -445,18 +445,20 @@ function openGitee() {
   }
 
   &--github {
+    --px-frame-fade: var(--px-frame-github);
+
     &:hover {
       background: #24292f;
       color: #fff;
-      border-color: #24292f;
     }
   }
 
   &--gitee {
+    --px-frame-fade: var(--px-frame-gitee);
+
     &:hover {
       background: #c71d23;
       color: #fff;
-      border-color: #c71d23;
 
       .platform-btn__icon {
         filter: brightness(2);
@@ -564,7 +566,7 @@ function openGitee() {
 .author-avatar {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   flex-shrink: 0;
   transition: box-shadow 0.2s ease;
 }

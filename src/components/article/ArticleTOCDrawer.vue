@@ -246,8 +246,8 @@ onUnmounted(() => {
   right: 16px;
   top: 16px;
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   box-shadow: 0 4px 20px var(--shadow);
   overflow: hidden;
   z-index: 50;
@@ -277,13 +277,13 @@ onUnmounted(() => {
   color: var(--text-secondary);
   font-size: 0.75rem;
   padding: 2px 8px;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
 }
 
 .toc-close-btn {
   width: 28px;
   height: 28px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   border: none;
   background: transparent;
   color: var(--text-secondary);
@@ -317,7 +317,7 @@ onUnmounted(() => {
   font-size: 0.85rem;
   color: var(--text-secondary);
   padding: 7px 12px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   transition: all 0.2s;
   line-height: 1.4;
   overflow: hidden;
@@ -367,7 +367,8 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  background: var(--bg-card);
+  /* 不能加不透明背景：定位子元素会盖住抽屉的 border-image 像素边框，
+     导致底边与底部圆角只剩 1px 残边；抽屉背景已是 --bg-card，此处保持透明即可 */
 }
 
 .toc-actions-left {
@@ -410,7 +411,7 @@ onUnmounted(() => {
   z-index: 49;
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   border: none;
   background: var(--bg-card);
   color: var(--text-primary);

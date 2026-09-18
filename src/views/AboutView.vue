@@ -3,6 +3,9 @@
     <h1 class="page-title">{{ $t('about.title') }}</h1>
 
     <div class="about-card">
+      <!-- 繁茂洞穴上边框：垂藤悬挂在卡片顶部；植物右移 60 逻辑像素（120px），让最长的垂藤避开站点名 -->
+      <CaveTopBorder class="about-cave-top" :plant-offset="60" />
+
       <!-- Profile Header -->
       <div class="about-header">
         <div class="avatar-wrapper">
@@ -16,6 +19,8 @@
           </div>
         </div>
       </div>
+
+      <GrassTerrainDivider size="sm" class="about-divider" />
 
       <!-- Skills Section -->
       <div class="about-section">
@@ -35,7 +40,7 @@
               <span
                 v-for="skill in category.skills"
                 :key="skill"
-                class="skill-tag"
+                class="skill-tag px-fade"
               >
                 {{ skill }}
               </span>
@@ -104,7 +109,7 @@
             :key="link.label"
             :href="link.href"
             :target="link.external ? '_blank' : undefined"
-            class="contact-card"
+            class="contact-card px-fade"
           >
             <span class="contact-icon">{{ link.icon }}</span>
             <span class="contact-label">{{ link.label }}</span>
@@ -113,6 +118,9 @@
           </a>
         </div>
       </div>
+
+      <!-- 繁茂洞穴下边框：苔藓地表铺在卡片底部 -->
+      <CaveBottomBorder class="about-cave-bottom" />
     </div>
   </div>
 </template>
@@ -121,6 +129,9 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { usePageSeo } from '@/composables/useSeo'
+import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import CaveTopBorder from '@/components/common/CaveTopBorder.vue'
+import CaveBottomBorder from '@/components/common/CaveBottomBorder.vue'
 
 const { t } = useI18n()
 
@@ -189,8 +200,8 @@ const contactLinks = computed<ContactLink[]>(() => [
   {
     icon: '📧',
     label: t('about.email'),
-    value: '15818961209@163.com',
-    href: 'mailto:15818961209@163.com',
+    value: 'turing158@foxmail.com',
+    href: 'mailto:turing158@foxmail.com',
     external: false,
   },
 ])
@@ -211,10 +222,41 @@ const contactLinks = computed<ContactLink[]>(() => [
 
 .about-card {
   background: var(--bg-card);
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   padding: 32px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 12px var(--shadow);
+}
+
+// 繁茂洞穴边框：用负外边距抵消卡片内边距，贴齐像素边框内缘。
+// 组件自身为 width:100%（内容盒宽度），需显式加宽 2×32px 才能铺满整个内边距盒。
+// 边框保持组件内联的原尺寸（176px/136px），不裁切、不缩放；
+// z-index 降到 0 层，由卡片内容（z-index 1）压在边框上方。
+.about-cave-top {
+  width: calc(100% + 64px);
+  // 负下边距把个人资料卡拉进垂藤区；洞顶苔藓厚约 0~38px，仍完整可见
+  margin: -32px -32px -72px;
+  z-index: 0;
+}
+
+.about-cave-bottom {
+  width: calc(100% + 64px);
+  // 负上边距让联系区滑进地表上方的空白天区，基本保留植物全高（仅草尖约 10px 被卡片遮住）
+  margin: -64px -32px -32px;
+  z-index: 0;
+}
+
+// 联系区现在是倒数第二个子节点（下边框才是末尾），
+// .about-section:last-child 的清零规则不再命中，在此单独清零，
+// 避免它与下边框的负上边距发生外边距折叠、抵消重叠量。
+.about-card > .about-section:nth-last-child(2) {
+  margin-bottom: 0;
+}
+
+// 卡片内容整体抬到边框层之上（边框 z-index 0），重叠时内容优先显示
+.about-card > :not(.about-cave-top):not(.about-cave-bottom) {
+  position: relative;
+  z-index: 1;
 }
 
 // ── Profile Header ──
@@ -222,35 +264,26 @@ const contactLinks = computed<ContactLink[]>(() => [
   display: flex;
   align-items: center;
   gap: 24px;
+  margin-bottom: 10px;
+}
+
+.about-divider {
   margin-bottom: 32px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--border);
 }
 
 .avatar-wrapper {
   position: relative;
   flex-shrink: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: 50%;
-    background: conic-gradient(from 0deg, var(--accent), var(--accent-hover), var(--accent));
-    animation: avatar-ring-spin 4s linear infinite;
-  }
-}
-
-@keyframes avatar-ring-spin {
-  to { transform: rotate(360deg); }
+  /* 静态等宽像素环：1 个网格单位 = 88px / 16 = 5.5px，不旋转 */
+  padding: 5.5px;
+  background: var(--accent);
+  clip-path: var(--pxc-circle);
 }
 
 .about-avatar {
-  position: relative;
-  z-index: 1;
   width: 88px;
   height: 88px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle-in);
   display: block;
 }
 
@@ -285,15 +318,14 @@ const contactLinks = computed<ContactLink[]>(() => [
   font-weight: 600;
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 10%, transparent);
-  border-radius: 20px;
-  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  --pxs: 4px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame-accent-faint) 6 / calc(2 * var(--pxs)) stretch;
   cursor: default;
   transition: all 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
     background: color-mix(in srgb, var(--accent) 18%, transparent);
-    border-color: color-mix(in srgb, var(--accent) 45%, transparent);
     box-shadow: 0 4px 12px var(--shadow);
   }
 }
@@ -369,13 +401,13 @@ const contactLinks = computed<ContactLink[]>(() => [
   font-weight: 600;
   color: var(--text-primary);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --px-frame-fade: var(--px-frame-accent-faint);
+  --pxs: 3px; clip-path: var(--pxc);
   cursor: default;
   transition: all 0.25s ease;
   &:hover {
     color: var(--accent);
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     background: color-mix(in srgb, var(--accent) 6%, transparent);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px var(--shadow);
@@ -476,7 +508,7 @@ const contactLinks = computed<ContactLink[]>(() => [
 .timeline-dot {
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: var(--bg-card);
   border: 2px solid color-mix(in srgb, var(--accent) 50%, transparent);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
@@ -489,7 +521,7 @@ const contactLinks = computed<ContactLink[]>(() => [
   top: 6px;
   width: 10px;
   height: 10px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: var(--accent);
   opacity: 0;
   z-index: 0;
@@ -515,8 +547,8 @@ const contactLinks = computed<ContactLink[]>(() => [
   flex: 1;
   padding: 16px 18px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: default;
   position: relative;
@@ -530,7 +562,7 @@ const contactLinks = computed<ContactLink[]>(() => [
     top: 12px;
     bottom: 12px;
     width: 3px;
-    border-radius: 0 3px 3px 0;
+
     background: var(--accent);
     opacity: 0;
     transform: scaleY(0);
@@ -597,14 +629,14 @@ const contactLinks = computed<ContactLink[]>(() => [
   gap: 12px;
   padding: 14px 16px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --px-frame-fade: var(--px-frame-accent-faint);
+  --pxs: 3px; clip-path: var(--pxc);
   text-decoration: none;
   transition: all 0.25s ease;
   cursor: pointer;
 
   &:hover {
-    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
     background: color-mix(in srgb, var(--accent) 6%, transparent);
     transform: translateX(4px);
 

@@ -4,6 +4,7 @@ import { resolve, join } from 'path'
 import matter from 'gray-matter'
 import { md5 } from '../utils/md5'
 import { md, registerLanguages } from '../utils/highlight'
+import { articleTime } from '../utils/articleDate'
 import {
   addBlankTargetToLinks,
   enhanceCodeBlocks,
@@ -49,7 +50,9 @@ async function loadArticles(rootDir: string): Promise<ArticleData[]> {
         html,
         content,
         title: data.title || slug,
-        date: typeof data.date === 'object' ? String(data.date) : (data.date || ''),
+        // YAML 日期被解析为 Date 对象，序列化为 ISO 字符串，
+        // 避免 String(date) 产生 "Fri Feb 09 2024 ..." 这类无法按字典序比较时间的格式
+        date: data.date instanceof Date ? data.date.toISOString() : (data.date || ''),
         tags: data.tags || [],
         description: data.description || '',
         cover: data.cover,
@@ -59,7 +62,7 @@ async function loadArticles(rootDir: string): Promise<ArticleData[]> {
     }
   }
 
-  articles.sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+  articles.sort((a, b) => articleTime(b.date) - articleTime(a.date))
   console.log(`[articles-plugin] Loaded ${articles.length} articles`)
   return articles
 }
@@ -93,6 +96,7 @@ function generateSitemap(rootDir: string, articles: ArticleData[]) {
     { path: '/#/projects', priority: '0.8', changefreq: 'weekly' },
     { path: '/#/tools', priority: '0.8', changefreq: 'weekly' },
     { path: '/#/about', priority: '0.7', changefreq: 'monthly' },
+    { path: '/#/friends', priority: '0.6', changefreq: 'monthly' },
     { path: '/#/releases', priority: '0.6', changefreq: 'weekly' },
     { path: '/#/commits', priority: '0.5', changefreq: 'daily' },
   ]

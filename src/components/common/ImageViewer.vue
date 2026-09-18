@@ -35,8 +35,8 @@
 
         <!-- 未加载完成 / 加载失败占位：占据层全屏可点，点空白处等同点击背景关闭 -->
         <div v-if="showPlaceholder" class="iv-placeholder" @click.self="close">
-          <Transition name="iv-fade" mode="out-in">
-            <LoadingSpinner v-if="isCurrentLoading" key="loading" variant="ring" size="large" color="#ffffff" />
+          <Transition name="iv-loader" mode="out-in">
+            <CubeLoader v-if="isCurrentLoading" key="loading" size="large" />
             <div v-else key="error" class="iv-error-box">
               <svg class="iv-placeholder-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="48" height="48">
                 <path d="M11 3l-1.5 5 2.5 2.5-2.5 3 2 3.5-1 4H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6z" /><path d="M13 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-8.5l1-4-2-3.5 2.5-3-2.5-2.5L13 3z" /><circle cx="16.8" cy="8.3" r="1.4" /><path d="m21 15.5-2.8-2.8-3.4 3.6" />
@@ -115,7 +115,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 
 export interface ImageViewerImage {
   src: string
@@ -477,7 +477,7 @@ onUnmounted(() => {
   max-height: 88vh;
   object-fit: contain;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.45);
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   cursor: inherit;
   -webkit-user-drag: none;
 }
@@ -562,7 +562,7 @@ onUnmounted(() => {
   height: 38px;
   padding: 0;
   border: none;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: rgba(255, 255, 255, 0.12);
   color: #fff;
   cursor: pointer;
@@ -597,7 +597,7 @@ onUnmounted(() => {
   transform: translateY(-50%);
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  clip-path: var(--pxc-circle);
   background: rgba(0, 0, 0, 0.4);
 
   &:hover {
@@ -626,7 +626,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: rgba(30, 30, 30, 0.85);
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
@@ -697,5 +697,17 @@ onUnmounted(() => {
 .iv-fade-enter-from,
 .iv-fade-leave-to {
   opacity: 0;
+}
+
+/* 加载占位切换：透明度 + 0.8↔1 缩放（与全局 loader-pop 一致） */
+.iv-loader-enter-active,
+.iv-loader-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.iv-loader-enter-from,
+.iv-loader-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
 }
 </style>

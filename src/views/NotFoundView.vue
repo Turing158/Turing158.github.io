@@ -66,17 +66,17 @@
         <p class="suggestions-title">{{ $t('notFound.suggestions') }}</p>
         <ul class="suggestions-list">
           <li>
-            <router-link to="/articles" class="suggestion-link">
+            <router-link to="/articles" class="suggestion-link px-fade">
               {{ $t('notFound.viewArticles') }}
             </router-link>
           </li>
           <li>
-            <router-link to="/projects" class="suggestion-link">
+            <router-link to="/projects" class="suggestion-link px-fade">
               {{ $t('notFound.viewProjects') }}
             </router-link>
           </li>
           <li>
-            <router-link to="/about" class="suggestion-link">
+            <router-link to="/about" class="suggestion-link px-fade">
               {{ $t('notFound.aboutMe') }}
             </router-link>
           </li>
@@ -429,7 +429,7 @@ onUnmounted(() => {
   padding: 10px 20px;
   font-size: 0.95rem;
   font-weight: 600;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
   border: none;
   cursor: pointer;
   transition: all 0.25s ease;
@@ -495,7 +495,7 @@ onUnmounted(() => {
   width: 360px;
   height: 360px;
   margin: 0 auto;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   overflow: hidden;
   box-shadow:
     0 4px 20px color-mix(in srgb, var(--accent) 15%, transparent),
@@ -523,7 +523,7 @@ onUnmounted(() => {
   backdrop-filter: blur(2px);
   cursor: pointer;
   z-index: 2;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   transition: background 0.3s ease;
 
   &:hover {
@@ -587,16 +587,15 @@ onUnmounted(() => {
   background: var(--bg-secondary);
   color: var(--text-primary);
   text-decoration: none;
-  border-radius: 20px;
+  --pxs: 4px; clip-path: var(--pxc);
   font-size: 0.85rem;
   font-weight: 500;
   transition: all 0.25s ease;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 
   &:hover {
     background: var(--accent);
     color: #fff;
-    border-color: var(--accent);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px color-mix(in srgb, var(--accent) 25%, transparent);
   }

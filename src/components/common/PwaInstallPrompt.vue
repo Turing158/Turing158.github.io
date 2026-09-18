@@ -95,12 +95,12 @@ onMounted(() => {
   transform: translateX(-50%);
   z-index: 10000;
   background: var(--bg-card);
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   box-shadow: var(--shadow-strong);
   padding: 16px 20px;
   min-width: 320px;
   max-width: 400px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 
   &__content {
     display: flex;
@@ -113,7 +113,7 @@ onMounted(() => {
     flex-shrink: 0;
     width: 48px;
     height: 48px;
-    border-radius: 12px;
+    --pxs: 3px; clip-path: var(--pxc);
     overflow: hidden;
 
     img {
@@ -149,7 +149,7 @@ onMounted(() => {
     font-size: 20px;
     color: var(--text-secondary, #999);
     cursor: pointer;
-    border-radius: 50%;
+    clip-path: var(--pxc-circle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -170,7 +170,7 @@ onMounted(() => {
     flex: 1;
     padding: 10px 16px;
     border: none;
-    border-radius: 8px;
+    --pxs: 3px; clip-path: var(--pxc);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;

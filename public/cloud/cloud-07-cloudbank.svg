@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="574" height="294" viewBox="0 0 574 294" fill="none" shape-rendering="crispEdges" role="img" aria-labelledby="title desc">
+<title id="title">07 大云团 / cloudbank</title>
+<desc id="desc">Original block-style pixel cloud. Transparent background; 14-unit square grid; editable vector rectangles.</desc>
+<g id="cloud-07" transform="translate(28 28)">
+  <g fill="#B6C7DA">
+    <rect x="182" y="28" width="126" height="42"/>
+    <rect x="140" y="70" width="210" height="28"/>
+    <rect x="42" y="98" width="308" height="14"/>
+    <rect x="42" y="112" width="420" height="28"/>
+    <rect x="0" y="140" width="518" height="56"/>
+    <rect x="56" y="196" width="420" height="28"/>
+    <rect x="126" y="224" width="294" height="14"/>
+  </g>
+  <g fill="#D4E0EC">
+    <rect x="182" y="14" width="126" height="42"/>
+    <rect x="140" y="56" width="210" height="28"/>
+    <rect x="42" y="84" width="308" height="14"/>
+    <rect x="42" y="98" width="420" height="28"/>
+    <rect x="0" y="126" width="518" height="56"/>
+    <rect x="56" y="182" width="420" height="28"/>
+    <rect x="126" y="210" width="294" height="14"/>
+  </g>
+  <g fill="#EEF4FA">
+    <rect x="182" y="0" width="126" height="42"/>
+    <rect x="140" y="42" width="210" height="28"/>
+    <rect x="42" y="70" width="308" height="14"/>
+    <rect x="42" y="84" width="420" height="28"/>
+    <rect x="0" y="112" width="518" height="56"/>
+    <rect x="56" y="168" width="420" height="28"/>
+    <rect x="126" y="196" width="294" height="14"/>
+  </g>
+  <g fill="#D4E0EC">
+    <rect x="280" y="70" width="70" height="42"/>
+    <rect x="392" y="112" width="98" height="42"/>
+    <rect x="224" y="154" width="140" height="42"/>
+  </g>
+  <g fill="#FFFFFF">
+    <rect x="182" y="0" width="112" height="28"/>
+    <rect x="140" y="42" width="56" height="28"/>
+    <rect x="42" y="70" width="112" height="28"/>
+    <rect x="350" y="84" width="70" height="14"/>
+    <rect x="0" y="112" width="56" height="14"/>
+  </g>
+</g>
+</svg>

@@ -35,7 +35,7 @@ export function addBlankTargetToLinks(html: string): string {
 
 /**
  * 给 <pre><code> 代码块外包裹 .code-block-wrapper，
- * 顶部显示语言标签，右上角添加 base64 编码代码的复制按钮。
+ * 右上角显示语言标签，右下角添加 base64 编码代码的复制按钮。
  *
  * 复制按钮的点击由 MarkdownRenderer 的 handleCopyClick 统一处理。
  *

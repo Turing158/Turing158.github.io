@@ -45,7 +45,7 @@
 
     <!-- 执行说明 -->
     <label class="tool-label">{{ $t('tools.cronEditor.descriptionLabel') }}</label>
-    <div class="cron-description" :class="{ 'cron-description--error': parseError }">
+    <div class="cron-description px-fade" :class="{ 'cron-description--error': parseError }">
       {{ parseError || description }}
     </div>
 
@@ -479,24 +479,35 @@ onMounted(() => {
 
 .cron-description {
   padding: 10px 12px;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   font-size: 0.85rem;
   color: var(--text-primary);
   line-height: 1.5;
+  /* 目标帧固定在基类：错误消失、叠加层淡出时，淡出的仍是 danger 帧而非回落色 */
+  --px-frame-fade: var(--px-frame-danger-soft);
 }
 
 .cron-description--error {
   color: #dc3545;
-  border-color: rgba(220, 53, 69, 0.3);
+}
+
+/* 提示区非交互：压过工具类 hover 淡入，仅错误态显示 danger 帧 */
+.cron-description.px-fade::after {
+  opacity: 0;
+}
+
+/* 原为 border-image-source 切换 danger 帧；改由叠加层淡入 */
+.cron-description.px-fade.cron-description--error::after {
+  opacity: 1;
 }
 
 .cron-next-times {
   max-height: 280px;
   overflow-y: auto;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
 }
 

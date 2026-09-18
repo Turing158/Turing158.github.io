@@ -43,37 +43,38 @@
       </div>
 
       <div class="results-display holiday-display">
-        <div v-if="loading" class="holiday-loading">
-          <span class="loading-spinner" />
-          <span>{{ $t('tools.holidayQuery.loading') }}</span>
-        </div>
-        <div v-else-if="error" class="holiday-error">
-          <span class="empty-icon">⚠️</span>
-          <span class="empty-text">{{ $t('tools.holidayQuery.loadFailed') }}</span>
-          <Button size="small" @click="fetchHolidays">{{ $t('tools.holidayQuery.retry') }}</Button>
-        </div>
-        <div v-else-if="holidays.length === 0" class="empty-state">
-          <span class="empty-icon">🎉</span>
-          <span class="empty-text">{{ queried ? $t('tools.holidayQuery.noResults') : $t('tools.holidayQuery.empty') }}</span>
-        </div>
-        <div v-else class="holiday-list">
-          <div
-            v-for="(h, index) in holidays"
-            :key="`${h.date}-${h.name}-${index}`"
-            class="holiday-row"
-            :class="{ 'is-passed': isPassed(h) }"
-          >
-            <span
-              class="holiday-name"
-              :title="$t('tools.holidayQuery.toggleNameTip')"
-              @click="toggleName(h)"
-            >{{ getDisplayName(h) }}</span>
-            <span class="holiday-date">{{ h.date }}</span>
-            <span class="holiday-status" :class="{ 'is-passed': isPassed(h) }">
-              {{ statusLabel(h) }}
-            </span>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="loading" class="holiday-loading cube-anim">
+            <CubeLoader :text="$t('tools.holidayQuery.loading')" />
           </div>
-        </div>
+          <div v-else-if="error" class="holiday-error">
+            <span class="empty-icon">⚠️</span>
+            <span class="empty-text">{{ $t('tools.holidayQuery.loadFailed') }}</span>
+            <Button size="small" @click="fetchHolidays">{{ $t('tools.holidayQuery.retry') }}</Button>
+          </div>
+          <div v-else-if="holidays.length === 0" class="empty-state">
+            <span class="empty-icon">🎉</span>
+            <span class="empty-text">{{ queried ? $t('tools.holidayQuery.noResults') : $t('tools.holidayQuery.empty') }}</span>
+          </div>
+          <div v-else class="holiday-list">
+            <div
+              v-for="(h, index) in holidays"
+              :key="`${h.date}-${h.name}-${index}`"
+              class="holiday-row"
+              :class="{ 'is-passed': isPassed(h) }"
+            >
+              <span
+                class="holiday-name"
+                :title="$t('tools.holidayQuery.toggleNameTip')"
+                @click="toggleName(h)"
+              >{{ getDisplayName(h) }}</span>
+              <span class="holiday-date">{{ h.date }}</span>
+              <span class="holiday-status" :class="{ 'is-passed': isPassed(h) }">
+                {{ statusLabel(h) }}
+              </span>
+            </div>
+          </div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -84,6 +85,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogInput from '@/components/common/BlogInput.vue'
 import BlogSelect from '@/components/common/BlogSelect.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { Button } from 'animal-island-vue'
 import BlogTip from '@/plugins/blog-tip'
 
@@ -237,8 +239,8 @@ async function fetchHolidays() {
   gap: 14px;
   padding: 16px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 .config-row {
   display: flex;
@@ -259,11 +261,11 @@ async function fetchHolidays() {
 .results-title { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
 .results-count {
   font-size: 0.75rem; color: var(--accent);
-  background: var(--bg-secondary); padding: 2px 8px; border-radius: 10px;
+  background: var(--bg-secondary); padding: 2px 8px; --pxs: 3px; clip-path: var(--pxc);
 }
 .results-display {
-  min-height: 80px; border: 1px solid var(--border);
-  border-radius: 8px; padding: 12px; background: var(--bg-card);
+  min-height: 80px; border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc); padding: 12px; background: var(--bg-card);
 }
 .holiday-loading {
   display: flex; align-items: center; gap: 8px; justify-content: center; padding: 20px;

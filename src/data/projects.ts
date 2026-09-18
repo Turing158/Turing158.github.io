@@ -14,9 +14,27 @@ export interface Category {
 
 export const developingProjects: Project[] = [
   {
+    name: 'CodeCraft',
+    description: '贴在屏幕顶端的小面板，随时看见 AI 编程助手在干什么。基于 Rust + Tauri 2，为 Windows 打造。',
+    tech: ['Rust', 'Tauri 2', 'Windows'],
+    url: 'https://github.com/Turing158/CodeCraft',
+  },
+  {
+    name: 'MemeMomo',
+    description: '贴在桌面上的轻量 Markdown 备忘录，支持便签弹窗、定时提醒、全局快捷键和贴边收起。基于 .NET 8 + WPF。',
+    tech: ['C#', 'WPF', 'Windows'],
+    url: 'https://github.com/Turing158/MemeMomo',
+  },
+  {
+    name: 'LeisureHub',
+    description: '纯前端单页导航站，把常用网站、日历、天气和搜索摆在浏览器第一眼，数据只存在本地浏览器。',
+    tech: ['Vue', 'TypeScript', 'Vite'],
+    url: 'https://github.com/Turing158/LeisureHub',
+  },
+  {
     name: 'StarFall-Minecraft-Launcher',
     description: 'SFMC Minecraft 启动器，支持多版本管理、模组集成等功能。',
-    tech: ['Java', 'Minecraft', 'Launcher'],
+    tech: ['C#', 'Minecraft', 'Launcher'],
     url: 'https://github.com/Turing158/StarFall-Minecraft-Launcher',
   },
   {
@@ -39,6 +57,12 @@ export const categories: Category[] = [
     icon: '✅',
     label: 'projects.categoryCompleted',
     projects: [
+      {
+        name: 'CoolCoding',
+        description: '通过提示词、模型与 Agent 一次性生成的小玩具集合。',
+        tech: ['JavaScript'],
+        url: 'https://github.com/Turing158/CoolCoding',
+      },
       {
         name: 'StarFall-vue',
         description: '基于 Vue 框架构建的前端界面，与 StarFall-SpringBoot 后端配合使用。',

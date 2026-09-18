@@ -1,0 +1,133 @@
+/* ── 旋转草方块加载动画（CubeLoader）
+   提取自 html/loading/cube 原型：贴图草方块以 1s ease 循环翻转（原 2s，提速 2 倍）。
+   样式置于全局：CubeLoader 组件与 MarkdownRenderer 动态注入的图片加载层共用同一份类名。 */
+
+.cube-loader {
+  --cube-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px;
+  color: inherit;
+}
+
+.cube-loader--inline {
+  display: inline-flex;
+  gap: 6px;
+  margin: 0 6px;
+}
+
+.cube-loader--small {
+  --cube-size: 10px;
+}
+
+.cube-loader--medium {
+  --cube-size: 18px;
+}
+
+.cube-loader--large {
+  --cube-size: 28px;
+}
+
+.cube-loader-text {
+  font-size: 0.9rem;
+}
+
+.cube3d {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  transform-style: preserve-3d;
+  animation: cube-loader-rotate 1s infinite ease;
+}
+
+.cube3d > * {
+  image-rendering: pixelated;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 1px solid black;
+  background-size: 100%;
+}
+
+/* 六个面：四面草侧、顶面草皮、底面泥土 */
+.cube3d > *:nth-child(1) {
+  transform: translateZ(calc(var(--cube-size) / -2)) rotateY(180deg);
+  background-image: url('../assets/cube-loader/grass.png');
+}
+
+.cube3d > *:nth-child(2) {
+  transform: rotateY(-270deg) translateX(50%);
+  transform-origin: top right;
+  background-image: url('../assets/cube-loader/grass.png');
+}
+
+.cube3d > *:nth-child(3) {
+  transform: rotateY(270deg) translateX(-50%);
+  transform-origin: center left;
+  background-image: url('../assets/cube-loader/grass.png');
+}
+
+.cube3d > *:nth-child(4) {
+  transform: rotateX(90deg) translateY(-50%);
+  transform-origin: top center;
+  background-image: url('../assets/cube-loader/grasstop.png');
+}
+
+.cube3d > *:nth-child(5) {
+  transform: rotateX(-90deg) translateY(50%);
+  transform-origin: bottom center;
+  background-image: url('../assets/cube-loader/grassbottom.png');
+}
+
+.cube3d > *:nth-child(6) {
+  transform: translateZ(calc(var(--cube-size) / 2));
+  background-image: url('../assets/cube-loader/grass.png');
+}
+
+@keyframes cube-loader-rotate {
+  0% {
+    transform: rotate(45deg) rotateX(-25deg) rotateY(25deg);
+  }
+  50% {
+    transform: rotate(45deg) rotateX(-385deg) rotateY(25deg);
+  }
+  100% {
+    transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube3d {
+    animation-duration: 3s;
+  }
+}
+
+/* ── 出现/消失过渡：透明度 + 0.8↔1 缩放
+   用法：<Transition name="loader-pop" mode="out-in" appear> 包住 loading 与内容的分支，
+   仅给 loading 容器加 .cube-anim 类 —— 缩放只作用于 loader 本身，内容分支不参与变形。 */
+.cube-anim.loader-pop-enter-active,
+.cube-anim.loader-pop-leave-active {
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.cube-anim.loader-pop-enter-from,
+.cube-anim.loader-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cube-anim.loader-pop-enter-active,
+  .cube-anim.loader-pop-leave-active {
+    transition: opacity 0.25s ease;
+  }
+
+  .cube-anim.loader-pop-enter-from,
+  .cube-anim.loader-pop-leave-to {
+    transform: none;
+  }
+}

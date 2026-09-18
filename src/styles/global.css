@@ -1,3 +1,6 @@
+/* Pixel Craft —— 全局基础样式
+   像素风语言：阶梯圆角(--pxc)、2px 描边、方块滚动条、硬边像素分隔。 */
+
 * {
   margin: 0;
   padding: 0;
@@ -10,13 +13,30 @@ html {
   overflow-x: hidden;
 }
 
-body {
-  font-family: 'Nunito', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  overflow-x: hidden;
+/* test scrollbar */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-left: 2px solid var(--border);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border: 2px solid var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--bg-card);
 }
 
 a {
@@ -28,43 +48,108 @@ a {
 a:hover {
   color: var(--accent-hover);
 }
+body { font-family: X; }
+body { font-family: 'Nunito', 'Noto Sans SC', sans-serif; }
+body { -webkit-font-smoothing: antialiased; }
+body { color: var(--text-primary); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-::-webkit-scrollbar {
-  width: 6px;
+/* ── 像素边框颜色过渡（px-fade）──
+   border-image-source 不可 transition（实测 Chrome 对 <image> 型 @property 也只在 50% 处
+   离散切换，cross-fade() 亦未实现），故用同九宫格叠加层做 opacity 交叉淡化：宿主保留
+   原边框，::after 叠一层目标色边框，状态切换时叠加层淡入淡出。用法：
+   1. 宿主元素加 .px-fade（::after 被占用时用 .px-fade-alt，走 ::before）；
+   2. 默认 hover 淡入 accent 帧；目标帧不同时在宿主规则写 --px-frame-fade: var(--px-frame-x)；
+   3. 类/属性驱动的状态在状态规则里补 ::after { opacity: 1 }，并删掉原 border-image-source；
+   4. 叠加层 inset 默认 -1px（宿主 border: 1px 时对齐）；宿主 border 为 2px 时写
+      --px-fade-inset: 2px。叠加层会被宿主 clip-path/overflow 裁剪：前者正是像素切角所需，
+      后者禁止（会裁掉铺进 border 区的叠加层）；input/textarea/img 等替换元素无伪元素，
+      叠加层须由其包裹层承载。 */
+.px-fade,
+.px-fade-alt,
+.markdown-image-retry {
+  position: relative;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+/* .markdown-image-retry 直接并入工具类选择器（border: 2px，inset 相应覆盖） */
+.px-fade::after,
+.px-fade-alt::before,
+.markdown-image-retry::after {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--px-fade-inset, 1px));
+  border: 2px solid transparent;
+  /* 同元素要交叉淡化两段状态（如 active→active:hover）时，px-fade-alt 的帧可另配
+     --px-frame-fade-alt，与 .px-fade 的帧同时在场，靠两个伪元素一隐一显做真交叉淡化 */
+  border-image: var(--px-frame-fade-alt, var(--px-frame-fade, var(--px-frame-accent))) 6 / calc(2 * var(--pxs)) stretch;
+  clip-path: var(--pxc);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: 3px;
+.px-fade:hover::after,
+.px-fade-alt:hover::before,
+.markdown-image-retry:hover::after {
+  opacity: 1;
 }
 
+.markdown-image-retry {
+  --px-fade-inset: 2px;
+  --pxs: 2px;
+}
+
+/* markdown 正文基础 */
 .markdown-body {
   background-color: transparent !important;
   color: var(--text-primary) !important;
 }
 
-/* 文章图片样式 */
 .markdown-body img {
-  border: 2px solid var(--border);
-  border-radius: 8px;
+  border: 2px solid transparent; border-image: var(--px-frame-strong) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 2px;
+  clip-path: var(--pxc);
   box-sizing: border-box;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: transform 0.25s ease, border-color 0.25s ease;
   cursor: zoom-in;
 }
 
 .markdown-body img:hover {
-  transform: scale(1.02);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-  border-color: var(--accent);
+  transform: translateY(-2px);
 }
 
-/* 图片加载占位：容器保持稳定，仅内容层（转圈/裂图/图片）做淡入淡出 */
+/* img 是替换元素无伪元素：accent 帧叠加层挂在 .markdown-img-wrap 上与 img 同步淡入，
+   并跟随 img 的 hover 位移（transition 曲线与 img 相同），保证交叉淡化期间逐像素对齐 */
+.markdown-img-wrap:not(.is-loading):not(.is-error) {
+  --px-fade-inset: 2px;
+  --pxs: 2px;
+}
+
+.markdown-img-wrap:not(.is-loading):not(.is-error)::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  border-image: var(--px-frame-accent) 6 / calc(2 * var(--pxs)) stretch;
+  clip-path: var(--pxc);
+  opacity: 0;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.markdown-img-wrap:not(.is-loading):not(.is-error):hover::after {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
 .markdown-img-wrap {
   position: relative;
+}
+
+/* 占位容器内的图片转块级：消除 inline 基线空隙，让 wrap 的 padding box 与
+   img 的 border box 重合，边框叠加层才能逐像素对齐 */
+.markdown-img-wrap > img {
+  display: block;
 }
 
 .markdown-img-wrap.is-loading,
@@ -73,8 +158,9 @@ a:hover {
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  border: 2px dashed var(--border);
-  border-radius: 8px;
+  border: 2px solid transparent; border-image: var(--px-frame-strong) 6 / calc(2 * var(--pxs)) repeat;
+  --pxs: 3px;
+  clip-path: var(--pxc);
   background: var(--bg-secondary);
 }
 
@@ -93,34 +179,20 @@ a:hover {
   gap: 12px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform: scale(0.8);
 }
 
 .is-loading .is-loading-layer,
 .is-error .is-error-layer {
   opacity: 1;
+  transform: scale(1);
 }
 
 .is-error .is-error-layer {
   pointer-events: auto;
 }
 
-.markdown-img-spinner {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 3px solid color-mix(in srgb, var(--accent) 20%, transparent);
-  border-top-color: var(--accent);
-  animation: markdown-img-spin 0.8s linear infinite;
-}
-
-@keyframes markdown-img-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 图片加载完成淡入（透明 + 轻微放大） */
 .markdown-body img.markdown-img-enter {
   animation: markdown-img-fadein 0.4s ease-out;
 }
@@ -136,44 +208,42 @@ a:hover {
   }
 }
 
-/* 失败占位的重试按钮：裂图 ↔ 刷新图标悬停变形，按下/松开缩放 */
 .markdown-image-retry {
   position: relative;
   width: 48px;
   height: 48px;
   padding: 0;
-  border: none;
-  border-radius: 10px;
-  background: transparent;
+  border: 2px solid transparent; border-image: var(--px-frame-strong) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 2px;
+  clip-path: var(--pxc);
+  background: var(--bg-card);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: color 0.25s ease, transform 0.15s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.12s ease;
 }
 
 .markdown-image-retry:hover {
   color: var(--accent);
 }
 
-/* 按下缩小，松开时弹性回弹 */
 .markdown-image-retry:active {
-  transform: scale(0.82);
+  transform: scale(0.9);
 }
 
 .markdown-image-retry svg {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  width: 72%;
+  height: 72%;
+  margin: auto;
   transition: opacity 0.3s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-/* 默认只显示裂图，刷新图标转到背后 */
 .markdown-image-retry .icon-refresh {
   opacity: 0;
   transform: rotate(-180deg) scale(0.4);
 }
 
-/* 悬停：裂图旋出，刷新图标旋入 */
 .markdown-image-retry:hover .icon-cracked {
   opacity: 0;
   transform: rotate(90deg) scale(0.4);
@@ -199,19 +269,39 @@ a:hover {
   color: var(--text-secondary);
 }
 
+/* github-markdown-css 写死的 6px 圆角：像素风下 code/pre/kbd 的
+   背景圆角会从像素切角处漏出底色，统一取直 */
+.markdown-body code,
+.markdown-body tt,
+.markdown-body kbd,
+.markdown-body .footnotes li:target::before {
+  border-radius: 0;
+}
+
 .markdown-body pre {
   background-color: var(--code-bg) !important;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  border: 2px solid transparent; border-image: var(--px-frame-strong) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px;
+  clip-path: var(--pxc);
+  border-radius: 0;
 }
 
 .markdown-body code {
   background-color: var(--code-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 0;
   padding: 2px 6px;
-  border-radius: 4px;
 }
 
-/* 代码块增强：语言标签 + 复制按钮 */
+/* 行内代码：像素圆角 + 像素描边（与代码块/语言标签同一套 3px 网格，描边 1:1 渲染保持锐利；
+   pre 内的 code 不参与裁切，避免切到代码内容） */
+.markdown-body :not(pre) > code {
+  --pxs: 3px;
+  border: 2px solid transparent;
+  border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  clip-path: var(--pxc);
+}
+
 .markdown-body .code-block-wrapper {
   position: relative;
   margin: 16px 0;
@@ -219,21 +309,24 @@ a:hover {
 
 .markdown-body .code-block-wrapper pre {
   margin: 0;
-  border-radius: 8px;
   padding-top: 1.2rem;
 }
 
 .markdown-body .code-lang {
   display: inline-block;
   position: absolute;
-  left: 0;
+  right: 0;
   top: 0;
   padding: 4px 10px;
   font-size: 0.6rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--bg-card);
+  background: var(--px-ink);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  /* --pxs 须与 pre 一致，切角步进才能和代码块外框对齐 */
+  --pxs: 3px;
+  clip-path: var(--pxc);
   z-index: 1;
 }
 
@@ -243,14 +336,15 @@ a:hover {
   bottom: 8px;
   padding: 4px 12px;
   font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: var(--text-primary);
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  border: 2px solid transparent; border-image: var(--px-frame-ink) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 2px;
+  clip-path: var(--pxc);
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.2s, background 0.2s, color 0.2s;
+  transition: opacity 0.2s, background 0.2s, color 0.2s, transform 0.12s;
   z-index: 2;
 }
 
@@ -260,114 +354,252 @@ a:hover {
 
 .markdown-body .code-copy-btn:hover {
   background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  color: var(--bg-card);
+  /* 原 border-image-source 与基座同帧（--px-frame-ink），无变化，移除 */
+}
+
+.markdown-body .code-copy-btn:active {
+  transform: translateY(1px);
 }
 
 .markdown-body .code-copy-btn.copied {
   opacity: 1;
   background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
+  color: var(--bg-card);
+}
+
+/* ── Markdown 表格：像素外框（同 pre 的 strong 描边）+ 2px 内网格；
+   外圈由外框负责，配合 clip-path 切出像素圆角 ── */
+.markdown-body table {
+  --pxs: 3px;
+  border: 2px solid transparent;
+  border-image: var(--px-frame-strong) 6 / calc(2 * var(--pxs)) stretch;
+  clip-path: var(--pxc);
+  border-radius: 0;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+  border: 2px solid var(--border);
+}
+
+/* 表格底色跟随主题：行透明露出卡片底色；表头与斑马纹用主题文字色低透明叠加
+   （与 markdown-dark.css 暗色方案同一手法），任意主题、任意底色（正文/评论卡片）都成立 */
+.markdown-body table tr {
+  background-color: transparent;
+  border-top-color: var(--border);
+}
+
+.markdown-body table thead tr {
+  background-color: color-mix(in srgb, var(--text-primary) 7%, transparent);
+}
+
+.markdown-body table tr:nth-child(2n) {
+  background-color: color-mix(in srgb, var(--text-primary) 4%, transparent);
 }
 
 .markdown-body blockquote {
   border-left-color: var(--accent) !important;
 }
 
-/* ── Markdown HR — Elegant Gradient Divider ── */
-/* 覆盖 github-markdown-css 默认 hr 样式 */
-.markdown-body hr {
+/* ── Markdown HR：红石线路像素分割线（hr 由 MarkdownRenderer 替换为 .redstone-divider，随指针"通电"发光） ── */
+.markdown-body .redstone-divider {
   position: relative;
-  height: 0.25rem;
-  border-radius: 9999px;
-  margin: 2rem 0;
-  padding: 0;
-  border: 0;
-  background-color: var(--accent) !important;
-  overflow: visible;
-  box-sizing: content-box;
-  transition: opacity 0.3s ease, margin 0.3s ease;
+  height: 64px;
+  margin: 1.25rem 0;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: transparent;
+  cursor: crosshair;
+  /* 两端渐隐约一个红石单元的宽度，避免线条边缘生硬截断 */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
 }
 
-/* 清除 github-markdown-css 的 ::before 浮动清除 */
+.markdown-body .redstone-track {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: 5px;
+}
+
+/* 单元尺寸与 JS 侧采样宽度保持同一 clamp 公式，确保铺满轨道 */
+.markdown-body .redstone-piece {
+  width: clamp(34px, 5vw, 48px);
+  height: clamp(34px, 5vw, 48px);
+  flex: 0 0 auto;
+  margin-left: -2px;
+  overflow: visible;
+  shape-rendering: crispEdges;
+  transition:
+    filter 140ms ease-out,
+    transform 140ms ease-out;
+}
+
+.markdown-body .redstone-piece .shadow,
+.markdown-body .redstone-piece .mid,
+.markdown-body .redstone-piece .light {
+  transition: fill 140ms ease-out;
+}
+
+.markdown-body .redstone-piece .shadow {
+  fill: #350703;
+}
+
+.markdown-body .redstone-piece .mid {
+  fill: #4b0905;
+}
+
+.markdown-body .redstone-piece .light {
+  fill: #650d07;
+}
+
+.markdown-body .redstone-piece:first-child {
+  margin-left: 0;
+}
+
+.markdown-body .redstone-piece.is-near {
+  filter: drop-shadow(0 0 3px rgba(201, 27, 12, 0.42));
+}
+
+.markdown-body .redstone-piece.is-near .shadow {
+  fill: #710b05;
+}
+
+.markdown-body .redstone-piece.is-near .mid {
+  fill: #9d1008;
+}
+
+.markdown-body .redstone-piece.is-near .light {
+  fill: #c91b0c;
+}
+
+.markdown-body .redstone-piece.is-powered {
+  filter:
+    drop-shadow(0 0 3px rgba(255, 95, 54, 1))
+    drop-shadow(0 0 9px rgba(255, 45, 18, 0.78));
+  transform: translateY(-1px);
+}
+
+.markdown-body .redstone-piece.is-powered .shadow {
+  fill: #bc1408;
+}
+
+.markdown-body .redstone-piece.is-powered .mid {
+  fill: #f52c13;
+}
+
+.markdown-body .redstone-piece.is-powered .light {
+  fill: #ff7540;
+}
+
+@media (max-width: 560px) {
+  .markdown-body .redstone-divider {
+    height: 56px;
+  }
+}
+
+/* ── Markdown H1/H2 分割线：Minecraft 铁轨像素分割线 ──
+   h1/h2 原有的 border-bottom 由 MarkdownRenderer 注入的 .rail-divider 替换
+   （悬停通电 + 矿车驶过）。只作用于正文渲染器：评论区的 .markdown-body
+   保留 github-markdown-css 原生下边框。 */
+.markdown-renderer.markdown-body h1,
+.markdown-renderer.markdown-body h2 {
+  border-bottom: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* 29px 悬停命中区：矿车需在铁轨上持续悬停，6px 视觉线单独放置难以命中 */
+.markdown-body .rail-divider {
+  width: 100%;
+  height: 29px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
+}
+
+.markdown-body .rail-divider:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.markdown-body .rail-divider-svg {
+  display: block;
+  width: 100%;
+  height: 6px;
+  flex: 0 0 auto;
+  overflow: hidden;
+  shape-rendering: crispEdges;
+  image-rendering: pixelated;
+}
+
+/* 矿车停在轨道外左侧（x=-16 由注入的 use 元素属性承担），运行时由 JS 驱动 translateX */
+.markdown-body .rail-divider .minecart {
+  opacity: 0;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+/* 动力铁轨段配色：暗金/暗红为常驻底色，悬停通电后提亮 */
+.markdown-body .rail-divider .powered-segment > rect {
+  transition: fill 160ms ease;
+}
+
+.markdown-body .rail-divider .power-gold-shadow { fill: #59440f; }
+.markdown-body .rail-divider .power-gold { fill: #80651b; }
+.markdown-body .rail-divider .power-gold-highlight { fill: #a1842d; }
+.markdown-body .rail-divider .power-red-deep { fill: #260a08; }
+.markdown-body .rail-divider .power-red { fill: #3e100c; }
+.markdown-body .rail-divider .power-red-highlight { fill: #5a1710; }
+
+.markdown-body .rail-divider:hover .power-gold-shadow { fill: #8f6812; }
+.markdown-body .rail-divider:hover .power-gold { fill: #c89b25; }
+.markdown-body .rail-divider:hover .power-gold-highlight { fill: #e3be59; }
+.markdown-body .rail-divider:hover .power-red-deep { fill: #7e130d; }
+.markdown-body .rail-divider:hover .power-red { fill: #b62718; }
+.markdown-body .rail-divider:hover .power-red-highlight { fill: #d94a2c; }
+
+/* 兜底：增强未生效时（如增强前的一帧）hr 仍保留原虚线样式 */
+.markdown-body hr {
+  position: relative;
+  height: 4px;
+  margin: 1.25rem 0;
+  padding: 0;
+  border: 0;
+  background-color: transparent !important;
+  background-image: repeating-linear-gradient(90deg, var(--accent) 0 8px, transparent 8px 16px);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 2px;
+  overflow: visible;
+}
+
 .markdown-body hr::before {
   display: none !important;
   content: none !important;
 }
 
-/* 中间装饰圆点 */
 .markdown-body hr::after {
-  content: '' !important;
-  display: block !important;
-  clear: none !important;
+  content: "";
+  display: block;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  width: 10px;
+  height: 10px;
   background: var(--accent);
-  opacity: 0.5;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.markdown-body hr:hover{
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
   opacity: 0.8;
-  margin: 2rem 1rem;
-
-}
-.markdown-body hr:hover::after {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1.2);
 }
 
-/* 防止连续多个 hr 产生多余间距 */
-/* .markdown-body hr + hr {
-  display: none;
-} */
-
-/* ── 全局加载动画 ── */
-.loading-text {
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 60px;
-}
-
-.loading-dots {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.loading-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: loading-bounce 1.4s infinite ease-in-out;
-  animation-fill-mode: both;
-}
-
-.loading-dot:nth-child(1) { animation-delay: -0.32s; }
-.loading-dot:nth-child(2) { animation-delay: -0.16s; }
-.loading-dot:nth-child(3) { animation-delay: 0s; }
-
-@keyframes loading-bounce {
-  0%, 80%, 100% {
-    transform: scale(0);
-    opacity: 0.5;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
-}
-
-/* 骨架屏加载效果 */
+/* ── 全局加载动画：统一使用 styles/cube-loader.css 的旋转草方块 ── */
 .skeleton {
   background: linear-gradient(
     90deg,
@@ -377,7 +609,6 @@ a:hover {
   );
   background-size: 400% 100%;
   animation: skeleton-shimmer 1.8s ease-in-out infinite;
-  border-radius: 4px;
 }
 
 @keyframes skeleton-shimmer {
@@ -389,14 +620,13 @@ a:hover {
   }
 }
 
-/* 遮罩层加载效果 */
 .loading-overlay {
   position: relative;
   overflow: hidden;
 }
 
 .loading-overlay::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
@@ -408,34 +638,39 @@ a:hover {
     rgba(255, 255, 255, 0.1),
     transparent
   );
-  transform: skewX(-15deg);
   animation: overlay-shimmer 1.5s ease-in-out infinite;
   z-index: 1;
 }
 
 @keyframes overlay-shimmer {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 200%;
-  }
+  0% { left: -100%; }
+  100% { left: 200%; }
 }
 
-/* 旋转加载器 */
-.loading-spinner {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: var(--accent);
-  animation: spinner-spin 0.8s linear infinite;
+input[type="checkbox"], input[type="radio"] {
+  accent-color: var(--accent);
 }
 
-@keyframes spinner-spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* ── 像素圆角工具类 ── */
+.pxc {
+  clip-path: var(--pxc);
 }
 
+.pxc-sm {
+  clip-path: var(--pxc);
+  --pxs: 2px;
+}
+
+.pxc-lg {
+  clip-path: var(--pxc);
+  --pxs: 4px;
+}
+
+.pxc-circle {
+  clip-path: var(--pxc-circle);
+}
+
+.px-font {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.4px;
+}

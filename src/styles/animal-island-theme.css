@@ -166,11 +166,11 @@
 .animal-btn--danger {
   background: var(--bg-card) !important;
   color: var(--animal-error-color) !important;
-  border-color: var(--animal-error-color) !important;
+  border-color: transparent !important;
+  border-image: var(--px-frame-error) 6 / calc(2 * var(--pxs)) stretch !important;
   /* box-shadow: 0 5px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important; */
 }
 .animal-btn--danger:hover:not(:disabled) {
-  border-color: var(--animal-error-color-hover) !important;
   color: var(--animal-error-color-hover) !important;
   box-shadow: 0 3px 10px var(--shadow) !important;
   /* box-shadow: 0 6px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important; */
@@ -179,20 +179,54 @@
   box-shadow: 0 1px color-mix(in srgb, var(--animal-error-color) 70%, #000) !important;
 }
 
-/* ── Default：浅底 + 主题边框，hover/active 跟随强调色 ─────── */
+/* ── Default：浅底 + 像素边框，hover/active 跟随强调色 ─────── */
 .animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading) {
   color: var(--text-primary) !important;
   background: var(--bg-card) !important;
-  border-color: var(--border) !important;
+  border-color: transparent !important;
+  border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch !important;
 }
 .animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):hover:not(:disabled) {
   color: var(--accent) !important;
-  border-color: var(--accent) !important;
   box-shadow: 0 3px 10px var(--shadow) !important;
 }
 .animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):active:not(:disabled) {
   color: var(--accent-hover) !important;
-  border-color: var(--accent-hover) !important;
+}
+
+/* 原为 border-image-source 切换（瞬变）；库组件无伪元素占用，改由叠加层
+   交叉淡化：hover 帧走 ::after，active 帧走 ::before，按压时 hover 帧退场。
+   库按钮基础边框 2px，叠加层外扩 2px 与边框盒对齐（同 px-fade 约定） */
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading)::after,
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading)::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  clip-path: var(--pxc);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading)::after {
+  border-image: var(--px-frame-accent) 6 / calc(2 * var(--pxs)) stretch;
+}
+
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading)::before {
+  border-image: var(--px-frame-accent-hover) 6 / calc(2 * var(--pxs)) stretch;
+}
+
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):hover:not(:disabled)::after {
+  opacity: 1;
+}
+
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):active:not(:disabled)::before {
+  opacity: 1;
+}
+
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):active:not(:disabled)::after {
+  opacity: 0;
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -203,16 +237,34 @@
  * 这里用全局选择器 + !important 强制接管其配色。
  * ════════════════════════════════════════════════════════════ */
 
-/* ── 未选中状态：边框 + 背景 ──────────────────────────────── */
+/* ── 未选中状态：像素边框 + 背景 ──────────────────────────── */
 .animal-checkbox__box[data-v-154fc45b] {
-  border-color: var(--border) !important;
+  border-color: transparent !important;
+  border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch !important;
   background: var(--bg-card) !important;
+}
+
+/* 选中帧叠加层常驻（opacity 0）：原为选中时 border-image-source 切换（瞬变），
+   改由叠加层淡入。库 checkbox 基础边框 2px，外扩 2px 与边框盒对齐 */
+.animal-checkbox__box[data-v-154fc45b]::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 2px solid transparent;
+  border-image: var(--px-frame-accent-hover) 6 / calc(2 * var(--pxs)) stretch;
+  clip-path: var(--pxc);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
 /* ── 选中状态：强调色背景 + 边框 ──────────────────────────── */
 .animal-checkbox--checked:not(.animal-checkbox--disabled) .animal-checkbox__box[data-v-154fc45b] {
   background: var(--accent) !important;
-  border-color: var(--accent-hover) !important;
+}
+
+.animal-checkbox--checked:not(.animal-checkbox--disabled) .animal-checkbox__box[data-v-154fc45b]::after {
+  opacity: 1;
 }
 
 /* ── 选中状态的 checkmark 图标保持白色 ───────────────────── */
@@ -220,10 +272,9 @@
   color: #fff !important;
 }
 
-/* ── 禁用状态：降低透明度 + 主题色边框 ───────────────────── */
+/* ── 禁用状态：降低透明度（边框沿用基础像素边框） ────────── */
 .animal-checkbox--disabled .animal-checkbox__box[data-v-154fc45b] {
   background: var(--bg-secondary) !important;
-  border-color: var(--border) !important;
 }
 
 /* ── 禁用状态标签文字 ─────────────────────────────────────── */
@@ -239,4 +290,49 @@
 /* ── 标签文字颜色 ─────────────────────────────────────────── */
 .animal-checkbox__label {
   color: var(--text-primary) !important;
+}
+
+/* ════════════════════════════════════════════════════════════
+ * 像素风改造：阶梯切角 + 内嵌像素底边
+ *
+ * 组件库的 Button 硬编码了 50px/16px/24px 胶囊圆角，
+ * Checkbox 硬编码了 12px/16px 圆角，均不随主题变化。
+ * 这里统一改为直角 + clip-path 阶梯切角（--pxc），
+ * 外侧 3D 阴影会被 clip-path 裁掉，因此改为 inset 内嵌底边，
+ * 保留按下动效的同时呈现像素按钮质感。
+ * ════════════════════════════════════════════════════════════ */
+
+.animal-btn[data-v-7a23427f],
+.animal-btn--small[data-v-7a23427f],
+.animal-btn--middle[data-v-7a23427f],
+.animal-btn--large[data-v-7a23427f] {
+  border-radius: 0 !important;
+  clip-path: var(--pxc);
+}
+
+.animal-checkbox__box[data-v-154fc45b] {
+  border-radius: 0 !important;
+  clip-path: var(--pxc);
+}
+
+/* ── Primary：外侧底边阴影 → 内嵌像素底边 ─────────────────── */
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading) {
+  box-shadow: inset 0 -4px 0 color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading):hover:not(:disabled) {
+  box-shadow: inset 0 -5px 0 color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+.animal-btn--primary:not(.animal-btn--danger):not(.animal-btn--ghost):not(.animal-btn--loading):active:not(:disabled) {
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--accent) 70%, #000) !important;
+}
+
+/* ── Default / Danger：hover 模糊阴影 → 内嵌像素底边 ─────── */
+.animal-btn--default:not(.animal-btn--danger):not(.animal-btn--loading):hover:not(:disabled) {
+  box-shadow: inset 0 -3px 0 var(--px-bevel-lo) !important;
+}
+.animal-btn--danger:hover:not(:disabled) {
+  box-shadow: inset 0 -3px 0 var(--px-bevel-lo) !important;
+}
+.animal-btn--danger:active:not(:disabled) {
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--animal-error-color) 70%, #000) !important;
 }

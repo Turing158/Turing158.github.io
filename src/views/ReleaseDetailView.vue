@@ -36,154 +36,147 @@
     <h1 class="page-title">{{ repoName }}</h1>
 
     <!-- 分割线 -->
-    <div class="divider">
-      <div class="divider-line"></div>
-      <div class="divider-dot"></div>
-      <div class="divider-line"></div>
-    </div>
+    <GrassTerrainDivider class="release-divider" />
 
     <!-- 加载状态 -->
-    <div v-if="loading" class="status-wrap loading-text">
-      <div class="loading-dots">
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
-        <div class="loading-dot"></div>
+    <Transition name="loader-pop" mode="out-in" appear>
+      <div v-if="loading" class="status-wrap cube-anim">
+        <CubeLoader :text="$t('pageReleases.loading')" />
       </div>
-      <span>{{ $t('pageReleases.loading') }}</span>
-    </div>
 
-    <!-- 错误状态 -->
-    <div v-else-if="error" class="status-wrap status-error">
-      <span>{{ $t('pageReleases.loadFailed') }}</span>
-      <Button size="small" @click="fetchReleases">{{ $t('pageReleases.retry') }}</Button>
-    </div>
+      <!-- 错误状态 -->
+      <div v-else-if="error" class="status-wrap status-error">
+        <span>{{ $t('pageReleases.loadFailed') }}</span>
+        <Button size="small" @click="fetchReleases">{{ $t('pageReleases.retry') }}</Button>
+      </div>
 
-    <!-- 发行版本列表 -->
-    <div v-else class="releases-list">
-      <div
-        v-for="(release, index) in releases"
-        :key="release.id"
-        class="release-card"
-        :style="{ '--delay': index * 80 + 'ms' }"
-      >
-        <!-- 卡片头部 -->
-        <div class="card-header">
-          <div class="header-left">
-            <h2 class="release-title">{{ release.tag_name }}</h2>
-            <span v-if="release.prerelease" class="tag tag-prerelease">
-              {{ $t('pageReleases.prerelease') }}
-            </span>
-          </div>
-          <time
-            class="release-date"
-            :datetime="release.published_at"
-            :title="formatFullTime(release.published_at)"
-          >
-            {{ formatRelativeTime(release.published_at) }}
-          </time>
-        </div>
-
-        <!-- 分割线 -->
-        <div class="card-divider"></div>
-
-        <!-- 发行内容 -->
+      <!-- 发行版本列表 -->
+      <div v-else class="releases-list">
         <div
-          v-if="release.body"
-          class="release-body"
-          v-html="renderMarkdown(release.body)"
-          @click="onBodyClick"
-        ></div>
-
-        <!-- 资源列表 -->
-        <div v-if="release.assets && release.assets.length > 0" class="release-assets">
-          <h3 class="assets-title">{{ $t('pageReleases.assets') }}</h3>
-          <div class="assets-list">
-            <a
-              v-for="asset in release.assets"
-              :key="asset.id"
-              :href="asset.browser_download_url"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="asset-item"
-              :download="asset.name"
+          v-for="(release, index) in releases"
+          :key="release.id"
+          class="release-card"
+          :style="{ '--delay': index * 80 + 'ms' }"
+        >
+          <!-- 卡片头部 -->
+          <div class="card-header">
+            <div class="header-left">
+              <h2 class="release-title">{{ release.tag_name }}</h2>
+              <span v-if="release.prerelease" class="tag tag-prerelease">
+                {{ $t('pageReleases.prerelease') }}
+              </span>
+            </div>
+            <time
+              class="release-date"
+              :datetime="release.published_at"
+              :title="formatFullTime(release.published_at)"
             >
-              <div class="asset-left">
-                <svg class="asset-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span class="asset-name">{{ asset.name }}</span>
-                <time
-                  v-if="asset.updated_at"
-                  class="asset-time"
-                  :datetime="asset.updated_at"
-                  :title="formatFullTime(asset.updated_at)"
-                >
-                  {{ formatRelativeTime(asset.updated_at) }}
-                </time>
-              </div>
-              <div class="asset-right">
-                <span v-if="asset.download_count !== undefined" class="asset-badge">
-                  <svg class="badge-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              {{ formatRelativeTime(release.published_at) }}
+            </time>
+          </div>
+  
+          <!-- 分割线 -->
+          <div class="card-divider"></div>
+  
+          <!-- 发行内容 -->
+          <div
+            v-if="release.body"
+            class="release-body"
+            v-html="renderMarkdown(release.body)"
+            @click="onBodyClick"
+          ></div>
+  
+          <!-- 资源列表 -->
+          <div v-if="release.assets && release.assets.length > 0" class="release-assets">
+            <h3 class="assets-title">{{ $t('pageReleases.assets') }}</h3>
+            <div class="assets-list">
+              <a
+                v-for="asset in release.assets"
+                :key="asset.id"
+                :href="asset.browser_download_url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="asset-item px-fade"
+                :download="asset.name"
+              >
+                <div class="asset-left">
+                  <svg class="asset-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="7 10 12 15 17 10" />
                     <line x1="12" y1="15" x2="12" y2="3" />
                   </svg>
-                  {{ formatNumber(asset.download_count) }}
-                </span>
-                <span class="asset-badge">
-                  <svg class="badge-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                    <polyline points="14 2 14 8 20 8" />
+                  <span class="asset-name">{{ asset.name }}</span>
+                  <time
+                    v-if="asset.updated_at"
+                    class="asset-time"
+                    :datetime="asset.updated_at"
+                    :title="formatFullTime(asset.updated_at)"
+                  >
+                    {{ formatRelativeTime(asset.updated_at) }}
+                  </time>
+                </div>
+                <div class="asset-right">
+                  <span v-if="asset.download_count !== undefined" class="asset-badge">
+                    <svg class="badge-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                      <polyline points="7 10 12 15 17 10" />
+                      <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    {{ formatNumber(asset.download_count) }}
+                  </span>
+                  <span class="asset-badge">
+                    <svg class="badge-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                      <polyline points="14 2 14 8 20 8" />
+                    </svg>
+                    {{ formatFileSize(asset.size) }}
+                  </span>
+                  <svg class="asset-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                    <polyline points="12 5 19 12 12 19" />
                   </svg>
-                  {{ formatFileSize(asset.size) }}
-                </span>
-                <svg class="asset-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </div>
-            </a>
+                </div>
+              </a>
+            </div>
           </div>
+  
+          <!-- Reactions 反应 -->
+          <template v-if="formatReactions(release.reactions).length > 0">
+            <div class="card-divider"></div>
+            <div class="release-reactions">
+              <span
+                v-for="reaction in formatReactions(release.reactions)"
+                :key="reaction.key"
+                class="reaction-item px-fade"
+              >
+                <span class="reaction-emoji">{{ reaction.emoji }}</span>
+                <span class="reaction-count">{{ formatNumber(reaction.count) }}</span>
+              </span>
+            </div>
+          </template>
         </div>
 
-        <!-- Reactions 反应 -->
-        <template v-if="formatReactions(release.reactions).length > 0">
-          <div class="card-divider"></div>
-          <div class="release-reactions">
-            <span
-              v-for="reaction in formatReactions(release.reactions)"
-              :key="reaction.key"
-              class="reaction-item"
-            >
-              <span class="reaction-emoji">{{ reaction.emoji }}</span>
-              <span class="reaction-count">{{ formatNumber(reaction.count) }}</span>
-            </span>
-          </div>
-        </template>
+        <!-- 更多发行版本按钮 -->
+        <div class="more-releases">
+          <Button size="large" @click="openReleases">
+            {{ $t('pageReleases.moreReleases') }}
+            <ExternalLinkIcon :size="16" />
+          </Button>
+        </div>
       </div>
-
-      <!-- 更多发行版本按钮 -->
-      <div class="more-releases">
-        <Button size="large" @click="openReleases">
-          {{ $t('pageReleases.moreReleases') }}
-          <ExternalLinkIcon :size="16" />
-        </Button>
-      </div>
-    </div>
+    </Transition>
 
     <!-- 长按平台选择弹窗 -->
     <BlogDialog v-model="showPlatformDialog" :title="repoName" :width="360" :show-close="true" :close-on-click-overlay="true">
       <div class="platform-dialog-content">
-        <button class="platform-btn platform-btn--github" @click="openGithub">
+        <button class="platform-btn platform-btn--github px-fade" @click="openGithub">
           <svg class="platform-btn__icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
           <span>GitHub</span>
           <ExternalLinkIcon />
         </button>
-        <button class="platform-btn platform-btn--gitee" @click="openGitee">
+        <button class="platform-btn platform-btn--gitee px-fade" @click="openGitee">
           <img class="platform-btn__icon" src="https://gitee.com/favicon.ico" alt="Gitee" />
           <span>Gitee</span>
           <ExternalLinkIcon />
@@ -205,6 +198,8 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
+import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()
@@ -500,7 +495,7 @@ onUnmounted(() => {
   width: 36px;
   height: 36px;
   padding: 0;
-  border-radius: 8px;
+  --pxs: 3px; clip-path: var(--pxc);
 
   .back-icon {
     transition: transform 0.2s ease;
@@ -525,31 +520,8 @@ onUnmounted(() => {
 }
 
 // 自定义分割线
-.divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.release-divider {
   margin-bottom: 32px;
-}
-
-.divider-line {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--border) 20%,
-    var(--border) 80%,
-    transparent
-  );
-}
-
-.divider-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent);
-  border-radius: 50%;
-  flex-shrink: 0;
 }
 
 // 状态显示
@@ -560,36 +532,6 @@ onUnmounted(() => {
   gap: 16px;
   padding: 64px 0;
   color: var(--text-secondary);
-}
-
-.loading-text {
-  .loading-dots {
-    display: flex;
-    gap: 8px;
-  }
-
-  .loading-dot {
-    width: 10px;
-    height: 10px;
-    background: var(--accent);
-    border-radius: 50%;
-    animation: bounce 1.4s ease-in-out infinite;
-
-    &:nth-child(1) { animation-delay: 0s; }
-    &:nth-child(2) { animation-delay: 0.2s; }
-    &:nth-child(3) { animation-delay: 0.4s; }
-  }
-}
-
-@keyframes bounce {
-  0%, 80%, 100% {
-    transform: scale(0.6);
-    opacity: 0.4;
-  }
-  40% {
-    transform: scale(1);
-    opacity: 1;
-  }
 }
 
 .status-error {
@@ -606,8 +548,8 @@ onUnmounted(() => {
 // 发行卡片
 .release-card {
   background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 24px;
   box-shadow: 0 2px 8px var(--shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -658,16 +600,19 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   padding: 4px 12px;
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
 
+// 变量表没有 0.3 透明度的琥珀帧，本地补一个与原 1px 描边同色的像素帧
 .tag-prerelease {
+  --px-frame-amber: url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'18'%20height%3D'18'%20viewBox%3D'0%200%2018%2018'%3E%3Cg%20fill%3D'rgba(245%2C%20158%2C%2011%2C%200.3)'%3E%3Crect%20x%3D'3'%20y%3D'3'%20width%3D'3'%20height%3D'3'%2F%3E%3Crect%20x%3D'12'%20y%3D'3'%20width%3D'3'%20height%3D'3'%2F%3E%3Crect%20x%3D'3'%20y%3D'12'%20width%3D'3'%20height%3D'3'%2F%3E%3Crect%20x%3D'12'%20y%3D'12'%20width%3D'3'%20height%3D'3'%2F%3E%3Crect%20x%3D'6'%20y%3D'0'%20width%3D'6'%20height%3D'3'%2F%3E%3Crect%20x%3D'6'%20y%3D'15'%20width%3D'6'%20height%3D'3'%2F%3E%3Crect%20x%3D'0'%20y%3D'6'%20width%3D'3'%20height%3D'6'%2F%3E%3Crect%20x%3D'15'%20y%3D'6'%20width%3D'3'%20height%3D'6'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
   background: rgba(245, 158, 11, 0.15);
   color: #d97706;
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  border: 1px solid transparent;
+  border-image: var(--px-frame-amber) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .release-date {
@@ -703,7 +648,7 @@ onUnmounted(() => {
   :deep(code) {
     background: var(--bg-secondary);
     padding: 2px 6px;
-    border-radius: 4px;
+    --pxs: 2px; clip-path: var(--pxc);
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 0.875em;
   }
@@ -711,7 +656,7 @@ onUnmounted(() => {
   :deep(pre) {
     background: var(--bg-secondary);
     padding: 16px;
-    border-radius: 8px;
+    --pxs: 3px; clip-path: var(--pxc);
     overflow-x: auto;
     margin: 12px 0;
 
@@ -772,14 +717,14 @@ onUnmounted(() => {
   padding: 12px 16px;
   background: var(--bg-secondary);
   border: 1px solid transparent;
-  border-radius: 10px;
+  --pxs: 3px; clip-path: var(--pxc);
+  --px-frame-fade: var(--px-frame-accent);
   text-decoration: none;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
     background: var(--bg-card);
-    border-color: var(--accent);
     transform: translateX(4px);
 
     .asset-arrow {
@@ -833,7 +778,7 @@ onUnmounted(() => {
   gap: 4px;
   padding: 4px 10px;
   background: var(--bg-primary);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -863,15 +808,14 @@ onUnmounted(() => {
   gap: 6px;
   padding: 4px 12px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 16px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 4px; clip-path: var(--pxc);
   font-size: 0.85rem;
   line-height: 1;
   transition: all 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    border-color: var(--accent);
     transform: translateY(-1px);
   }
 }
@@ -909,8 +853,8 @@ onUnmounted(() => {
   justify-content: center;
   gap: 10px;
   padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 1rem;
@@ -923,7 +867,7 @@ onUnmounted(() => {
     height: 22px;
     flex-shrink: 0;
     object-fit: contain;
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 
   &:hover {
@@ -936,18 +880,20 @@ onUnmounted(() => {
   }
 
   &--github {
+    --px-frame-fade: var(--px-frame-github);
+
     &:hover {
       background: #24292f;
       color: #fff;
-      border-color: #24292f;
     }
   }
 
   &--gitee {
+    --px-frame-fade: var(--px-frame-gitee);
+
     &:hover {
       background: #c71d23;
       color: #fff;
-      border-color: #c71d23;
 
       .platform-btn__icon {
         filter: brightness(2);

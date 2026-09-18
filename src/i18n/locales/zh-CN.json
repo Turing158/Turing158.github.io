@@ -6,6 +6,7 @@
     "releases": "发行",
     "tools": "工具",
     "about": "关于",
+    "friends": "友链",
     "commits": "提交",
     "achievements": "成就"
   },
@@ -19,6 +20,7 @@
     "tools": "工具",
     "toolDetail": "工具详情",
     "about": "关于",
+    "friends": "友情链接",
     "commits": "提交记录",
     "responsiveTimeDemo": "响应式时间组件演示",
     "notFound": "页面未找到",
@@ -35,6 +37,7 @@
     "releases": "各项目的发行版本、更新日志与下载资源",
     "tools": "开发者工具集：JSON 格式化、Base64 编解码、正则测试、颜色转换等",
     "about": "了解 Turing_ICE 的背景、技能和联系方式",
+    "friends": "友情链接 — Turing_ICE 博客的友链页面",
     "achievements": "成就/徽章系统 — 探索所有隐藏成就"
   },
   "home": {
@@ -116,6 +119,11 @@
     "prev": "上一页",
     "next": "下一页",
     "perPage": "每页显示",
+    "sortBy": "排序",
+    "sortNewest": "最新发布",
+    "sortOldest": "最早发布",
+    "sortViews": "最多浏览",
+    "sortComments": "最多评论",
     "views": "次浏览",
     "readingTime": "{time} 分钟阅读"
   },
@@ -193,6 +201,36 @@
     "contact": "联系方式",
     "email": "电子邮箱"
   },
+  "friends": {
+    "listTitle": "我的朋友们",
+    "applyTitle": "申请友链",
+    "empty": "暂无友链，欢迎交换链接～",
+    "loadFailed": "友链加载失败，请稍后重试",
+    "retry": "重试",
+    "prev": "上一页",
+    "next": "下一页",
+    "unnamed": "未命名站点",
+    "applyName": "名称",
+    "applyNamePlaceholder": "你的站点名称",
+    "applyHead": "头像",
+    "applyHeadPlaceholder": "头像图片链接",
+    "applyLink": "链接",
+    "applyLinkPlaceholder": "https://example.com",
+    "applyMore": "补充信息（选填）",
+    "applyDescLabel": "介绍",
+    "applyDescPlaceholder": "简单介绍一下你的站点",
+    "applyTagsLabel": "标签",
+    "applyTagsPlaceholder": "搜索或输入自定义标签",
+    "applyTagsHint": "最多 5 个标签，每个不超过 10 个字",
+    "applySubmit": "提交申请",
+    "applySubmitting": "提交中…",
+    "applyPreview": "卡片效果预览",
+    "applySuccess": "申请已提交，审核通过后就会展示在这里～",
+    "applyMissing": "请填写名称、头像和链接",
+    "applyDescTooLong": "介绍不能超过 50 个字",
+    "applyFailed": "提交失败，请稍后重试",
+    "applyNetworkError": "网络异常，请稍后重试"
+  },
   "theme": {
     "system": "系统",
     "systemLight": "亮色主题",
@@ -207,15 +245,13 @@
     "description": "常用在线工具，开箱即用。",
     "viewDetails": "查看详情",
     "viewDetailsFor": "查看 {name} 详情",
-    "expandDetailNavigationFor": "展开 {name} 的详情页导航",
-    "jumpToDetail": "跳转",
-    "jumpToDetailFor": "在新标签页打开 {name} 详情页",
-    "switchToDetail": "切换",
-    "switchToDetailFor": "在当前页面切换到 {name} 详情页",
     "backToTools": "返回工具集",
     "notFoundTitle": "工具不存在",
     "notFoundDescription": "抱歉，没有找到对应的工具。请返回工具集选择其他工具。",
     "workspaceLabel": "工具操作区",
+    "dialogNavLabel": "工具快捷操作",
+    "dialogNavSwitch": "切换",
+    "dialogNavJump": "跳转",
     "copied": "已复制!",
     "dragToReorder": "长按拖动以重排工具",
     "resetOrder": "重置顺序",
@@ -785,7 +821,9 @@
     "cancel": "取消",
     "confirm": "确认",
     "retry": "重试",
-    "reloadImage": "重新加载图片"
+    "reloadImage": "重新加载图片",
+    "redstoneDivider": "红石线路像素分割线",
+    "railDivider": "Minecraft 铁轨像素分割线"
   },
   "contextMenu": {
     "goBack": "返回上一页",
@@ -881,6 +919,10 @@
     "select": {
       "noData": "暂无数据",
       "loading": "加载中..."
+    },
+    "tagSelect": {
+      "empty": "暂无匹配标签",
+      "create": "添加"
     }
   },
   "sfmc": {

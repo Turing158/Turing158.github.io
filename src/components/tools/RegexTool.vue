@@ -22,7 +22,7 @@
         <span
           v-for="flag in availableFlags"
           :key="flag"
-          class="regex-flag-chip"
+          class="regex-flag-chip px-fade"
           :class="{ active: selectedFlags.includes(flag) }"
           @click="toggleFlag(flag)"
         >{{ flag }}</span>
@@ -613,12 +613,12 @@ function clear() {
   justify-content: center;
   width: 26px;
   height: 26px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-secondary);
   color: var(--text-secondary);
   transition: all 0.15s;
@@ -626,20 +626,23 @@ function clear() {
 }
 
 .regex-flag-chip:hover {
-  border-color: var(--accent);
   color: var(--accent);
 }
 
 .regex-flag-chip.active {
   background: var(--accent);
   color: #fff;
-  border-color: var(--accent);
+}
+
+/* 原为 border-image-source 常显 accent；改由叠加层常显淡入 */
+.regex-flag-chip.active::after {
+  opacity: 1;
 }
 
 /* 错误提示 */
 .regex-error {
   padding: 8px 12px;
-  border-radius: 6px;
+  --pxs: 2px; clip-path: var(--pxc);
   background: rgba(220, 53, 69, 0.08);
   color: #dc3545;
   font-size: 0.8rem;
@@ -700,8 +703,8 @@ function clear() {
 
 .regex-vis-svg-scroll {
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   background: var(--bg-secondary);
   padding: 12px;
 }
@@ -715,7 +718,7 @@ function clear() {
   align-items: center;
   gap: 8px;
   padding: 4px 8px;
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   background: var(--bg-secondary);
   font-size: 0.8rem;
 }
@@ -727,7 +730,7 @@ function clear() {
   justify-content: center;
   width: 24px;
   height: 20px;
-  border-radius: 4px;
+  --pxs: 2px; clip-path: var(--pxc);
   font-size: 0.7rem;
   font-weight: 700;
   color: #fff;

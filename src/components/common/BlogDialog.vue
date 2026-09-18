@@ -28,7 +28,7 @@
 
           <!-- Close button -->
           <slot v-if="showClose" name="close">
-            <button class="blog-dialog-close" @click="close" aria-label="Close">
+            <button class="blog-dialog-close px-fade" @click="close" aria-label="Close">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
               </svg>
@@ -330,13 +330,13 @@ defineExpose({ open, close })
 
 .blog-dialog {
   background: var(--bg-card);
-  border-radius: 16px;
+  --pxs: 4px; clip-path: var(--pxc);
   width: 100%;
   max-width: 640px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   outline: none;
   position: relative;
   box-shadow:
@@ -361,6 +361,8 @@ defineExpose({ open, close })
   color: var(--text-primary);
 }
 
+/* 与 ToolDialogActions 快捷操作钮同款方形像素外观：
+   --pxc 切角 + px-frame 九宫格描边，悬停底色加深并淡入 accent 帧（px-fade） */
 .blog-dialog-close {
   position: absolute;
   top: 14px;
@@ -368,25 +370,30 @@ defineExpose({ open, close })
   z-index: 10;
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
+  --pxs: 2px;
+  clip-path: var(--pxc);
+  border: 1px solid transparent;
+  border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-secondary);
   color: var(--text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: background-color 0.2s, color 0.2s, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 
   &:hover {
-    background: var(--accent);
-    color: var(--bg-card);
-    border-color: var(--accent);
-    transform: rotate(90deg) scale(1.05);
+    background: var(--border);
+    color: var(--text-primary);
   }
 
   &:active {
-    transform: rotate(90deg) scale(0.95);
+    transform: scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 
@@ -409,7 +416,7 @@ defineExpose({ open, close })
 
   &::-webkit-scrollbar-thumb {
     background: var(--border);
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
     transition: background 0.2s;
   }
 

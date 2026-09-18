@@ -9,6 +9,8 @@
         <span class="category-count">{{ category.projects.length }}</span>
       </div>
 
+      <GrassTerrainDivider size="sm" class="category-divider" />
+
       <TransitionGroup
         v-if="category.projects.length > 0 && showCards"
         name="project-card"
@@ -26,7 +28,7 @@
           <h3 class="project-name">{{ project.name }}</h3>
           <p class="project-desc">{{ project.description }}</p>
           <div class="project-tech">
-            <span v-for="tech in project.tech" :key="tech" class="tech-tag">{{ tech }}</span>
+            <span v-for="tech in project.tech" :key="tech" class="tech-tag px-fade">{{ tech }}</span>
           </div>
           <div class="project-actions">
             <Button size="small" @click="open(`${project.url}/issues`)">
@@ -57,14 +59,14 @@
     <!-- 长按选择弹窗 -->
     <BlogDialog v-model="showPlatformDialog" :title="dialogTitle" :width="360" :show-close="true" :close-on-click-overlay="true">
       <div class="platform-dialog-content">
-        <button class="platform-btn platform-btn--github" @click="openGithub">
+        <button class="platform-btn platform-btn--github px-fade" @click="openGithub">
           <svg class="platform-btn__icon" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
           </svg>
           <span>GitHub</span>
           <ExternalLinkIcon />
         </button>
-        <button class="platform-btn platform-btn--gitee" @click="openGitee">
+        <button class="platform-btn platform-btn--gitee px-fade" @click="openGitee">
           <img class="platform-btn__icon" src="https://gitee.com/favicon.ico" alt="Gitee" />
           <span>Gitee</span>
           <ExternalLinkIcon />
@@ -85,6 +87,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
+import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 
 const { t } = useI18n()
 
@@ -268,9 +271,11 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  margin-bottom: 6px;
+}
+
+.category-divider {
   margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid var(--border);
 }
 
 .category-icon {
@@ -288,8 +293,8 @@ onUnmounted(() => {
   color: var(--text-secondary);
   font-size: 0.8rem;
   padding: 2px 10px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .category-empty {
@@ -298,8 +303,8 @@ onUnmounted(() => {
   padding: 24px;
   text-align: center;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px dashed var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) repeat;
 }
 
 .projects-grid {
@@ -314,9 +319,9 @@ onUnmounted(() => {
 
 .project-card {
   background: var(--bg-card);
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 20px;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   box-shadow: 0 2px 8px var(--shadow);
   display: flex;
   flex-direction: column;
@@ -371,15 +376,14 @@ onUnmounted(() => {
   background: var(--bg-secondary);
   color: var(--accent);
   padding: 2px 10px;
-  border-radius: 12px;
+  --pxs: 3px; clip-path: var(--pxc);
   font-size: 0.75rem;
-  border: 1px solid var(--border);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
   cursor: default;
 
   &:hover {
     transform: scale(1.1) translateY(-1px);
-    border-color: var(--accent);
     box-shadow: 0 2px 8px var(--shadow);
   }
 }
@@ -405,8 +409,8 @@ onUnmounted(() => {
   justify-content: center;
   gap: 10px;
   padding: 16px 20px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 1rem;
@@ -419,7 +423,7 @@ onUnmounted(() => {
     height: 22px;
     flex-shrink: 0;
     object-fit: contain;
-    border-radius: 3px;
+    --pxs: 2px; clip-path: var(--pxc);
   }
 
   &:hover {
@@ -432,18 +436,20 @@ onUnmounted(() => {
   }
 
   &--github {
+    --px-frame-fade: var(--px-frame-github);
+
     &:hover {
       background: #24292f;
       color: #fff;
-      border-color: #24292f;
     }
   }
 
   &--gitee {
+    --px-frame-fade: var(--px-frame-gitee);
+
     &:hover {
       background: #c71d23;
       color: #fff;
-      border-color: #c71d23;
 
       .platform-btn__icon {
         filter: brightness(2);

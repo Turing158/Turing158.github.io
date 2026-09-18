@@ -39,67 +39,70 @@
       </div>
 
       <div class="results-display github-display">
-        <div v-if="loading" class="github-loading">
-          <span class="loading-spinner" />
-          <span>{{ $t('tools.githubInfo.loading') }}</span>
-        </div>
-
-        <div v-else-if="notFound" class="empty-state">
-          <svg class="github-empty-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path :d="gitHubMarkPath" fill="currentColor" />
-          </svg>
-          <span class="empty-text">{{ $t('tools.githubInfo.notFound') }}</span>
-          <Button size="small" @click="fetchUser">{{ $t('tools.githubInfo.retry') }}</Button>
-        </div>
-
-        <div v-else-if="error" class="empty-state">
-          <svg class="github-empty-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path :d="gitHubMarkPath" fill="currentColor" />
-          </svg>
-          <span class="empty-text">{{ $t('tools.githubInfo.loadFailed') }}</span>
-          <Button size="small" @click="fetchUser">{{ $t('tools.githubInfo.retry') }}</Button>
-        </div>
-
-        <div v-else-if="user" class="github-profile">
-          <div class="github-profile-head">
-            <img
-              class="github-avatar"
-              :src="user.avatar_url"
-              :alt="user.login"
-              loading="lazy"
-              referrerpolicy="no-referrer"
-            />
-            <div class="github-profile-info">
-              <span class="github-login">{{ user.login }}</span>
-              <span class="github-bio">{{ user.bio || $t('tools.githubInfo.noBio') }}</span>
-            </div>
+        <Transition name="loader-pop" mode="out-in" appear>
+          <div v-if="loading" class="github-loading cube-anim">
+            <CubeLoader :text="$t('tools.githubInfo.loading')" />
           </div>
 
-          <div class="github-stats">
-            <div class="github-stat">
-              <span class="github-stat-value">{{ formatNumber(user.public_repos) }}</span>
-              <span class="github-stat-label">{{ $t('tools.githubInfo.publicRepos') }}</span>
+          <div v-else-if="notFound" class="empty-state">
+            <svg class="github-empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path :d="gitHubMarkPath" fill="currentColor" />
+            </svg>
+            <span class="empty-text">{{ $t('tools.githubInfo.notFound') }}</span>
+            <Button size="small" @click="fetchUser">{{ $t('tools.githubInfo.retry') }}</Button>
+          </div>
+  
+          <div v-else-if="error" class="empty-state">
+            <svg class="github-empty-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path :d="gitHubMarkPath" fill="currentColor" />
+            </svg>
+            <span class="empty-text">{{ $t('tools.githubInfo.loadFailed') }}</span>
+            <Button size="small" @click="fetchUser">{{ $t('tools.githubInfo.retry') }}</Button>
+          </div>
+  
+          <div v-else-if="user" class="github-profile">
+            <div class="github-profile-head">
+              <div class="github-avatar-wrap">
+                <img
+                  class="github-avatar"
+                  :src="user.avatar_url"
+                  :alt="user.login"
+                  loading="lazy"
+                  referrerpolicy="no-referrer"
+                />
+              </div>
+              <div class="github-profile-info">
+                <span class="github-login">{{ user.login }}</span>
+                <span class="github-bio">{{ user.bio || $t('tools.githubInfo.noBio') }}</span>
+              </div>
             </div>
-            <div class="github-stat">
-              <span class="github-stat-value">{{ formatNumber(user.followers) }}</span>
-              <span class="github-stat-label">{{ $t('tools.githubInfo.followers') }}</span>
+  
+            <div class="github-stats">
+              <div class="github-stat">
+                <span class="github-stat-value">{{ formatNumber(user.public_repos) }}</span>
+                <span class="github-stat-label">{{ $t('tools.githubInfo.publicRepos') }}</span>
+              </div>
+              <div class="github-stat">
+                <span class="github-stat-value">{{ formatNumber(user.followers) }}</span>
+                <span class="github-stat-label">{{ $t('tools.githubInfo.followers') }}</span>
+              </div>
+              <div class="github-stat">
+                <span class="github-stat-value">{{ formatNumber(user.following) }}</span>
+                <span class="github-stat-label">{{ $t('tools.githubInfo.following') }}</span>
+              </div>
             </div>
-            <div class="github-stat">
-              <span class="github-stat-value">{{ formatNumber(user.following) }}</span>
-              <span class="github-stat-label">{{ $t('tools.githubInfo.following') }}</span>
+  
+            <div class="github-joined">
+              <div class="github-joined-row">
+                <span class="github-joined-label">{{ $t('tools.githubInfo.joinedFor') }}</span>
+                <span class="github-joined-value" aria-live="off">{{ durationText }}</span>
+              </div>
+              <div class="github-created">
+                {{ $t('tools.githubInfo.createdAt') }}: {{ formatCreated(user.created_at) }}
+              </div>
             </div>
           </div>
-
-          <div class="github-joined">
-            <div class="github-joined-row">
-              <span class="github-joined-label">{{ $t('tools.githubInfo.joinedFor') }}</span>
-              <span class="github-joined-value" aria-live="off">{{ durationText }}</span>
-            </div>
-            <div class="github-created">
-              {{ $t('tools.githubInfo.createdAt') }}: {{ formatCreated(user.created_at) }}
-            </div>
-          </div>
-        </div>
+        </Transition>
       </div>
     </div>
   </div>
@@ -109,6 +112,7 @@
 import { ref, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import BlogInput from '@/components/common/BlogInput.vue'
+import CubeLoader from '@/components/common/CubeLoader.vue'
 import { Button } from 'animal-island-vue'
 import BlogTip from '@/plugins/blog-tip'
 
@@ -256,8 +260,8 @@ async function fetchUser() {
   gap: 10px;
   padding: 16px;
   background: var(--bg-secondary);
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
 }
 
 .config-row {
@@ -304,8 +308,8 @@ async function fetchUser() {
 
 .github-display {
   min-height: 100px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   padding: 14px;
   background: var(--bg-card);
 }
@@ -338,13 +342,21 @@ async function fetchUser() {
   gap: 14px;
 }
 
-.github-avatar {
+.github-avatar-wrap {
   width: 64px;
   height: 64px;
   flex-shrink: 0;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: var(--bg-secondary);
+  /* 1 个像素网格单位 = 64px / 16 = 4px，环宽即 1 单位 */
+  padding: 4px;
+  background-color: var(--border);
+  clip-path: var(--pxc-circle);
+}
+
+.github-avatar {
+  width: 100%;
+  height: 100%;
+  display: block;
+  clip-path: var(--pxc-circle-in);
 }
 
 .github-profile-info {
@@ -381,8 +393,8 @@ async function fetchUser() {
   gap: 2px;
   padding: 10px 6px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
   text-align: center;
 }
 
@@ -404,8 +416,8 @@ async function fetchUser() {
   gap: 4px;
   padding: 12px 14px;
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
 }
 
 .github-joined-row {
