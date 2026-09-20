@@ -11,6 +11,11 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+interface Window {
+  /** 百度统计全局队列，由 index.html 中的 hm.js 片段初始化；SPA 内补报 PV 时使用 */
+  _hmt?: any[][]
+}
+
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'
   const component: DefineComponent<{}, {}, any>

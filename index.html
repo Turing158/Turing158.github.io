@@ -40,6 +40,20 @@
     <link rel="dns-prefetch" href="https://api.github.com" />
 
     <title>Turing_ICE | Blog</title>
+
+    <!-- 百度统计：本站为单页应用（SPA），index.html 是全站唯一的 HTML 模板，
+         在 head 结束标签之前安装一次即可覆盖所有路由（含 standalone 独立页面）。
+         构建阶段若引入预渲染，各页面以本文件为模板派生，会自动继承此段代码。
+         注意：本注释内不可出现 head 结束标签的字面量，Vite 会按该字符串注入入口脚本。 -->
+    <script>
+      var _hmt = _hmt || [];
+      (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?9b832eaef1c3ba0327f7976bd87aac30";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

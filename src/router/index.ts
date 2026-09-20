@@ -1,3 +1,4 @@
+import { nextTick } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import { useAchievements } from '@/composables/useAchievements'
@@ -135,6 +136,10 @@ const router = createRouter({
 
 const progressListeners: { onStart: () => void; onDone: () => void }[] = []
 
+// 百度统计：hash 路由下首次进入的 PV 由 index.html 的 hm.js 自动上报，
+// 此处只负责补报后续的站内跳转，故用该标志跳过第一次导航，避免重复计数。
+let hasTrackedInitialPageview = false
+
 export function registerProgress(listener: { onStart: () => void; onDone: () => void }) {
   progressListeners.push(listener)
 }
@@ -152,6 +157,18 @@ router.afterEach((to) => {
   if (to.name && typeof to.name === 'string') {
     const achievements = useAchievements()
     achievements.handleRouteVisit(to.name)
+  }
+
+  // 百度统计：hash 路由的站内跳转不触发页面加载，hm.js 不会自动记录，
+  // 因此除首次外手动补报一条 PV；等 nextTick 让各视图的 useSeo 先更新 document.title，
+  // 否则该条 PV 记录到的是上一页的标题。
+  // 只上报 fullPath（如 /article/xxx），保证日后改用 history 路由时报表口径不变。
+  if (!hasTrackedInitialPageview) {
+    hasTrackedInitialPageview = true
+  } else {
+    nextTick(() => {
+      window._hmt?.push(['_trackPageview', to.fullPath])
+    })
   }
 })
 
