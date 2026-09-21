@@ -28,18 +28,25 @@ const DEVELOPING_REPOS = [
 ]
 
 // --- 评论代理 ---
-const GITALK_PROXY = 'https://gitalk.turing158.de5.net/github_access_token'
+// Gitalk OAuth token 由 tool-proxy（/github_access_token）转发到 GitHub
+const GITALK_PROXY = 'https://tool-proxy.turing158.de5.net/github_access_token'
 const GITALK_CLIENT_ID = import.meta.env.VITE_GITALK_CLIENT_ID || '0275b8f48f2a7e0ac1b0'
 
 // --- 节假日 API ---
 const HOLIDAY_API_BASE = 'https://date.nager.at/api/v3/publicholidays'
 const HOLIDAY_COUNTRY = 'CN'
 
-// --- Cline 推荐模型 API ---
-// 通过 Cloudflare Worker 代理（dev-docs/work.js 的 /cline/model/recommended）转发 Cline 接口，规避浏览器 CORS
-// 浏览器直连 Worker 绝对地址；可用环境变量 VITE_CLINE_API_BASE 覆盖
+// --- Cline 推荐/免费模型 API ---
+// 通过 Cloudflare Worker 代理（tool-proxy 的 /cline/model/recommended）转发 Cline 接口，规避浏览器 CORS
+// 浏览器直连绝对地址；可用环境变量 VITE_CLINE_API_BASE 覆盖
 const CLINE_MODELS_API = import.meta.env.VITE_CLINE_API_BASE
-  ?? 'https://api.turing158.dpdns.org/cline/model/recommended'
+  ?? 'https://tool-proxy.turing158.de5.net/cline/model/recommended'
+
+// --- Cline 全量模型目录 API ---
+// tool-proxy 的 /cline/model/all 返回 OpenRouter 全量目录（{ data: ClineModel[] }），
+// 搜索 Tab 以此为基础做本地过滤；可用环境变量 VITE_CLINE_ALL_API 覆盖
+const CLINE_MODELS_ALL_API = import.meta.env.VITE_CLINE_ALL_API
+  ?? 'https://tool-proxy.turing158.de5.net/cline/model/all'
 
 // --- 缓存 TTL（毫秒） ---
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
@@ -68,6 +75,7 @@ export const config = {
   },
   cline: {
     apiBase: CLINE_MODELS_API,
+    allApi: CLINE_MODELS_ALL_API,
   },
   cache: {
     articlesTTL: ARTICLES_CACHE_TTL,

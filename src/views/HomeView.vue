@@ -283,6 +283,7 @@ import { config } from '@/config'
 import BlogTip from '@/plugins/blog-tip'
 import { useAchievements } from '@/composables/useAchievements'
 import { useTypewriter } from '@/composables/useTypewriter'
+import { apiFetch } from '@/utils/apiEndpoint'
 import '@/styles/gitalk-theme.css'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
@@ -695,7 +696,8 @@ async function fetchGiteeTimeline(): Promise<any[]> {
   ]
   for (const url of sources) {
     try {
-      const res = await fetch(url, { headers: { Accept: 'application/json' } })
+      // apiFetch：本地自动改走 Vite 同源代理，线上直连；其余公开源原样请求
+      const res = await apiFetch(url, { headers: { Accept: 'application/json' } })
       if (!res.ok) continue
       const text = await res.text()
       const data = JSON.parse(text)

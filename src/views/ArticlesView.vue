@@ -84,15 +84,16 @@
                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                     <circle cx="12" cy="12" r="3"></circle>
                   </svg>
-                  <template v-if="viewCountsLoading">
-                    <CubeLoader inline :size="12" />
-                  </template>
-                  <template v-else-if="viewCounts[article.slug] !== undefined">
-                    {{ formatViewCount(viewCounts[article.slug]) }}
-                  </template>
-                  <template v-else>
-                    ---
-                  </template>
+                  <!-- 加载完成后方块淡出（loader-pop 出场动画）+ 数字滚动入场 -->
+                  <Transition name="loader-pop" mode="out-in">
+                    <CubeLoader v-if="viewCountsLoading" inline :size="12" class="cube-anim" />
+                    <AnimatedNumber
+                      v-else-if="viewCounts[article.slug] !== undefined"
+                      :value="viewCounts[article.slug]"
+                      class="cube-anim"
+                    />
+                    <span v-else class="cube-anim">---</span>
+                  </Transition>
                 </span>
                 <span v-for="tag in article.tags" :key="tag" class="tag px-fade">{{ tag }}</span>
                 <!-- 评论计数 -->
@@ -171,7 +172,7 @@ import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useGitalkCounts } from '@/composables/useGitalkCount'
 import { useViewCounts } from '@/composables/useViewCount'
 import CubeLoader from '@/components/common/CubeLoader.vue'
-import { formatViewCount } from '@/utils/formatViewCount'
+import AnimatedNumber from '@/components/common/AnimatedNumber.vue'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'

@@ -1,8 +1,37 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type ProxyOptions } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 import { articlesPlugin } from './src/plugins/articles-plugin'
+
+// ── 本地接口代理 ──
+// 后端（Cloudflare Worker / 友链服务 / Gitalk token 代理）的 CORS 白名单只放行线上站点域名，
+// 本地用 127.0.0.1、局域网 IP 或其它端口打开时会被浏览器拦截。
+// 这里把这些远端地址映射到同源路径，前端在本地自动改用该路径（见 src/utils/apiEndpoint.ts）；
+// 线上（GitHub Pages 纯静态托管，无代理能力）仍是直连绝对地址，请求方式保持不变。
+const API_PROXY: Record<string, string> = {
+  '/api/turing158': 'https://api.turing158.dpdns.org', // 浏览量、Gitee 动态
+  '/api/friends': 'https://blog.friendlink.de5.net', // 友链列表
+  '/api/friend-apply': 'https://blog.add-friendlink.de5.net', // 友链申请
+  '/api/tool-proxy': 'https://tool-proxy.turing158.de5.net', // Cline 模型目录 + Gitalk OAuth token
+}
+
+// 转发时把 Origin 伪装成线上站点域名，避免后端按白名单判定为非法来源
+const SITE_ORIGIN = 'https://blog.turing158.cc.cd'
+
+const apiProxy: Record<string, ProxyOptions> = Object.fromEntries(
+  Object.entries(API_PROXY).map(([prefix, target]) => [
+    prefix,
+    {
+      target,
+      changeOrigin: true,
+      secure: true,
+      headers: { Origin: SITE_ORIGIN },
+      // 去掉代理前缀，转发到后端真实路径
+      rewrite: (path: string) => path.replace(new RegExp(`^${prefix}`), ''),
+    } satisfies ProxyOptions,
+  ])
+)
 
 export default defineConfig({
   plugins: [
@@ -154,5 +183,10 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    proxy: apiProxy,
+  },
+  preview: {
+    // npm run preview 时同样启用，方便本地校验构建产物
+    proxy: apiProxy,
   },
 })

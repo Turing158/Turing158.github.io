@@ -3,8 +3,10 @@
 interface ImportMetaEnv {
   /** 浏览量 API 基址，未配置时使用默认后端地址（见 src/api/viewCount.ts） */
   readonly VITE_API_BASE?: string
-  /** Cline 模型 API 基址，未配置时使用默认 Worker 地址（见 src/config.ts） */
+  /** Cline 推荐/免费模型 API 基址，未配置时使用默认 tool-proxy 地址（见 src/config.ts） */
   readonly VITE_CLINE_API_BASE?: string
+  /** Cline 全量模型目录 API（搜索 Tab 数据源），未配置时使用默认 tool-proxy 地址（见 src/config.ts） */
+  readonly VITE_CLINE_ALL_API?: string
 }
 
 interface ImportMeta {

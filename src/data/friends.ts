@@ -1,3 +1,5 @@
+import { apiFetch } from '@/utils/apiEndpoint'
+
 export interface FriendLink {
   /** 友链名称 */
   name: string | null
@@ -15,7 +17,7 @@ export interface FriendLink {
   weight: number
 }
 
-// 跨域直连（API 的 CORS 白名单包含站点域名）
+// 后端绝对地址；本地由 apiFetch 自动改走 Vite 代理（同源，绕开 CORS 白名单），线上直连
 const API_BASE = 'https://blog.friendlink.de5.net'
 
 /** 拉取全部友情链接（接口要求 POST，无需请求体，避免预检请求） */
@@ -23,7 +25,7 @@ export async function fetchFriendLinks(): Promise<FriendLink[]> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 10_000)
   try {
-    const res = await fetch(`${API_BASE}/friend-link/find/all`, {
+    const res = await apiFetch(`${API_BASE}/friend-link/find/all`, {
       method: 'POST',
       signal: controller.signal,
     })
@@ -61,7 +63,7 @@ export interface ApplyFriendLinkResult {
   error?: string
 }
 
-// 跨域直连（Worker 的 CORS 白名单包含站点域名）
+// 后端绝对地址；本地由 apiFetch 自动改走 Vite 代理（同源，绕开 CORS 白名单），线上直连
 const APPLY_API_BASE = 'https://blog.add-friendlink.de5.net'
 
 /** 提交友链申请（业务校验失败时 HTTP 仍为 200，以返回体 success/error 为准） */
@@ -69,7 +71,7 @@ export async function applyFriendLink(payload: ApplyFriendLinkPayload): Promise<
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 10_000)
   try {
-    const res = await fetch(`${APPLY_API_BASE}/friend-link/apply`, {
+    const res = await apiFetch(`${APPLY_API_BASE}/friend-link/apply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

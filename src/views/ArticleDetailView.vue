@@ -23,14 +23,23 @@
               </svg>
               {{ $t('articles.readingTime', { time: article.readingTime }) }}
             </span>
-            <!-- 浏览量 -->
-            <span v-if="viewCount > 0" class="article-views-badge" :title="`${viewCount} 次浏览`">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                <circle cx="12" cy="12" r="3"></circle>
-              </svg>
-              {{ formatViewCount(viewCount) }}
-            </span>
+            <!-- 浏览量：加载中显示小方块，完成后淡出 + 数字滚动入场 -->
+            <Transition name="loader-pop" mode="out-in">
+              <span v-if="viewLoading" class="article-views-badge cube-anim" :title="`${viewCount} 次浏览`">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <CubeLoader inline :size="12" />
+              </span>
+              <span v-else-if="viewCount > 0" class="article-views-badge cube-anim" :title="`${viewCount} 次浏览`">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                <AnimatedNumber :value="viewCount" />
+              </span>
+            </Transition>
             <span v-for="tag in article.tags" :key="tag" class="tag px-fade">{{ tag }}</span>
           </div>
         </header>
@@ -87,7 +96,7 @@ import { useI18n } from 'vue-i18n'
 import { Button } from 'animal-island-vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { useViewCount } from '@/composables/useViewCount'
-import { formatViewCount } from '@/utils/formatViewCount'
+import AnimatedNumber from '@/components/common/AnimatedNumber.vue'
 import Gitalk from 'gitalk'
 import '../styles/gitalk-theme.css'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
@@ -96,6 +105,7 @@ import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import BlogTip from '@/plugins/blog-tip'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import { apiUrl } from '@/utils/apiEndpoint'
 
 const route = useRoute()
 const router = useRouter()
@@ -140,7 +150,7 @@ const loadAttempted = ref(false)
 const htmlAttempted = ref(false)
 
 // 浏览量（useViewCount 内部 onMounted 自动递增）
-const { viewCount } = useViewCount(slug.value)
+const { viewCount, loading: viewLoading } = useViewCount(slug.value)
 
 // 将 headings 传递给 layout 中的 TOC
 const updateHeadings = () => {
@@ -180,7 +190,8 @@ const initGitalk = () => {
     body: article.value?.title || slug.value,
     distractionFreeMode: false,
     language: locale.value === 'zh-CN' ? 'zh-CN' : 'en',
-    proxy: config.gitalk.proxy,
+    // 本地走 Vite 同源代理换取 access_token，线上直连原有代理地址
+    proxy: apiUrl(config.gitalk.proxy),
   })
   gitalk.render('gitalk-container')
 

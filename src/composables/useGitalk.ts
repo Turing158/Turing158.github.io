@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import Gitalk from 'gitalk'
 import { config } from '@/config'
+import { apiUrl } from '@/utils/apiEndpoint'
 
 export function useGitalk(containerId: string, slug: string, title: string) {
   const initialized = ref(false)
@@ -22,7 +23,8 @@ export function useGitalk(containerId: string, slug: string, title: string) {
       body: title,
       distractionFreeMode: false,
       language: 'zh-CN',
-      proxy: config.gitalk.proxy,
+      // 本地走 Vite 同源代理换取 access_token，线上直连原有代理地址
+      proxy: apiUrl(config.gitalk.proxy),
     })
 
     gitalk.render(containerId)

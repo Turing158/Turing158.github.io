@@ -29,12 +29,15 @@ export function useViewCount(slug: string) {
   }
 
   const increment = async () => {
+    loading.value = true
     try {
       const count = await incrementViewCount(slug)
       viewCount.value = count
       viewCountCache.set(slug, count)
     } catch {
       // 静默处理
+    } finally {
+      loading.value = false
     }
   }
 

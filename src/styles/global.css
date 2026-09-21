@@ -22,7 +22,6 @@ html {
 
 ::-webkit-scrollbar-track {
   background: var(--bg-secondary);
-  border-left: 2px solid var(--border);
 }
 
 ::-webkit-scrollbar-thumb {
