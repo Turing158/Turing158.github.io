@@ -7,6 +7,10 @@ interface ImportMetaEnv {
   readonly VITE_CLINE_API_BASE?: string
   /** Cline 全量模型目录 API（搜索 Tab 数据源），未配置时使用默认 tool-proxy 地址（见 src/config.ts） */
   readonly VITE_CLINE_ALL_API?: string
+  /** GitHub 用户信息 API 基址（tool-proxy 的 /github/user），未配置时使用默认值（见 src/config.ts） */
+  readonly VITE_GITHUB_USER_API?: string
+  /** GitHub REST 代理基址（Cloudflare Worker github-proxy），未配置时使用默认值（见 src/config.ts） */
+  readonly VITE_GITHUB_API_BASE?: string
 }
 
 interface ImportMeta {

@@ -115,6 +115,8 @@ import BlogInput from '@/components/common/BlogInput.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import { Button } from 'animal-island-vue'
 import BlogTip from '@/plugins/blog-tip'
+import { apiFetch } from '@/utils/apiEndpoint'
+import { config } from '@/config'
 
 const { t, locale } = useI18n()
 
@@ -230,7 +232,8 @@ async function fetchUser() {
   stopTick()
   user.value = null
   try {
-    const res = await fetch(`https://api.github.com/users/${encodeURIComponent(name)}`)
+    // 经 tool-proxy 转发（Worker 侧带 PAT，规避浏览器匿名限流）
+    const res = await apiFetch(`${config.github.userApi}/${encodeURIComponent(name)}`)
     if (res.status === 404) {
       notFound.value = true
       return

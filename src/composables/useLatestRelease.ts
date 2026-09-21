@@ -6,7 +6,7 @@
 
 import { ref } from 'vue'
 import axios from 'axios'
-import { config } from '@/config'
+import { githubOptions, githubUrl } from '@/utils/githubApi'
 
 export interface LatestReleaseAsset {
   name: string
@@ -44,7 +44,8 @@ export function useLatestRelease(repo: string) {
 
     try {
       const res = await axios.get<any>(
-        `https://api.github.com/repos/${config.github.owner}/${repo}/releases/latest`
+        githubUrl(`repos/${repo}/releases/latest`),
+        githubOptions()
       )
       const data: LatestRelease = {
         tag_name: res.data.tag_name,

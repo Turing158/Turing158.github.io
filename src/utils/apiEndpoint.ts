@@ -8,7 +8,9 @@
  * （代理映射见 vite.config.ts 的 API_PROXY），浏览器视角下是同源请求，不再受 CORS 限制；
  * 线上（GitHub Pages，纯静态托管没有代理能力）仍直连原来的绝对地址，请求方式与现状完全一致。
  *
- * CORS 本身放行的接口（如 https://api.github.com、https://date.nager.at）不在此列，保持直连。
+ * CORS 本身放行的接口（如 https://date.nager.at）不在此列，保持直连；
+ * GitHub 用户信息虽然 api.github.com 自身放行 CORS，但改由 tool-proxy 转发
+ * （/github/user/<login>，Worker 侧带 PAT 规避匿名限流），因此同样走代理映射。
  */
 
 /** 远端地址 → 本地同源代理前缀；必须与 vite.config.ts 的 API_PROXY 保持一致 */
@@ -17,7 +19,12 @@ const PROXY_ROUTES: ReadonlyArray<readonly [RegExp, string]> = [
   [/^https:\/\/blog\.add-friendlink\.de5\.net(?=\/|$)/i, '/api/friend-apply'],
   [/^https:\/\/blog\.friendlink\.de5\.net(?=\/|$)/i, '/api/friends'],
   // tool-proxy：Cline 模型目录（/cline/model/*）+ Gitalk OAuth token（/github_access_token）
+  //              + GitHub 用户信息（/github/user/*）
   [/^https:\/\/tool-proxy\.turing158\.de5\.net(?=\/|$)/i, '/api/tool-proxy'],
+  // github-proxy：GitHub REST 代理。它的 CORS 已放行 localhost / 线上域名，
+  // 原则上可以直连；映射在此只是为了在 dev 环境可视作同源、便于排查，
+  // 前端调用统一走 src/utils/githubApi.ts（直连绝对地址，不做同源改写）。
+  [/^https:\/\/turing158\.github-proxy\.de5\.net(?=\/|$)/i, '/api/github'],
 ]
 
 /** 本地 / 内网主机名：命中时走代理（dev server 与 preview 均适用） */

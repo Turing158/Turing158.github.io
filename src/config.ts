@@ -10,6 +10,23 @@
 const GITHUB_OWNER = import.meta.env.VITE_GITHUB_OWNER || 'Turing158'
 const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'Turing158.github.io'
 
+// --- GitHub API 代理基址 ---
+// 浏览器直连 api.github.com 是匿名调用（60 次/小时，按访客出口 IP 计），
+// 站点上多处调用很容易打满，因此统一改走自建 Cloudflare Worker：
+//   GET /repos/<repo>/...    → https://api.github.com/repos/Turing158/<repo>/...
+//   GET /users/<login>/...   → https://api.github.com/users/<login>/...
+// owner 由 Worker 写死注入，调用方**不要**写在路径里；Worker 侧注入 PAT 把额度提到
+// 5000 次/小时并在边缘缓存，CORS 已放行线上域名与 localhost。
+// 源码：D:\EducationalData\cf\github-proxy\worker.js；可用环境变量 VITE_GITHUB_API_BASE 覆盖
+const GITHUB_API_BASE = import.meta.env.VITE_GITHUB_API_BASE
+  ?? 'https://turing158.github-proxy.de5.net'
+
+// --- GitHub 用户信息 API ---
+// 旧通道：tool-proxy 的 /github/user/<login>（仅支持用户信息，其余端点仍需上面的 github-proxy）
+// 作为 github-proxy 不可用时的兜底保留，可用环境变量 VITE_GITHUB_USER_API 覆盖
+const GITHUB_USER_API = import.meta.env.VITE_GITHUB_USER_API
+  ?? 'https://tool-proxy.turing158.de5.net/github/user'
+
 // --- Gitee 配置 ---
 const GITEE_OWNER = import.meta.env.VITE_GITEE_OWNER || 'turing-ice'
 
@@ -55,6 +72,9 @@ export const config = {
   github: {
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
+    /** github-proxy 基址：GET <apiBase>/repos/<repo>/... 与 /users/<login>/... */
+    apiBase: GITHUB_API_BASE,
+    userApi: GITHUB_USER_API,
   },
   gitee: {
     owner: GITEE_OWNER,

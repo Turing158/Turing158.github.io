@@ -6,6 +6,7 @@ import type { Article } from '@/types/article'
 import localArticles from '@/generated/_articles-index'
 import { developingProjects } from '@/data/projects'
 import { config } from '@/config'
+import { githubFetch, GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
 import { calculateReadingTime } from '@/composables/useReadingTime'
 import {
   addBlankTargetToLinks,
@@ -38,8 +39,8 @@ function loadLocalArticles(): Article[] {
 async function loadGitHubArticles(): Promise<Article[]> {
   if (!GITHUB_OWNER || !GITHUB_REPO) return []
 
-  const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/content`
-  const res = await fetch(apiUrl)
+  // 经 github-proxy 转发（Worker 注入 owner 与 PAT），失败时 githubFetch 自动回退直连
+  const res = await githubFetch(`repos/${GITHUB_REPO}/contents/content`)
   if (!res.ok) throw new Error(`GitHub API error: ${res.status}`)
   const files = (await res.json()) as { name: string; download_url: string }[]
 
@@ -169,8 +170,8 @@ export function useArticles() {
       const commits = await Promise.all(
         developingRepos.map(async (repo) => {
           try {
-            const url = `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/commits?per_page=1`
-            const res = await fetch(url)
+            const url = githubUrl(`repos/${repo}/commits?per_page=1`)
+            const res = await fetch(url, { headers: GITHUB_API_HEADERS })
             if (!res.ok) return null
             const data = (await res.json()) as any[]
             if (!data || data.length === 0) return null

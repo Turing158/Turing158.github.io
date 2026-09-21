@@ -284,6 +284,7 @@ import BlogTip from '@/plugins/blog-tip'
 import { useAchievements } from '@/composables/useAchievements'
 import { useTypewriter } from '@/composables/useTypewriter'
 import { apiFetch } from '@/utils/apiEndpoint'
+import { githubFetch } from '@/utils/githubApi'
 import '@/styles/gitalk-theme.css'
 
 const { fetchArticles, fetchRecentCommits, loading } = useArticles()
@@ -346,7 +347,8 @@ const profile = ref<GitHubProfile | null>(null)
 const profileBio = computed(() => profile.value?.bio || t('home.profileBio'))
 onMounted(async () => {
   try {
-    const res = await fetch(`https://api.github.com/users/${githubUser}`)
+    // 经 tool-proxy 转发（Worker 侧带 PAT，规避浏览器匿名限流）
+    const res = await apiFetch(`${config.github.userApi}/${encodeURIComponent(githubUser)}`)
     if (!res.ok) return
     const data = await res.json()
     profile.value = {
@@ -528,7 +530,8 @@ const rawGitHubEvents = ref<any[]>([])
 
 onMounted(async () => {
   try {
-    const res = await fetch(`https://api.github.com/users/${githubUser}/events?per_page=10`)
+    // github-proxy 会把写死的 owner 注入到 /users 之后，所以这里不写登录名
+    const res = await githubFetch('users/events?per_page=10')
     if (!res.ok) {
       activityError.value = true
       return

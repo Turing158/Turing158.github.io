@@ -1,6 +1,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { config } from '@/config'
+import { githubOptions, githubUrl } from '@/utils/githubApi'
 
 // 缓存评论计数，避免重复请求
 const commentCountCache = new Map<string, number>()
@@ -27,23 +28,16 @@ export function useGitalkCount(slug: string) {
     try {
       // Gitalk 使用 GitHub Issues 存储评论
       // 通过 GitHub API 获取 issue 的评论数
-      const repo = config.github.repo
-      const owner = config.github.owner
-
-      // 构建搜索查询，查找对应 slug 的 issue
-      // Gitalk 的 issue id 就是文章的 slug
+      // （经 github-proxy 转发：owner 由 Worker 注入，路径里不写 owner）
       const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/issues`,
-        {
+        githubUrl(`repos/${config.github.repo}/issues`),
+        githubOptions({
           params: {
             labels: 'gitalk',
             state: 'all',
             per_page: 100,
           },
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-          },
-        }
+        })
       )
 
       // 查找匹配的 issue
@@ -92,22 +86,16 @@ export function useGitalkCounts(slugs: string[]) {
     loading.value = true
 
     try {
-      const repo = config.github.repo
-      const owner = config.github.owner
-
-      // 获取所有 gitalk 标签的 issues
+      // 获取所有 gitalk 标签的 issues（同样经 github-proxy 转发）
       const response = await axios.get(
-        `https://api.github.com/repos/${owner}/${repo}/issues`,
-        {
+        githubUrl(`repos/${config.github.repo}/issues`),
+        githubOptions({
           params: {
             labels: 'gitalk',
             state: 'all',
             per_page: 100,
           },
-          headers: {
-            Accept: 'application/vnd.github.v3+json',
-          },
-        }
+        })
       )
 
       // 构建 slug -> comments 的映射

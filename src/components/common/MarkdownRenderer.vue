@@ -12,9 +12,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { createApp, ref, watch, onMounted, onUnmounted } from 'vue'
+import type { App } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ImageViewer, { type ImageViewerImage } from '@/components/common/ImageViewer.vue'
+import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 
 const props = defineProps<{
   html: string
@@ -50,10 +52,13 @@ const handleImageError = (e: Event) => {
 }
 
 // 失败层点击重试：容器切回加载态，原图元素重新请求（重试参数绕过失败缓存）
+// 占位容器对已加载图片同样存在，因此必须先确认容器处于失败态：
+// 否则左键点击已加载的图片会在打开查看器的同时被重新赋 src，导致图片再次请求、闪一下重载
 const handleRetryClick = (e: Event) => {
   const wrap = (e.target as HTMLElement).closest('.markdown-img-wrap') as HTMLElement | null
-  const img = wrap?.querySelector('img')
-  if (!wrap || !img) return
+  if (!wrap || !wrap.classList.contains('is-error')) return
+  const img = wrap.querySelector('img')
+  if (!img) return
   wrap.classList.remove('is-error')
   wrap.classList.add('is-loading')
   const base = (wrap.dataset.src || img.src).replace(/([?&])retry=\d+/, '')
@@ -455,7 +460,94 @@ const setupRailDivider = (divider: HTMLElement): (() => void) => {
   }
 }
 
+// ==================== 花田分割线（GrassTerrainDivider 挂载） ====================
+
+// 正文里有两类分割线会改用页面顶部同款的草方块花田分割线（紧凑尺寸 sm）：
+//   1. 标题下一行本身就是分割线；
+//   2. 正文里连续堆叠（相邻）的两条及以上分割线。
+// v-html 渲染出的 DOM 不受 Vue 模板管辖，这里为每个锚点单独 createApp 挂载实例。
+// 锚点先入 DOM 再挂载：空 div 高度为 0 不会占位，组件挂载时就能量到真实宽度，
+// 一次性铺满花田单元（而不是先 1 个、再等 ResizeObserver 补齐）。
+type TerrainHandle = { el: HTMLElement; app: App<Element> }
+
+const terrainHandles: TerrainHandle[] = []
+
+const mountTerrainDivider = (anchor: HTMLElement) => {
+  const app = createApp(GrassTerrainDivider, { size: 'sm' })
+  app.mount(anchor)
+  terrainHandles.push({ el: anchor, app })
+}
+
+// v-html 更新时容器整体重建，旧锚点随之失联，这里回收其 Vue 实例
+const reapTerrainHandles = () => {
+  for (let i = terrainHandles.length - 1; i >= 0; i -= 1) {
+    const handle = terrainHandles[i]
+    if (handle.el.isConnected) continue
+    handle.app.unmount()
+    terrainHandles.splice(i, 1)
+  }
+}
+
+// 把花田锚点插到 after 之后并立即挂载；modifier 用于切换上下留白
+const buildTerrainAnchor = (after: Element, modifier = '') => {
+  const anchor = document.createElement('div')
+  anchor.className = modifier ? `md-terrain-anchor ${modifier}` : 'md-terrain-anchor'
+  after.insertAdjacentElement('afterend', anchor)
+  mountTerrainDivider(anchor)
+}
+
+// ==================== 正文连续分割线合并 ====================
+
+// 相邻两条 hr 之间只允许隔着空白文本与注释：中间夹着段落/图片的属于各自独立的分割线
+const nextAdjacentHr = (hr: Element): Element | null => {
+  let node: Node | null = hr.nextSibling
+  while (node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      return (node as Element).tagName === 'HR' ? (node as Element) : null
+    }
+    const skippable =
+      node.nodeType === Node.COMMENT_NODE ||
+      (node.nodeType === Node.TEXT_NODE && !node.textContent?.trim())
+    if (!skippable) return null
+    node = node.nextSibling
+  }
+  return null
+}
+
+// Markdown 里连写多条分割线（`***` 三连、`---` 空行后接 `---` 等）会渲染成一串相邻的
+// <hr>，叠在一起只是几条一模一样的线。整组撤掉，合并为一条草方块花田分割线。
+//
+// 花田线的上下留白取决于它是否紧贴标题：紧跟 h1/h2 的贴住标题、只留下留白；
+// 夹在正文段落之间的上下都留白（与单条分割线的节奏一致，见 global.css）。
+const collapseStackedDividers = () => {
+  const container = containerRef.value
+  if (!container) return
+  reapTerrainHandles()
+  container.querySelectorAll('hr').forEach((hr) => {
+    // 同一组里的后续 hr 在处理首条时已被移除
+    if (!hr.isConnected) return
+    const run: Element[] = [hr]
+    let cursor: Element = hr
+    for (;;) {
+      const next = nextAdjacentHr(cursor)
+      if (!next) break
+      run.push(next)
+      cursor = next
+    }
+    if (run.length < 2) return
+    // 紧跟在 h1/h2 之后的花田线贴住标题，其余留出上下间距
+    const afterHeading = /^H[12]$/.test(hr.previousElementSibling?.tagName ?? '')
+    buildTerrainAnchor(hr, afterHeading ? '' : 'md-terrain-anchor--section')
+    run.forEach((el) => el.remove())
+  })
+}
+
 // 在每个 h1/h2 后面插入铁轨分割线（同一标题只绑一次；html 变化时容器整体重建，标记随旧 DOM 消失）
+//
+// 例外：标题下一行本身就是分割线（Markdown 里单独一行的 `---`，渲染成 <hr>）时，
+// 铁轨线与这条 hr 视觉上重复，且会与正文的"红石分割线"风格打架 —— 两者一并撤掉，
+// 改用同款草方块花田分割线替代。判定只认"紧邻的下一个元素"：中间隔着段落/代码块的
+// hr 属于正文内容，不动。
 const enhanceHeadingDividers = () => {
   const container = containerRef.value
   if (!container) return
@@ -467,8 +559,19 @@ const enhanceHeadingDividers = () => {
   }
   container.querySelectorAll('h1, h2').forEach((heading) => {
     const el = heading as HTMLElement
-    if (el.dataset.railDividerBound) return
-    el.dataset.railDividerBound = '1'
+    if (el.dataset.headingDividerBound) return
+    el.dataset.headingDividerBound = '1'
+
+    // 必须在 enhanceRedstoneDividers 之前调用：那条 hr 此时还没被换成 .redstone-divider
+    const next = el.nextElementSibling
+    if (next?.tagName === 'HR') {
+      next.remove()
+      buildTerrainAnchor(el)
+      return
+    }
+    // 标题后的整组分割线已被 collapseStackedDividers 合成花田线，不再叠加铁轨线
+    if (next?.classList.contains('md-terrain-anchor')) return
+
     const divider = document.createElement('div')
     divider.className = `rail-divider is-${el.tagName.toLowerCase()}`
     divider.setAttribute('role', 'separator')
@@ -535,8 +638,11 @@ watch(
   () => {
     setTimeout(() => {
       bindImageStates()
-      enhanceRedstoneDividers()
+      // 顺序不能反：合并连续分割线与标题增强都要先看到原生的 <hr>，
+      // 晚于 enhanceRedstoneDividers 就只能看到已被替换掉的 .redstone-divider
+      collapseStackedDividers()
       enhanceHeadingDividers()
+      enhanceRedstoneDividers()
     }, 0)
   },
   { immediate: true }
@@ -548,8 +654,11 @@ onMounted(() => {
   containerRef.value?.addEventListener('click', handleImageClick)
   containerRef.value?.addEventListener('click', handleRetryClick)
   bindImageStates()
-  enhanceRedstoneDividers()
+  // 顺序不能反：合并连续分割线与标题增强都要先看到原生的 <hr>，
+  // 晚于 enhanceRedstoneDividers 就只能看到已被替换掉的 .redstone-divider
+  collapseStackedDividers()
   enhanceHeadingDividers()
+  enhanceRedstoneDividers()
 })
 
 onUnmounted(() => {
@@ -558,6 +667,9 @@ onUnmounted(() => {
   containerRef.value?.removeEventListener('click', handleImageClick)
   containerRef.value?.removeEventListener('click', handleRetryClick)
   unbindImageStates()
+  while (terrainHandles.length) {
+    terrainHandles.pop()?.app.unmount()
+  }
   while (redstoneHandles.length) {
     redstoneHandles.pop()?.dispose()
   }

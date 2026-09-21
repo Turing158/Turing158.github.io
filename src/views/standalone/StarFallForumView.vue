@@ -317,6 +317,7 @@ import { useGitalk } from '@/composables/useGitalk'
 import axios from 'axios'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import { githubOptions, githubUrl } from '@/utils/githubApi'
 
 const FRONTEND_REPO = 'StarFall-vue'
 const BACKEND_REPO = 'StarFall-SpringBoot'
@@ -376,7 +377,10 @@ async function fetchLatestReleases() {
     const results = await Promise.allSettled(
       [FRONTEND_REPO, BACKEND_REPO].map(repo =>
         axios
-          .get<any[]>(`https://api.github.com/repos/${config.github.owner}/${repo}/releases?per_page=1`)
+          .get<any[]>(
+            githubUrl(`repos/${repo}/releases?per_page=1`),
+            githubOptions()
+          )
           .then(res => {
             const data = res.data?.[0]
             if (!data) return null

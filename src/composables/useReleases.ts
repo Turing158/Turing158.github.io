@@ -7,10 +7,16 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import type { Release } from '@/types/search'
-import { config } from '@/config'
+import { githubOptions, githubUrl } from '@/utils/githubApi'
 
-const GITHUB_OWNER = config.github.owner
-const RELEASE_REPOS = ['StarFall-Minecraft-Launcher', 'SFMC', 'StarFall-Vue', 'StarFall-SpringBoot']
+const RELEASE_REPOS = [
+  'StarFall-Minecraft-Launcher',
+  'SFMC',
+  'StarFall-Vue',
+  'StarFall-SpringBoot',
+  'MemeMomo',
+  'CodeCraft',
+]
 const CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 // 模块级缓存
@@ -37,7 +43,8 @@ export function useReleases() {
         RELEASE_REPOS.map(repo =>
           axios
             .get<any[]>(
-              `https://api.github.com/repos/${GITHUB_OWNER}/${repo}/releases?per_page=1`
+              githubUrl(`repos/${repo}/releases?per_page=1`),
+              githubOptions()
             )
             .then(res => {
               const data = res.data?.[0]

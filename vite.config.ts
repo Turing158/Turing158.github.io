@@ -13,7 +13,8 @@ const API_PROXY: Record<string, string> = {
   '/api/turing158': 'https://api.turing158.dpdns.org', // 浏览量、Gitee 动态
   '/api/friends': 'https://blog.friendlink.de5.net', // 友链列表
   '/api/friend-apply': 'https://blog.add-friendlink.de5.net', // 友链申请
-  '/api/tool-proxy': 'https://tool-proxy.turing158.de5.net', // Cline 模型目录 + Gitalk OAuth token
+  '/api/tool-proxy': 'https://tool-proxy.turing158.de5.net', // Cline 模型目录 + Gitalk OAuth token + GitHub 用户信息
+  '/api/github': 'https://turing158.github-proxy.de5.net', // GitHub REST 代理（前端直连，此处仅供本地手动排查）
 }
 
 // 转发时把 Origin 伪装成线上站点域名，避免后端按白名单判定为非法来源
@@ -132,12 +133,15 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: /\/api\/v3\//,
+            // GitHub REST 统一走自建 github-proxy（Worker 侧已注入 PAT + 边缘缓存），
+            // 这里再缓存一层，避免离线/开发环境反复回源。
+            // 注意：/\/api\/v3\// 只匹配 LeanCloud 风格的 version 前缀，原先并未命中 GitHub。
+            urlPattern: /^https:\/\/turing158\.github-proxy\.de5\.net\//,
             handler: 'NetworkFirst',
             options: {
               cacheName: 'github-api-cache',
               expiration: {
-                maxEntries: 20,
+                maxEntries: 60,
                 maxAgeSeconds: 60 * 5,
               },
               networkTimeoutSeconds: 10,

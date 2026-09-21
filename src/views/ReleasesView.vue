@@ -70,10 +70,11 @@
                   {{ $t('releases.download') }}
                   <ExternalLinkIcon />
                 </Button>
+                <!-- 暂无独立页面的仓库保留按钮但禁用（如 MemeMomo / CodeCraft） -->
                 <Button
-                  v-if="getStandalonePage(release.repo)"
                   size="small"
-                  @click="goToStandalone(getStandalonePage(release.repo)!)"
+                  :disabled="!getStandalonePage(release.repo)"
+                  @click="goToStandalone(release.repo)"
                 >
                   {{ $t('releases.page') }}
                 </Button>
@@ -140,7 +141,10 @@ function getStandalonePage(repo: string): string | null {
   return map[repo] ?? null
 }
 
-function goToStandalone(path: string) {
+function goToStandalone(repo: string) {
+  // 无独立页面的仓库按钮为禁用态，点击不生效
+  const path = getStandalonePage(repo)
+  if (!path) return
   router.push(path)
 }
 

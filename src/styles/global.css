@@ -502,14 +502,40 @@ body { color: var(--text-primary); }
   }
 }
 
-/* ── Markdown H1/H2 分割线：Minecraft 铁轨像素分割线 ──
-   h1/h2 原有的 border-bottom 由 MarkdownRenderer 注入的 .rail-divider 替换
-   （悬停通电 + 矿车驶过）。只作用于正文渲染器：评论区的 .markdown-body
-   保留 github-markdown-css 原生下边框。 */
+/* ── Markdown H1/H2 分割线：由 MarkdownRenderer 注入，两种形态 ──
+   默认注入 .rail-divider 铁轨像素分割线（悬停通电 + 矿车驶过）。
+   改用 .md-terrain-anchor + 草方块花田分割线（紧凑尺寸）替代的两种情况：
+     1. 标题下一行本身就是分割线（正文里单独一行 `---`）——铁轨线与该 hr 重复；
+     2. 正文里连续堆叠（相邻）的两条及以上分割线——整组合并成一条花田线。
+   只作用于正文渲染器：评论区的 .markdown-body 保留 github-markdown-css 原生下边框。 */
 .markdown-renderer.markdown-body h1,
 .markdown-renderer.markdown-body h2 {
   border-bottom: 0;
   padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* 花田锚点：只是 GrassTerrainDivider 的挂载容器，本身不产生任何盒模型贡献 */
+.markdown-body .md-terrain-anchor {
+  display: block;
+  width: 100%;
+}
+
+/* 花田默认只留下留白（1.25rem，与正文分割线同节奏），上方为 0：
+   紧跟标题时正好贴住标题 —— 标题自身的 margin-bottom 已被上面清零 */
+.markdown-body .md-terrain-anchor > .terrain-divider {
+  margin-bottom: 1.25rem;
+}
+
+/* 夹在正文段落之间的花田线上下都要留白 */
+.markdown-body .md-terrain-anchor--section > .terrain-divider {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* 末尾锚点：github-markdown-css 的 `>*:last-child{margin-bottom:0!important}` 只作用在
+   锚点上，内层 .terrain-divider 的下边距会穿透合并，需显式清掉 */
+.markdown-body > .md-terrain-anchor:last-child > .terrain-divider {
   margin-bottom: 0;
 }
 

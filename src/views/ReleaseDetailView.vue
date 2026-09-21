@@ -201,6 +201,7 @@ import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 import { usePageSeo } from '@/composables/useSeo'
+import { GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
 
 const router = useRouter()
 const GITHUB_OWNER = 'Turing158'
@@ -395,7 +396,8 @@ async function fetchReleases() {
 
   try {
     const res = await fetch(
-      `https://api.github.com/repos/${GITHUB_OWNER}/${repoName.value}/releases?per_page=10`
+      githubUrl(`repos/${repoName.value}/releases?per_page=10`),
+      { headers: GITHUB_API_HEADERS }
     )
     if (!res.ok) throw new Error(`GitHub API error: ${res.status}`)
     releases.value = (await res.json()) as Release[]
