@@ -1,15 +1,17 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** 浏览量 API 基址，未配置时使用默认后端地址（见 src/api/viewCount.ts） */
+  /** 统一后端基址（合并后的单个 Cloudflare Worker），未配置时用默认值（见 src/config.ts） */
+  readonly VITE_BACKEND_BASE?: string
+  /** 浏览量 API 基址，未配置时由 VITE_BACKEND_BASE 派生（见 src/api/viewCount.ts） */
   readonly VITE_API_BASE?: string
-  /** Cline 推荐/免费模型 API 基址，未配置时使用默认 tool-proxy 地址（见 src/config.ts） */
+  /** Cline 推荐/免费模型 API 基址，未配置时由 VITE_BACKEND_BASE 派生（见 src/config.ts） */
   readonly VITE_CLINE_API_BASE?: string
-  /** Cline 全量模型目录 API（搜索 Tab 数据源），未配置时使用默认 tool-proxy 地址（见 src/config.ts） */
+  /** Cline 全量模型目录 API（搜索 Tab 数据源），未配置时由 VITE_BACKEND_BASE 派生（见 src/config.ts） */
   readonly VITE_CLINE_ALL_API?: string
-  /** GitHub 用户信息 API 基址（tool-proxy 的 /github/user），未配置时使用默认值（见 src/config.ts） */
+  /** GitHub 用户信息 API 基址（Worker 的 /github/user），未配置时由 VITE_BACKEND_BASE 派生 */
   readonly VITE_GITHUB_USER_API?: string
-  /** GitHub REST 代理基址（Cloudflare Worker github-proxy），未配置时使用默认值（见 src/config.ts） */
+  /** GitHub REST 代理基址（Worker 的 /github/api），未配置时由 VITE_BACKEND_BASE 派生 */
   readonly VITE_GITHUB_API_BASE?: string
 }
 

@@ -1,4 +1,5 @@
 import { apiFetch } from '@/utils/apiEndpoint'
+import { config } from '@/config'
 
 export interface FriendLink {
   /** 友链名称 */
@@ -17,15 +18,16 @@ export interface FriendLink {
   weight: number
 }
 
-// 后端绝对地址；本地由 apiFetch 自动改走 Vite 代理（同源，绕开 CORS 白名单），线上直连
-const API_BASE = 'https://blog.friendlink.de5.net'
+// 后端绝对地址：派生自统一后端基址（合并后的单个 Worker，见 src/config.ts）。
+// 本地由 apiFetch 自动改走 Vite 代理（同源，绕开 CORS 白名单），线上直连
+const API_BASE = `${config.backendBase}/friend-link`
 
 /** 拉取全部友情链接（接口要求 POST，无需请求体，避免预检请求） */
 export async function fetchFriendLinks(): Promise<FriendLink[]> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 10_000)
   try {
-    const res = await apiFetch(`${API_BASE}/friend-link/find/all`, {
+    const res = await apiFetch(`${API_BASE}/find/all`, {
       method: 'POST',
       signal: controller.signal,
     })
@@ -63,15 +65,16 @@ export interface ApplyFriendLinkResult {
   error?: string
 }
 
-// 后端绝对地址；本地由 apiFetch 自动改走 Vite 代理（同源，绕开 CORS 白名单），线上直连
-const APPLY_API_BASE = 'https://blog.add-friendlink.de5.net'
+// 与读取同域（合并后读 / 写由同一 Worker 的 /friend-link/* 承担），
+// 仅路径不同：/friend-link/find/all 与 /friend-link/apply
+const APPLY_API_BASE = API_BASE
 
 /** 提交友链申请（业务校验失败时 HTTP 仍为 200，以返回体 success/error 为准） */
 export async function applyFriendLink(payload: ApplyFriendLinkPayload): Promise<ApplyFriendLinkResult> {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), 10_000)
   try {
-    const res = await apiFetch(`${APPLY_API_BASE}/friend-link/apply`, {
+    const res = await apiFetch(`${APPLY_API_BASE}/apply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),

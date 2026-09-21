@@ -1,30 +1,37 @@
 /**
  * 外部 API 端点解析（本地走代理 / 线上直连）
  *
- * 背景：本站后端（Cloudflare Worker、友链服务、tool-proxy）的 CORS 白名单只放行
- * 线上站点域名。本地用 127.0.0.1、局域网 IP 或其它端口打开时，浏览器会直接拦截跨域请求。
+ * 背景：后端（合并后的 Cloudflare Worker）的 CORS 白名单由 NORMAL_OPERATE_ALLOW_ORIGIN
+ * 控制，只放行线上站点域名与 localhost:3000。本地用 127.0.0.1、局域网 IP 或其它端口
+ * 打开时，浏览器会直接拦截跨域请求。
  *
  * 方案：本地（dev server / vite preview）把远端绝对地址改写成 Vite 代理的同源路径
  * （代理映射见 vite.config.ts 的 API_PROXY），浏览器视角下是同源请求，不再受 CORS 限制；
  * 线上（GitHub Pages，纯静态托管没有代理能力）仍直连原来的绝对地址，请求方式与现状完全一致。
  *
- * CORS 本身放行的接口（如 https://date.nager.at）不在此列，保持直连；
- * GitHub 用户信息虽然 api.github.com 自身放行 CORS，但改由 tool-proxy 转发
- * （/github/user/<login>，Worker 侧带 PAT 规避匿名限流），因此同样走代理映射。
+ * CORS 本身放行的第三方接口（如 https://date.nager.at）不在此列，保持直连。
+ * GitHub REST 代理（<BASE>/github/api/*）与 GitHub 用户信息（<BASE>/github/user/*）
+ * 也一律纳入代理：合并后 Worker 的 CORS 由 `*` 收窄成了显式白名单，
+ * 只有 localhost:3000 在列，走同源代理才能覆盖 127.0.0.1 / 局域网 IP 等本地打开方式。
  */
 
-/** 远端地址 → 本地同源代理前缀；必须与 vite.config.ts 的 API_PROXY 保持一致 */
+import { config } from '@/config'
+
+/** 正则转义：把基址里的 `.` 等元字符按字面量匹配 */
+function escapeRegExp(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * 远端地址 → 本地同源代理前缀；必须与 vite.config.ts 的 API_PROXY 保持一致。
+ *
+ * 5 个后端合并为 1 个 Worker 后只剩一个基址，因此这里只有一条映射
+ * （article / gitee / github / cline / friend-link 全部由它覆盖）。
+ * 匹配模式按 config.backendBase 动态生成，所以用 VITE_BACKEND_BASE 换域名时
+ * 这里会自动跟随，无需改代码。
+ */
 const PROXY_ROUTES: ReadonlyArray<readonly [RegExp, string]> = [
-  [/^https:\/\/api\.turing158\.dpdns\.org(?=\/|$)/i, '/api/turing158'],
-  [/^https:\/\/blog\.add-friendlink\.de5\.net(?=\/|$)/i, '/api/friend-apply'],
-  [/^https:\/\/blog\.friendlink\.de5\.net(?=\/|$)/i, '/api/friends'],
-  // tool-proxy：Cline 模型目录（/cline/model/*）+ Gitalk OAuth token（/github_access_token）
-  //              + GitHub 用户信息（/github/user/*）
-  [/^https:\/\/tool-proxy\.turing158\.de5\.net(?=\/|$)/i, '/api/tool-proxy'],
-  // github-proxy：GitHub REST 代理。它的 CORS 已放行 localhost / 线上域名，
-  // 原则上可以直连；映射在此只是为了在 dev 环境可视作同源、便于排查，
-  // 前端调用统一走 src/utils/githubApi.ts（直连绝对地址，不做同源改写）。
-  [/^https:\/\/turing158\.github-proxy\.de5\.net(?=\/|$)/i, '/api/github'],
+  [new RegExp(`^${escapeRegExp(config.backendBase)}(?=/|$)`, 'i'), '/api/turing158'],
 ]
 
 /** 本地 / 内网主机名：命中时走代理（dev server 与 preview 均适用） */

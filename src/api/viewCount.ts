@@ -12,13 +12,14 @@ import blogTip from '@/plugins/blog-tip'
 import zhCN from '@/i18n/locales/zh-CN.json'
 import enUS from '@/i18n/locales/en-US.json'
 import { apiFetch } from '@/utils/apiEndpoint'
+import { config } from '@/config'
 
-// API 基址：始终写后端绝对地址。
+// API 基址：派生自统一后端基址（合并后的单个 Worker，见 src/config.ts）。
 // 本地（dev / preview）由 apiFetch 自动改写成 Vite 代理的同源路径，绕开后端 CORS 白名单；
 // 线上（GitHub Pages）保持直连，与现在的请求方式一致。
 // 可用环境变量 VITE_API_BASE 覆盖
-const API_BASE = import.meta.env.VITE_API_BASE
-  ?? 'https://api.turing158.dpdns.org/article'
+const API_BASE = (import.meta.env.VITE_API_BASE ?? `${config.backendBase}/article`)
+  .replace(/\/+$/, '')
 
 // ==================== 缓存结构 ====================
 
