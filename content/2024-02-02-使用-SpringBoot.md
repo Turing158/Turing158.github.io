@@ -25,11 +25,11 @@ springboot是java的一个框架，他将spring框架的初始化和搭建进行
 
 1. 在IDEA里**文件** > **新建** > **项目**
 
-   ![image-20240130214504538](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947283317_image-20240130214504538.webp)
+   ![image-20240130214504538](https://picco.de5.net/file/SpringBoot-Tutorial/1787947283317_image-20240130214504538.webp)
 
 2. 选择**新建项目**，名称随意，主要是构建系统选择**Maven**，**JDK选择17***[因为要使用SpringBoot3需要JDK17的支持]*
 
-   ![image-20240130214707217](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947285676_image-20240130214717928.webp)
+   ![image-20240130214707217](https://picco.de5.net/file/SpringBoot-Tutorial/1787947285676_image-20240130214717928.webp)
 
 ## 配置Pom
 
@@ -41,7 +41,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 其他的就不需要怎么动
 
-![image-20240130231405249](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947286942_image-20240130231405249.webp)
+![image-20240130231405249](https://picco.de5.net/file/SpringBoot-Tutorial/1787947286942_image-20240130231405249.webp)
 
 1. 添加**Parent**
 
@@ -102,7 +102,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
    一般来说，启动了之后是不会有什么报错或者直接报错后停止的
    
-   ![image-20240201020341498](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947287297_image-20240201020341498.webp)
+   ![image-20240201020341498](https://picco.de5.net/file/SpringBoot-Tutorial/1787947287297_image-20240201020341498.webp)
 
 
 
@@ -172,7 +172,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 5. 在application.java启动类启动，并打开浏览器输入**localhost:8080**即可查看结果
 
-![image-20240207204059405](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947287019_image-20240207204059405.webp)
+![image-20240207204059405](https://picco.de5.net/file/SpringBoot-Tutorial/1787947287019_image-20240207204059405.webp)
 
 ## application
 
@@ -180,7 +180,7 @@ groupId可以起一个你自己想起的，例如：com.xxx
 
 我们先在**resources**文件下新建一个文件**application.properties**或**application.yml**，这个文件是用来设置Springboot的一些配置的，但是目前还没有用到，所以先搁置着
 
-![image-20240202162603439](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947282504_image-20240202162603439.webp)
+![image-20240202162603439](https://picco.de5.net/file/SpringBoot-Tutorial/1787947282504_image-20240202162603439.webp)
 
 # SpringBoot对于现在的使用方式
 
@@ -273,6 +273,6 @@ public String test3(){
 
 3. 启动测试
 
-   ![image-20240207204039342](https://pic.turing158.de5.net/file/SpringBoot-Tutorial/1787947287582_image-20240207204039342.webp)
+   ![image-20240207204039342](https://picco.de5.net/file/SpringBoot-Tutorial/1787947287582_image-20240207204039342.webp)
 
 Springboot的基本用法就这些了，如果还有什么补充，尽管提出

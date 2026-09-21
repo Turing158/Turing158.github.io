@@ -196,7 +196,7 @@ public class Person1Sender {
    }
    ```
    
-   效果：![image-20240127203952345](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947165053_image-20240127203952345.webp)
+   效果：![image-20240127203952345](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947165053_image-20240127203952345.webp)
    
    ------
    
@@ -257,7 +257,7 @@ public class Person1Sender {
 
    4. 运行之后，看下控制台
 
-   ![image-20240125220318175](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947157403_image-20240125220318175.webp)
+   ![image-20240125220318175](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947157403_image-20240125220318175.webp)
 
    突然发现，**person2**和**person3**接收的消息都是**一半一半**的，都是你一个我一个
 
@@ -303,7 +303,7 @@ public class Person1Sender {
    
    3. 重新启动运行下看控制台
    
-   ![image-20240125221409953](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947166895_image-20240125221409953.webp)
+   ![image-20240125221409953](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947166895_image-20240125221409953.webp)
    
    真**神奇，3接4的消息，2接1的消息，也是一半一半
    
@@ -333,7 +333,7 @@ public class Person1Sender {
 
    交换机的主要功能是**接收**消息并且**转发**到绑定的队列，不会储存消息
 
-   ![概念图](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947158333_c65b0e005c026a9582234fd16da583ba.webp)
+   ![概念图](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947158333_c65b0e005c026a9582234fd16da583ba.webp)
 
    交换机有**四种**类型
 
@@ -558,7 +558,7 @@ public class Person1Sender {
       
    调用**Person5Sender**的四个方法，并加点延迟区分一下，可得结果↓
       
-   ![image-20240129150721894](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947159536_image-20240129150721894.webp)
+   ![image-20240129150721894](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947159536_image-20240129150721894.webp)
       
    其实者很明显了
          
@@ -703,7 +703,7 @@ public class Person1Sender {
       
    查看效果
       
-   ![image-20240129171749376](https://pic.turing158.de5.net/file/SpringBoot-RabbitMQ/1787947162477_image-20240129171749376.webp)
+   ![image-20240129171749376](https://picco.de5.net/file/SpringBoot-RabbitMQ/1787947162477_image-20240129171749376.webp)
       
    **总结**：很明显了，这三个队列无论发送者是什么路由键，他都会将消息发送到三个队列中
 
