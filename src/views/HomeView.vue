@@ -690,7 +690,8 @@ function mapGiteeEvent(ev: any): ActivityItem | null {
 }
 
 async function fetchGiteeTimeline(): Promise<any[]> {
-  const target = 'https://api.turing158.dpdns.org/gitee/contribution'
+  // 走统一后端基址（域名池首项），不要硬编码域名 —— 否则切到备用域名后这里会失效
+  const target = `${config.backendBase}/gitee/contribution`
   const sources = [
     target,
     `https://gitee.com/${giteeUser}/contribution_timeline?limit=10`,

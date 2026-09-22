@@ -36,12 +36,27 @@
  */
 
 import { config } from '@/config'
-import { apiUrl } from '@/utils/apiEndpoint'
+import { buildPoolUrl, getActiveIndex, runWithPool, splitPoolUrl } from '@/utils/backendPool'
+import { isLocalEnv } from '@/utils/apiEndpoint'
 
 /** 默认请求头；与 Worker 侧 buildGithubHeaders 的语义对齐 */
 export const GITHUB_API_HEADERS = {
   Accept: 'application/vnd.github+json',
 } as const
+
+/**
+ * 由「不含域名的资源路径」拼出当前 active 域名下的可请求地址。
+ *
+ * @param path 以 `/repos/...` 或 `/users/...` 开头的资源路径，**不要包含 owner / login**。
+ *             前导斜杠可有可无；query string 直接跟在后面。
+ */
+function activeGithubPath(path: string): string {
+  const rest = path.replace(/^\/+/, '')
+  // config.github.apiBase 形如 <BASE>/github/api → 取其中的路径部分
+  const split = splitPoolUrl(config.github.apiBase)
+  const prefix = split ? split.path.replace(/\/+$/, '') : '/github/api'
+  return `${prefix}/${rest}`
+}
 
 /**
  * 拼接一条经 Worker 转发的 GitHub API 地址（已按环境完成本地代理改写）。
@@ -54,9 +69,7 @@ export const GITHUB_API_HEADERS = {
  *             前导斜杠可有可无；query string 直接跟在后面。
  */
 export function githubUrl(path: string): string {
-  const base = config.github.apiBase.replace(/\/+$/, '')
-  const rest = path.replace(/^\/+/, '')
-  return apiUrl(`${base}/${rest}`)
+  return buildPoolUrl(getActiveIndex(), activeGithubPath(path), isLocalEnv ? 'proxy' : 'remote')
 }
 
 /**
@@ -74,25 +87,38 @@ export function githubOptions(init?: {
 }
 
 /**
- * 带兜底的 GitHub 请求：优先走代理，代理不可用（Worker 未部署、被墙、网络抖动）时
- * 自动回退直连 api.github.com，回退时按 Worker 的规则补回 owner。
+ * 带兜底的 GitHub 请求。降级顺序：
+ *   ① 池内轮转 —— 当前 active 域名的同源代理（本地）/ 绝对地址（线上）
+ *   ② 池内下一个域名（额度耗尽 / 被墙 / 宕机时自动切换）
+ *   ③ 最后才回退直连 api.github.com（按 Worker 规则补回 owner）
+ *
+ * ⚠️ 与改造前的区别：旧版在**第一个域名**失败时就跳去 api.github.com，
+ * 而匿名直连只有 60 次/小时，等于把请求丢进了必死的通道。现在先把域名池
+ * 用完，直连仅作为最终兜底。
  *
  * @param path 以 `/repos/...` 或 `/users/...` 开头的路径（不含 owner / login）
  * @param init 同 fetch 的 RequestInit
  */
 export async function githubFetch(path: string, init?: RequestInit): Promise<Response> {
-  const proxied = githubUrl(path)
   const headers = { ...GITHUB_API_HEADERS, ...((init?.headers as Record<string, string>) ?? {}) }
+  const resourcePath = activeGithubPath(path)
 
   try {
-    const res = await fetch(proxied, { ...init, headers })
-    // 代理正常工作时直接返回；5xx 才值得回退，4xx 是 GitHub 的真实答复
-    if (res.status < 500) return res
-  } catch {
-    // 落到下面的直连兜底
+    return await runWithPool(
+      async (_entry, index) => {
+        const target = buildPoolUrl(index, resourcePath, isLocalEnv ? 'proxy' : 'remote')
+        const res = await fetch(target, { ...init, headers })
+        // 拿到响应即为成功；5xx 表示该域名确实有问题 → 抛出以触发轮转
+        if (res.status < 500) return res
+        throw new Error(`GitHub proxy ${res.status}`)
+      },
+      { callerSignal: init?.signal ?? undefined }
+    )
+  } catch (err) {
+    // 池内全部失败 → 最终兜底：直连 api.github.com（匿名，仅 60 次/小时）
+    if (init?.signal?.aborted) throw err
+    return fetch(fallbackUrl(path), { ...init, headers })
   }
-
-  return fetch(fallbackUrl(path), { ...init, headers })
 }
 
 /**

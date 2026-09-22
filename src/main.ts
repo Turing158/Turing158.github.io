@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from './router'
 import i18n from './i18n'
 import { useTheme } from './composables/useTheme'
+import { installAxiosPoolInterceptor } from './utils/axiosPool'
 import BlogTip from './plugins/blog-tip'
 import 'highlight.js/styles/github.css'
 import 'github-markdown-css/github-markdown-light.css'
@@ -20,6 +21,9 @@ import './styles/gitalk-theme.css'
 const app = createApp(App)
 const pinia = createPinia()
 const head = createHead()
+
+// 后端域名池：让 5 处 axios 调用点也具备「额度耗尽自动换域名」的能力（挂全局拦截器）
+installAxiosPoolInterceptor()
 
 app.use(pinia)
 app.use(router)

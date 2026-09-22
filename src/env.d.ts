@@ -3,6 +3,11 @@
 interface ImportMetaEnv {
   /** 统一后端基址（合并后的单个 Cloudflare Worker），未配置时用默认值（见 src/config.ts） */
   readonly VITE_BACKEND_BASE?: string
+  /**
+   * 后端域名池（逗号分隔，顺序即优先级）。
+   * 未配置时 = VITE_BACKEND_BASE + 内置备用域名；额度耗尽时自动向后切换。
+   */
+  readonly VITE_BACKEND_POOL?: string
   /** 浏览量 API 基址，未配置时由 VITE_BACKEND_BASE 派生（见 src/api/viewCount.ts） */
   readonly VITE_API_BASE?: string
   /** Cline 推荐/免费模型 API 基址，未配置时由 VITE_BACKEND_BASE 派生（见 src/config.ts） */

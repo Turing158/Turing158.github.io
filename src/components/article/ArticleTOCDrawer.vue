@@ -29,7 +29,7 @@
               :class="{ active: activeId === heading.id }"
               @click.prevent="scrollTo(heading.id)"
             >
-              {{ heading.text }}
+              <span class="toc-text">{{ heading.text }}</span>
             </a>
             <!-- H3 子级容器，带展开/折叠动画 -->
             <transition name="toc-expand">
@@ -44,7 +44,7 @@
                     :class="{ active: activeId === sub.id }"
                     @click.prevent="scrollTo(sub.id)"
                   >
-                    {{ sub.text }}
+                    <span class="toc-text">{{ sub.text }}</span>
                   </a>
                 </template>
               </div>
@@ -58,7 +58,7 @@
               :class="{ active: activeId === heading.id }"
               @click.prevent="scrollTo(heading.id)"
             >
-              {{ heading.text }}
+              <span class="toc-text">{{ heading.text }}</span>
             </a>
           </template>
         </template>
@@ -312,42 +312,120 @@ onUnmounted(() => {
 }
 
 .toc-link {
+  position: relative;
   display: flex;
   align-items: center;
   font-size: 0.85rem;
   color: var(--text-secondary);
   padding: 7px 12px;
   --pxs: 2px; clip-path: var(--pxc);
-  transition: all 0.2s;
+  /* 背景交给 ::before 叠加层，这里只过渡文字颜色 */
+  transition: color 0.2s ease;
   line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-left: 2px solid transparent;
   flex-shrink: 0;
+  /* isolation + ::before z-index:-1：背景层压在文字之下（与侧边栏 .nav-link 同构）。
+     overflow: hidden 会把伪元素裁在 padding box 内，故强调条用 ::after 贴 padding box
+     左缘（left: 0）；padding-left 最小 12px，4px 宽的条不会压到文字 */
+  isolation: isolate;
 
-  &:hover {
-    color: var(--accent);
-    background: var(--bg-secondary);
+  /* 背景层：透明度 0→1 + 缩放 0.9→1 弹入，底色随 hover/active 切换 */
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--bg-secondary);
+    opacity: 0;
+    transform: scale(0.9);
+    transition:
+      opacity 0.2s ease,
+      background-color 0.2s ease,
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  &.active {
-    color: var(--accent);
-    font-weight: 600;
-    border-left-color: var(--accent);
-    background: var(--bg-secondary);
-  }
-
+  /* 结构层级规则必须声明在状态规则之前：二者特异度相同（.toc-link.h2 与
+     .toc-link:hover/.active 均为 0,2,0），靠后声明者胜出，所以这里的 color
+     会被下面的 hover / active 正常覆盖；若挪到状态规则之后则会盖掉它们 */
   &.h2 {
     font-weight: 600;
-    color: var(--text-primary);
     cursor: pointer;
+    color: var(--text-primary);
   }
 
   &.h3 {
     padding-left: 28px;
     font-size: 0.8rem;
   }
+
+  &:hover {
+    color: var(--accent);
+
+    &::before {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .toc-text {
+      transform: translateX(3px);
+    }
+
+    /* 与侧边栏一致：hover 才亮出左侧强调条 */
+    &::after {
+      transform: translateY(-50%) scaleY(1);
+      opacity: 1;
+    }
+  }
+
+  /* 激活态：与侧边栏 .nav-link.active 同款——实心"亮色"底 + accent-ink 文字。
+     用 --accent-bright 而非 --accent：后者偏暗，配 accent-ink 对比度仅约 3.5:1，
+     而亮色底在四套主题下都能到 8:1 以上（与侧边栏的 --text-sidebar-active 同位） */
+  &.active {
+    color: var(--accent-ink);
+    font-weight: 600;
+
+    &::before {
+      background-color: var(--accent-bright);
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* 实心底上再叠强调条会糊在一起：与侧边栏 .nav-link.active .nav-indicator 一样隐藏 */
+    &::after {
+      opacity: 0;
+      transform: translateY(-50%) scaleY(0);
+    }
+  }
+
+  /* 左侧强调条：与侧边栏 .nav-indicator 同构，靠 scaleY 弹入而非宽度跳变。
+     H3 与 H2 左缘相同（.toc-h3-group 无横向内边距，缩进由 .h3 的 padding-left 提供），
+     故无需按层级偏移 */
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 4px;
+    height: 60%;
+    background: var(--accent);
+    transform: translateY(-50%) scaleY(0);
+    transform-origin: center;
+    opacity: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    pointer-events: none;
+  }
+}
+
+.toc-text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* H3 子级容器 */

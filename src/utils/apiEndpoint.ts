@@ -1,38 +1,23 @@
 /**
- * 外部 API 端点解析（本地走代理 / 线上直连）
+ * 外部 API 端点解析（域名池 + 本地代理 / 线上直连）
  *
- * 背景：后端（合并后的 Cloudflare Worker）的 CORS 白名单由 NORMAL_OPERATE_ALLOW_ORIGIN
- * 控制，只放行线上站点域名与 localhost:3000。本地用 127.0.0.1、局域网 IP 或其它端口
- * 打开时，浏览器会直接拦截跨域请求。
+ * 背景一（CORS）：后端 Worker 的 CORS 白名单由 NORMAL_OPERATE_ALLOW_ORIGIN 控制，
+ * 只放行线上站点域名与 localhost:3000。本地用 127.0.0.1、局域网 IP 或其它端口
+ * 打开时会被浏览器拦截，因此本地把远端绝对地址改写成 Vite 代理的同源路径
+ * （映射见 vite.config.ts 的 API_PROXY）；线上（GitHub Pages 纯静态托管）直连绝对地址。
  *
- * 方案：本地（dev server / vite preview）把远端绝对地址改写成 Vite 代理的同源路径
- * （代理映射见 vite.config.ts 的 API_PROXY），浏览器视角下是同源请求，不再受 CORS 限制；
- * 线上（GitHub Pages，纯静态托管没有代理能力）仍直连原来的绝对地址，请求方式与现状完全一致。
+ * 背景二（额度轮换）：多个域名分属不同 Cloudflare 账号，各有 10 万次/天免费额度。
+ * 任一域名耗尽（Error 1027）时自动切到下一个 —— 判定与状态机全在
+ * src/utils/backendPool.ts；本模块只负责「按 active 域名拼地址」并接上轮转重试。
  *
  * CORS 本身放行的第三方接口（如 https://date.nager.at）不在此列，保持直连。
- * GitHub REST 代理（<BASE>/github/api/*）与 GitHub 用户信息（<BASE>/github/user/*）
- * 也一律纳入代理：合并后 Worker 的 CORS 由 `*` 收窄成了显式白名单，
- * 只有 localhost:3000 在列，走同源代理才能覆盖 127.0.0.1 / 局域网 IP 等本地打开方式。
  */
 
-import { config } from '@/config'
-
-/** 正则转义：把基址里的 `.` 等元字符按字面量匹配 */
-function escapeRegExp(input: string): string {
-  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-/**
- * 远端地址 → 本地同源代理前缀；必须与 vite.config.ts 的 API_PROXY 保持一致。
- *
- * 5 个后端合并为 1 个 Worker 后只剩一个基址，因此这里只有一条映射
- * （article / gitee / github / cline / friend-link 全部由它覆盖）。
- * 匹配模式按 config.backendBase 动态生成，所以用 VITE_BACKEND_BASE 换域名时
- * 这里会自动跟随，无需改代码。
- */
-const PROXY_ROUTES: ReadonlyArray<readonly [RegExp, string]> = [
-  [new RegExp(`^${escapeRegExp(config.backendBase)}(?=/|$)`, 'i'), '/api/turing158'],
-]
+import {
+  buildPoolUrl,
+  runWithPool,
+  splitPoolUrl,
+} from '@/utils/backendPool'
 
 /** 本地 / 内网主机名：命中时走代理（dev server 与 preview 均适用） */
 const LOCAL_HOST_PATTERN =
@@ -50,26 +35,60 @@ function isLocalHost(): boolean {
 export const isLocalEnv = import.meta.env.DEV || isLocalHost()
 
 /**
- * 把远端绝对地址解析为当前环境应使用的地址
+ * 把远端绝对地址解析为当前环境应使用的地址。
  *
- * - 本地：命中代理映射则返回同源代理路径，未命中原样返回
- * - 线上：原样返回（与现在的直连方式一致）
+ * - 本地：池内地址 → 同源代理路径；其余原样返回
+ * - 线上：原样返回（直连绝对地址）
  */
 export function apiUrl(url: string): string {
   if (!isLocalEnv) return url
-  for (const [pattern, prefix] of PROXY_ROUTES) {
-    if (pattern.test(url)) return url.replace(pattern, prefix)
-  }
-  return url
+  const split = splitPoolUrl(url)
+  if (!split) return url
+  return buildPoolUrl(split.index, split.path, 'proxy')
 }
 
 /**
- * 带兜底的 fetch：优先走本地代理；代理不可用时（例如直接用普通静态服务器打开构建产物）
- * 自动回退到远端直连，行为与改造前一致。
+ * 带兜底的 fetch。
+ *
+ * 池内地址（后端 Worker）：接上「额度耗尽自动换域名」的轮转 —— 某个域名网络层
+ * 失败时改用池内下一个域名重试同一个请求。同时保留既有的「本地代理不可用
+ * （404/405/501，例如用普通静态服务器打开构建产物）则回退远端直连」行为。
+ *
+ * 非池内地址（date.nager.at、corsproxy.io 等）：行为与改造前完全一致。
  */
 export async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
-  const proxied = apiUrl(url)
-  if (proxied === url) return fetch(url, init)
+  const split = splitPoolUrl(url)
+
+  if (!split) {
+    // 非池内地址（第三方接口）：保持改造前的行为 —— 本地代理不可用时回退直连
+    const proxied = apiUrl(url)
+    if (proxied === url) return fetch(url, init)
+    return fetchNonPoolWithFallback(proxied, url, init)
+  }
+
+  const path = split.path
+  return runWithPool(
+    async (entry, index) => {
+      const direct = `${entry.base}${path}`
+      // 线上：直接请求该域名；失败由 runWithPool 接管轮转
+      if (!isLocalEnv) return fetch(direct, init)
+      // 本地：先走同源代理；仅在「代理本身不存在」时才直连（见下）
+      return fetchViaLocalProxy(buildPoolUrl(index, path, 'proxy'), direct, init)
+    },
+    { callerSignal: init?.signal ?? undefined }
+  )
+}
+
+/**
+ * 非池内地址的兜底：代理不可用（网络层失败，或返回 404/405/501 表示服务器未配代理）
+ * 时回退直连。这些地址不属于域名池，没有「换域名」可谈，因此保持改造前的宽松行为。
+ */
+async function fetchNonPoolWithFallback(
+  proxied: string,
+  fallback: string,
+  init?: RequestInit
+): Promise<Response> {
+  if (proxied === fallback) return fetch(proxied, init)
 
   let res: Response | null = null
   try {
@@ -78,9 +97,40 @@ export async function apiFetch(url: string, init?: RequestInit): Promise<Respons
     res = null
   }
 
-  // 404/405/501 通常意味着当前服务器没有配置代理，回退直连
   if (res && res.status !== 404 && res.status !== 405 && res.status !== 501) {
     return res
   }
-  return fetch(url, init)
+  return fetch(fallback, init)
+}
+
+/**
+ * 本地环境的池内请求：优先同源代理。
+ *
+ * ⚠️ 与改造前的关键差别 —— 只有当代理【返回了 404/405/501】（说明当前服务器压根没配代理，
+ * 例如直接用普通静态服务器打开构建产物）才回退直连；若代理是【网络层失败】（抛异常），
+ * 则原样抛出，交给 runWithPool 去轮转域名。
+ *
+ * 改造前无论何种失败都回退直连，等于把请求打向同一个（可能已额度耗尽的）域名，
+ * 使域名池形同虚设。
+ */
+async function fetchViaLocalProxy(
+  proxied: string,
+  direct: string,
+  init?: RequestInit
+): Promise<Response> {
+  if (proxied === direct) return fetch(proxied, init)
+
+  let res: Response
+  try {
+    res = await fetch(proxied, init)
+  } catch (err) {
+    // 代理不可达 → 不盲目直连，让上层换域名重试
+    throw err
+  }
+
+  // 404/405/501 通常意味着当前服务器没有配置代理，此时才回退该域名的直连地址
+  if (res.status === 404 || res.status === 405 || res.status === 501) {
+    return fetch(direct, init)
+  }
+  return res
 }

@@ -26,6 +26,38 @@ const BACKEND_BASE = (
   import.meta.env.VITE_BACKEND_BASE || 'https://api.turing158.dpdns.org'
 ).replace(/\/+$/, '')
 
+// --- 后端域名池 ---
+// 下列域名各自部署了同一个合并版 Worker，但分属不同 Cloudflare 账号
+// （免费额度按【账号】计：10 万次/天，00:00 UTC 重置）。
+// 任一域名额度耗尽（Error 1027）、被墙或宕机时，由 src/utils/backendPool.ts
+// 自动切到下一个域名继续服务 —— 数组顺序即优先级。
+//
+// 可用环境变量 VITE_BACKEND_POOL 覆盖（逗号分隔）；未配置时 = BACKEND_BASE + 下列备用域名。
+// ⚠️ 池内每个域名都必须部署了同一个合并版 Worker，否则切过去会大面积 404。
+const BUILTIN_BACKUP_BASES = [
+  'https://api.turing158.de5.net',
+  'https://api.friendlink.de5.net',
+  'https://api.github-proxy.de5.net',
+  'https://api.add-friendlink.de5.net',
+]
+
+const BACKEND_POOL: readonly string[] = (() => {
+  const raw = import.meta.env.VITE_BACKEND_POOL
+  const list = raw
+    ? raw.split(',').map((s) => s.trim()).filter(Boolean)
+    : [BACKEND_BASE, ...BUILTIN_BACKUP_BASES]
+  // 去重（按去掉尾斜杠后的值），保持声明顺序
+  const seen = new Set<string>()
+  const out: string[] = []
+  for (const item of list) {
+    const normalized = item.replace(/\/+$/, '')
+    if (!normalized || seen.has(normalized)) continue
+    seen.add(normalized)
+    out.push(normalized)
+  }
+  return out.length > 0 ? out : [BACKEND_BASE]
+})()
+
 // --- GitHub 配置 ---
 const GITHUB_OWNER = import.meta.env.VITE_GITHUB_OWNER || 'Turing158'
 const GITHUB_REPO = import.meta.env.VITE_GITHUB_REPO || 'Turing158.github.io'
@@ -94,8 +126,13 @@ const CLINE_MODELS_ALL_API = import.meta.env.VITE_CLINE_ALL_API
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 export const config = {
-  /** 统一后端基址：合并后的单个 Worker（见文件头注释的路径分工） */
+  /** 统一后端基址：合并后的单个 Worker（见文件头注释的路径分工）；= 域名池首项 */
   backendBase: BACKEND_BASE,
+  /**
+   * 后端域名池：顺序即优先级，额度耗尽时由 backendPool 自动向后切换。
+   * 池首项始终等于 pageTitle 所用的 backendBase（见上方 BACKEND_POOL 构造）。
+   */
+  backendPool: BACKEND_POOL,
   github: {
     owner: GITHUB_OWNER,
     repo: GITHUB_REPO,
