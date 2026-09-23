@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="gb-art" width="64" height="630" viewBox="0 0 64 630" style="--gb-idle:0.35" role="group" aria-label="发光浆果藤，7 枚切片">
+<title>发光浆果藤 · 随机生长</title>
+<desc>每片藤蔓有一至两处额外的叶簇、嫩芽或卷须。浆果悬停时在 150 毫秒内从常态亮度过渡至 85%，移开后恢复。内联 SVG 或 object 支持交互。</desc>
+<style>
+.gb-art .gb-base,.gb-art .gb-decoration,.gb-art .gb-berry-shape{pointer-events:none}
+.gb-art .gb-berry{cursor:pointer;outline:none}
+.gb-art .gb-halo{opacity:var(--gb-idle,.35);transition:opacity 150ms ease-in-out;pointer-events:none}
+.gb-art .gb-hit{fill:transparent;pointer-events:all}
+.gb-art .gb-touch-hit{display:none}
+.gb-art .gb-focus{fill:none;stroke:#a9bb72;stroke-width:1;stroke-dasharray:2 2;opacity:0;pointer-events:none}
+.gb-art .gb-berry:focus-visible .gb-halo,.gb-art .gb-berry:active .gb-halo{opacity:.85}
+.gb-art .gb-berry:focus-visible .gb-focus{opacity:1}
+@media(hover:hover){.gb-art .gb-berry:hover .gb-halo{opacity:.85}}
+@media(pointer:coarse){.gb-art .gb-touch-hit{display:block}}
+</style>
+<defs><radialGradient id="gb-light">
+  <stop offset="0" stop-color="#ffd371" stop-opacity=".6"/>
+  <stop offset=".4" stop-color="#ffbe46" stop-opacity=".22"/>
+  <stop offset="1" stop-color="#ffad32" stop-opacity="0"/>
+</radialGradient>
+<g id="gb-vine-base" shape-rendering="crispEdges">
+    <!-- The continuous stem: matching four-pixel edges, no caps or gaps. -->
+    <path fill="#3e5935" d="M30 0h4v10h-2v14h2v12h2v20h-2v16h-2v10h2v8h-4v-8h-2V70h2V56h2V38h-2V26h-2V8h2z"/>
+    <path fill="#7f9950" d="M31 0h2v9h-2v16h2v12h2v18h-2v16h-2v12h2v7h-2v-7h-2V71h2V55h2V37h-2V25h-2V9h2z"/>
+    <path fill="#afbb70" d="M31 0h1v8h-1zM29 16h1v7h-1zM33 49h1v6h-1zM31 60h1v8h-1zM31 84h1v6h-1z"/>
+
+    <!-- Alternating, stepped leaves and small branching stems. -->
+    <path fill="#48683b" d="M30 20h-4v-4h-4v-4h-8v6h2v4h6v2h8z"/>
+    <path fill="#74974e" d="M16 13h6v3h4v4h-6v-2h-4z"/>
+    <path fill="#a8bc6a" d="M16 13h6v2h-6z"/>
+    <path fill="#314f32" d="M20 19h6v2h-6z"/>
+
+    <path fill="#425f35" d="M32 30h6v-4h4v-6h8v4h-2v6h-6v2H32z"/>
+    <path fill="#6c9047" d="M40 26h4v-4h4v4h-2v3h-6z"/>
+    <path fill="#a2b962" d="M44 21h5v2h-5z"/>
+
+    <path fill="#425d34" d="M33 66h6v-4h6v-4h6v6h-3v4h-9v2h-6z"/>
+    <path fill="#72974d" d="M39 64h6v-4h4v4h-3v2h-7z"/>
+    <path fill="#a4b965" d="M45 60h4v2h-4z"/>
+
+    <path fill="#46673a" d="M30 76h-5v-3h-5v-4h-7v5h3v4h8v2h6z"/>
+    <path fill="#73934c" d="M15 70h5v4h5v3h-7v-3h-3z"/>
+    <path fill="#a6b769" d="M15 70h5v2h-5z"/>
+
+    <!-- A pair of hanging berries forms one readable timeline node. -->
+    <path fill="#46653a" d="M31 31h-5v4h-3v6h3v-4h3v-3h2zM33 34h5v5h3v4h-3v-2h-3v-5h-2z"/>
+    <path fill="#8da259" d="M26 34h3v2h-3v5h-2v-4h2zM36 36h2v5h-2z"/>
+</g>
+<g id="gb-berries" shape-rendering="crispEdges">    <path fill="#805d2b" d="M21 40h8v2h2v8h-2v3h-8v-2h-2v-8h2z"/>
+    <path fill="#d88b2e" d="M21 42h8v8h-2v2h-5v-2h-2v-6h1z"/>
+    <path fill="#f5bc4e" d="M22 42h5v2h2v5h-7v-2h-1v-3h1z"/>
+    <path fill="#ffe394" d="M22 43h4v4h-4z"/>
+    <path fill="#fff4c2" d="M22 43h2v2h-2z"/>
+    <path fill="#a7b461" d="M23 39h4v3h-2v1h-2z"/>
+
+    <path fill="#89622c" d="M35 43h8v2h2v9h-2v2h-8v-2h-2v-9h2z"/>
+    <path fill="#e19a32" d="M35 45h8v8h-2v2h-5v-2h-2v-6h1z"/>
+    <path fill="#ffd169" d="M36 45h5v2h2v5h-7v-2h-1v-3h1z"/>
+    <path fill="#ffecad" d="M36 46h4v4h-4z"/>
+    <path fill="#fff8d0" d="M36 46h2v2h-2z"/>
+    <path fill="#aac16c" d="M37 42h4v3h-2v1h-2z"/></g>
+<g id="gb-extra-leaf" shape-rendering="crispEdges">
+  <path fill="#48683b" d="M0 -1h5v2h5v2h5v2h-2V4H8V2H3V1H0zM7 1h5v2h4v2h3v4h-6V7h-3V5H7z"/>
+  <path fill="#8eac59" d="M9 2h3v2h4v2h2v2h-5V6h-3V4H9z"/>
+  <path fill="#bdd17b" d="M10 3h2v2h-2zM14 5h3v1h-3z"/>
+</g>
+<g id="gb-extra-shoot" shape-rendering="crispEdges">
+  <path fill="#48683b" d="M0 -1h4v2h4v2h4v2h4v2h-2V6h-4V4H6V2H0zM4 0h5v3H6V2H4zM10 5h6v2h2v2h-5V7h-3z"/>
+  <path fill="#91ae5e" d="M5 0h4v2H5zM12 6h4v2h-3V7h-1z"/>
+  <path fill="#c0cf82" d="M6 0h3v1H6zM13 6h3v1h-3z"/>
+</g>
+<g id="gb-extra-curl" shape-rendering="crispEdges">
+  <path fill="#4d703e" d="M0 -1h5v2h5v2h5v2h3v4h-6V7h4V6h-3V5H9V3H4V1H0z"/>
+  <path fill="#9bb969" d="M1 0h4v2h5v2h4v1h-5V3H4V1H1zM16 6h1v2h-3V7h2z"/>
+</g></defs>
+<g class="gb-segment" data-segment="0" data-extra-count="1" transform="translate(0 0)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="curl" data-angle="-4" data-size="0.78" data-direction="left-out" transform="translate(32 62) scale(-1 1)"><path fill="#4d703e" d="M0 -1h4v1h-4zM0 0h1v1h-1zM4 0h4v1h-4zM9 1h3v1h-3zM11 2h1v1h-1zM10 3h1v1h-1zM10 4h1v1h-1zM10 5h2v1h-2z"/><path fill="#9bb969" d="M1 0h3v1h-3zM3 1h5v1h-5zM7 2h4v1h-4zM13 3h1v1h-1zM11 4h3v1h-3z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 1 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="1" data-extra-count="2" transform="translate(0 90)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="curl" data-angle="6" data-size="0.97" data-direction="right-out" transform="translate(31 8) scale(1 1)"><path fill="#4d703e" d="M0 -1h3v1h-3zM0 0h1v1h-1zM5 1h1v1h-1zM8 2h1v1h-1zM11 4h3v1h-3zM13 5h1v1h-1zM14 6h3v1h-3zM11 7h2v1h-2zM16 7h1v1h-1zM11 8h6v1h-6z"/><path fill="#9bb969" d="M1 0h4v1h-4zM4 1h1v1h-1zM4 2h4v1h-4zM8 3h1v1h-1zM8 4h3v1h-3zM12 5h1v1h-1zM13 7h3v1h-3z"/></g><g class="gb-decoration" shape-rendering="crispEdges" data-kind="leaf" data-angle="-21" data-size="0.88" data-direction="right-out" transform="translate(30 75) scale(1 1)"><path fill="#48683b" d="M9 -3h1v1h-1zM13 -3h1v1h-1zM2 -2h2v1h-2zM6 -2h2v1h-2zM11 -2h1v1h-1zM15 -2h2v1h-2zM0 -1h8v1h-8zM17 -1h1v1h-1zM0 0h1v1h-1zM7 0h2v1h-2zM16 0h2v1h-2zM10 1h1v1h-1zM13 1h2v1h-2z"/><path fill="#8eac59" d="M8 -2h2v1h-2zM12 -2h3v1h-3zM8 -1h1v1h-1zM11 -1h2v1h-2zM14 -1h3v1h-3zM10 0h6v1h-6z"/><path fill="#bdd17b" d="M10 -2h1v1h-1zM9 -1h2v1h-2zM13 -1h1v1h-1z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 2 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="2" data-extra-count="2" transform="translate(0 180)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="shoot" data-angle="-79" data-size="0.72" data-direction="right-up" transform="translate(32 26) scale(1 1)"><path fill="#48683b" d="M7 -12h2v1h-2zM7 -11h2v1h-2zM8 -10h1v1h-1zM5 -9h1v1h-1zM4 -8h3v1h-3zM3 -7h3v1h-3zM3 -6h1v1h-1zM2 -5h2v1h-2zM0 -3h2v1h-2zM0 -2h2v1h-2zM-1 -1h3v1h-3zM0 0h1v1h-1z"/><path fill="#91ae5e" d="M7 -10h1v1h-1zM7 -9h1v1h-1zM2 -6h1v1h-1zM1 -4h1v1h-1z"/><path fill="#c0cf82" d="M6 -10h1v1h-1zM6 -9h1v1h-1zM1 -6h1v1h-1zM1 -5h1v1h-1z"/></g><g class="gb-decoration" shape-rendering="crispEdges" data-kind="shoot" data-angle="-65" data-size="0.88" data-direction="left-up" transform="translate(30 75) scale(-1 1)"><path fill="#48683b" d="M12 -12h1v1h-1zM10 -11h1v1h-1zM12 -11h2v1h-2zM9 -10h1v1h-1zM12 -10h1v1h-1zM9 -9h1v1h-1zM12 -9h1v1h-1zM6 -8h3v1h-3zM11 -8h1v1h-1zM6 -7h4v1h-4zM5 -6h1v1h-1zM4 -5h2v1h-2zM2 -4h1v1h-1zM5 -4h1v1h-1zM0 -3h3v1h-3zM0 -2h3v1h-3zM-1 -1h3v1h-3zM0 0h2v1h-2z"/><path fill="#91ae5e" d="M11 -10h1v1h-1zM11 -9h1v1h-1zM9 -8h1v1h-1zM4 -7h1v1h-1zM4 -6h1v1h-1zM2 -5h2v1h-2zM3 -4h1v1h-1z"/><path fill="#c0cf82" d="M10 -10h1v1h-1zM10 -9h1v1h-1zM3 -7h1v1h-1zM3 -6h1v1h-1z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 3 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="3" data-extra-count="2" transform="translate(0 270)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="curl" data-angle="20" data-size="0.78" data-direction="left-out" transform="translate(31 24) scale(-1 1)"><path fill="#4d703e" d="M0 -1h1v1h-1zM0 0h3v1h-3zM3 2h2v1h-2zM6 3h1v1h-1zM7 5h2v1h-2zM9 6h1v1h-1zM9 7h2v1h-2zM7 8h2v1h-2zM11 8h1v1h-1zM9 9h2v1h-2z"/><path fill="#9bb969" d="M2 1h2v1h-2zM2 2h1v1h-1zM4 3h2v1h-2zM6 4h1v1h-1zM5 5h2v1h-2zM8 6h1v1h-1zM9 8h2v1h-2z"/></g><g class="gb-decoration" shape-rendering="crispEdges" data-kind="curl" data-angle="-4" data-size="0.77" data-direction="left-out" transform="translate(32 60) scale(-1 1)"><path fill="#4d703e" d="M0 -1h4v1h-4zM0 0h1v1h-1zM4 0h4v1h-4zM9 1h3v1h-3zM11 2h1v1h-1zM10 3h1v1h-1zM13 3h1v1h-1zM10 4h1v1h-1zM13 4h1v1h-1zM10 5h3v1h-3z"/><path fill="#9bb969" d="M1 0h3v1h-3zM3 1h5v1h-5zM7 2h4v1h-4zM11 4h2v1h-2z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 4 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="4" data-extra-count="1" transform="translate(0 360)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="leaf" data-angle="-34" data-size="0.83" data-direction="right-up" transform="translate(32 83) scale(1 1)"><path fill="#48683b" d="M8 -5h1v1h-1zM11 -5h1v1h-1zM14 -5h2v1h-2zM6 -4h2v1h-2zM16 -4h1v1h-1zM2 -3h1v1h-1zM5 -3h2v1h-2zM14 -3h1v1h-1zM1 -2h4v1h-4zM6 -2h3v1h-3zM10 -2h1v1h-1zM13 -2h1v1h-1zM0 -1h2v1h-2zM0 0h1v1h-1z"/><path fill="#8eac59" d="M12 -5h1v1h-1zM8 -4h1v1h-1zM10 -4h2v1h-2zM13 -4h3v1h-3zM7 -3h1v1h-1zM10 -3h4v1h-4zM9 -2h1v1h-1zM12 -2h1v1h-1z"/><path fill="#bdd17b" d="M13 -5h1v1h-1zM9 -4h1v1h-1zM12 -4h1v1h-1zM8 -3h2v1h-2z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 5 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="5" data-extra-count="1" transform="translate(0 450)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="shoot" data-angle="-51" data-size="0.82" data-direction="right-up" transform="translate(30 16) scale(1 1)"><path fill="#48683b" d="M11 -8h1v1h-1zM13 -8h1v1h-1zM10 -7h1v1h-1zM13 -7h2v1h-2zM8 -6h1v1h-1zM10 -6h1v1h-1zM13 -6h1v1h-1zM7 -5h3v1h-3zM12 -5h1v1h-1zM5 -4h2v1h-2zM9 -4h1v1h-1zM1 -3h2v1h-2zM5 -3h1v1h-1zM0 -2h3v1h-3zM-1 -1h3v1h-3zM0 0h2v1h-2z"/><path fill="#91ae5e" d="M12 -7h1v1h-1zM12 -6h1v1h-1zM5 -5h1v1h-1zM10 -5h2v1h-2zM4 -4h1v1h-1zM3 -3h1v1h-1z"/><path fill="#c0cf82" d="M11 -7h1v1h-1zM4 -6h1v1h-1zM11 -6h1v1h-1zM4 -5h1v1h-1zM3 -4h1v1h-1z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 6 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+<g class="gb-segment" data-segment="6" data-extra-count="1" transform="translate(0 540)">
+  <use class="gb-base" href="#gb-vine-base"/>
+  <g class="gb-decoration" shape-rendering="crispEdges" data-kind="curl" data-angle="0" data-size="0.89" data-direction="right-out" transform="translate(31 71) scale(1 1)"><path fill="#4d703e" d="M0 -1h4v1h-4zM0 0h1v1h-1zM4 1h5v1h-5zM9 2h4v1h-4zM12 3h1v1h-1zM12 4h4v1h-4zM15 5h1v1h-1zM11 6h5v1h-5z"/><path fill="#9bb969" d="M1 0h3v1h-3zM8 2h1v1h-1zM8 3h4v1h-4zM14 5h1v1h-1z"/></g>
+  <g class="gb-berry" tabindex="0" focusable="true" role="img" aria-label="第 7 簇发光浆果，悬停或聚焦时变亮">
+    <g class="gb-halo"><ellipse cx="32" cy="44" rx="27" ry="28" fill="url(#gb-light)"/><ellipse cx="32" cy="44" rx="16" ry="18" fill="url(#gb-light)"/></g>
+    <use class="gb-berry-shape" href="#gb-berries"/>
+    <rect class="gb-hit" x="15" y="35" width="34" height="25" rx="3"/>
+    <rect class="gb-hit gb-touch-hit" x="10" y="25" width="44" height="44" rx="4"/>
+    <rect class="gb-focus" x="13" y="33" width="38" height="29" rx="3"/>
+  </g>
+</g>
+</svg>

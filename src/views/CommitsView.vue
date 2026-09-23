@@ -48,14 +48,9 @@
         >
           <!-- 左侧：纯图形列 -->
           <div class="tl-graph">
-            <!-- 主干竖线（始终在中心） -->
-            <div
-              v-if="index > 0"
-              class="tl-spine tl-spine--top"
-            />
-            <div
-              v-if="index < commits.length - 1"
-              class="tl-spine tl-spine--bottom"
+            <GlowberryVine
+              :variant="index"
+              :label="firstLine(commit.commit.message)"
             />
   
             <!-- 分支曲线 SVG：从上方某处弯曲汇入当前节点 -->
@@ -75,11 +70,6 @@
               <path :d="curve.d" fill="none" class="tl-curve-path" />
             </svg>
   
-            <!-- 节点圆点 -->
-            <div
-              class="tl-dot"
-              :class="{ 'tl-dot--merge': isMerge(commit) }"
-            />
           </div>
   
           <!-- 右侧：提交信息 -->
@@ -184,6 +174,7 @@ import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import GlowberryVine from '@/components/common/GlowberryVine.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
 
@@ -211,12 +202,11 @@ const commits = ref<CommitData[]>([])
 const repoName = computed(() => props.repo || 'StarFall-Minecraft-Launcher')
 
 // ── 布局常量 ──
-const ROW_H = 72    // 每行高度
+const ROW_H = 90    // 藤蔓原始切片高度
 const DOT = 12      // 圆点直径
-const graphW = 56   // 图形列宽度
+const graphW = 64   // 藤蔓原始切片宽度
 const spineX = graphW / 2  // 主干竖线 x 位置（居中）
-const DOT_TOP = 15       // 圆点 top 值
-const DOT_CENTER = DOT_TOP + DOT / 2  // 圆点中心距行顶 = 21px
+const DOT_CENTER = 44   // 浆果中心距行顶
 
 function firstLine(msg: string) { return msg.split('\n')[0].trim() }
 function restLines(msg: string) { return msg.split('\n').slice(1).join('\n').trimEnd() }
@@ -505,56 +495,14 @@ onUnmounted(() => {
   position: relative;
   display: flex;
   align-items: stretch;
-  min-height: 72px;
+  min-height: 90px;
 }
 
 // ── 左侧图形列 ──
 .tl-graph {
   position: relative;
   flex-shrink: 0;
-  width: 56px;
-}
-
-// 主干竖线
-.tl-spine {
-  position: absolute;
-  left: 27px;  // spineX - 1px (线宽一半)
-  width: 2px;
-  background: var(--border);
-  z-index: 0;
-
-  &--top {
-    top: 0;
-    height: 21px;  // 上半段到圆点中心 (dot top:15 + radius:6 = 21)
-  }
-  &--bottom {
-    top: 21px;
-    bottom: 0;
-  }
-}
-
-// 节点圆点
-.tl-dot {
-  position: absolute;
-  top: 15px;
-  left: 50%;
-  transform: translate(-50%, 0);
-  width: 12px;
-  height: 12px;
-  clip-path: var(--pxc-circle);
-  background: var(--accent);
-  z-index: 2;
-  flex-shrink: 0;
-  transition: background 0.2s;
-
-  &:hover{
-    background: var(--accent-hover);
-  }
-
-  &--merge {
-    background: var(--bg-card);
-    border: 2.5px solid var(--accent);
-  }
+  width: 64px;
 }
 
 // 分支曲线
@@ -672,8 +620,6 @@ onUnmounted(() => {
   .commits-view { padding: 20px 12px; }
   .commits-header { flex-direction: column; align-items: flex-start; }
   .header-actions { width: 100%; justify-content: flex-end; }
-  .tl-graph { width: 44px; }
-  .tl-spine { left: 21px; }
 }
 	// ── 展开按钮 ──
 	.tl-msg {
