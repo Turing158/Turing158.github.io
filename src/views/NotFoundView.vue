@@ -98,7 +98,7 @@ const { t } = useI18n()
 // SEO：404 页不应被索引
 useSeo({
   title: computed(() => t('pageTitle.notFound')),
-  url: '#/not-found',
+  url: '/not-found',
   noIndex: true,
 })
 

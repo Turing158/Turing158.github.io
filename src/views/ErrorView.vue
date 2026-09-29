@@ -110,7 +110,7 @@ const errorMessage = ref('')
 // SEO：错误页不应被索引
 useSeo({
   title: computed(() => t('pageTitle.error')),
-  url: '#/error',
+  url: '/error',
   noIndex: true,
 })
 

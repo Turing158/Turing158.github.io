@@ -141,7 +141,7 @@ const { t, tm } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.tools')),
   computed(() => t('seo.tools')),
-  '#/tools',
+  '/tools',
 )
 
 // 组件映射：字符串名 → 异步组件（按需加载，避免 Tools 页全量同步导入）

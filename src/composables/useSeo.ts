@@ -2,6 +2,8 @@ import { computed, unref, type MaybeRef } from 'vue'
 import { useHead } from '@vueuse/head'
 import { useI18n } from 'vue-i18n'
 import { config } from '@/config'
+import { absoluteUrl } from '@/utils/siteUrl'
+import { buildJsonLd } from '@/utils/structuredData'
 
 export interface SeoOptions {
   title?: MaybeRef<string>
@@ -17,7 +19,7 @@ export interface SeoOptions {
   noIndex?: MaybeRef<boolean>
 }
 
-const SITE_URL = 'https://turing158.github.io'
+const SITE_URL = config.site.url
 const DEFAULT_IMAGE = '/icons/icon-512.png'
 const DEFAULT_DESCRIPTION = 'Turing_ICE 的个人博客，分享技术文章、开发工具和学习笔记'
 const DEFAULT_KEYWORDS = ['博客', '技术', 'Vue', '前端', '开发']
@@ -48,11 +50,11 @@ export function useSeo(options: SeoOptions = {}) {
     return SITE_URL + img
   })
 
-  const url = computed(() => {
-    const path = unref(options.url) || ''
-    if (path.startsWith('http')) return path
-    return SITE_URL + '/' + path.replace(/^\//, '')
-  })
+  // canonical / og:url：与构建时预渲染注入的值**必须逐字节一致**
+  // （同一个 absoluteUrl 实现，逐段百分号编码，中文/空格/方括号 slug 不会漏编码）。
+  // 旧实现用 `SITE_URL + '/' + path` 拼字符串，对 '' 产出 `https://site/`、
+  // 对 '/article/x' 产出 `https://site//article/x`（双斜杠）。
+  const url = computed(() => absoluteUrl(unref(options.url) || '/', SITE_URL))
 
   const type = computed(() => unref(options.type) || 'website')
 
@@ -66,65 +68,25 @@ export function useSeo(options: SeoOptions = {}) {
 
   const noIndex = computed(() => unref(options.noIndex) || false)
 
-  // 构建 JSON-LD 结构化数据
-  const jsonLd = computed(() => {
-    const data: Record<string, any> = {
-      '@context': 'https://schema.org',
-    }
-
-    if (type.value === 'article') {
-      data['@type'] = 'Article'
-      data.headline = title.value
-      data.description = description.value
-      data.image = image.value
-      data.author = {
-        '@type': 'Person',
-        name: author.value,
-        url: SITE_URL,
-      }
-      data.publisher = {
-        '@type': 'Organization',
-        name: config.blog.title,
-        logo: {
-          '@type': 'ImageObject',
-          url: SITE_URL + DEFAULT_IMAGE,
-        },
-      }
-      if (publishedTime.value) {
-        data.datePublished = publishedTime.value
-      }
-      if (modifiedTime.value) {
-        data.dateModified = modifiedTime.value
-      }
-      if (tags.value.length > 0) {
-        data.keywords = tags.value.join(', ')
-      }
-      data.mainEntityOfPage = {
-        '@type': 'WebPage',
-        '@id': url.value,
-      }
-    } else if (type.value === 'blog') {
-      data['@type'] = 'Blog'
-      data.name = title.value
-      data.description = description.value
-      data.url = url.value
-    } else {
-      data['@type'] = 'WebSite'
-      data.name = title.value
-      data.description = description.value
-      data.url = url.value
-      data.potentialAction = {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: SITE_URL + '/#/search?q={search_term_string}',
-        },
-        'query-input': 'required name=search_term_string',
-      }
-    }
-
-    return JSON.stringify(data)
-  })
+  // 构建 JSON-LD 结构化数据。
+  // 与构建时预渲染共用 buildJsonLd：@unhead 按内容哈希匹配 script 标签，
+  // 两侧算出的 JSON 必须逐字节一致，否则会留下两份 ld+json。
+  const jsonLd = computed(() =>
+    buildJsonLd({
+      type: type.value as 'website' | 'article' | 'blog',
+      title: title.value,
+      description: description.value,
+      url: url.value,
+      siteUrl: SITE_URL,
+      defaultImage: DEFAULT_IMAGE,
+      blogTitle: config.blog.title,
+      author: author.value,
+      cover: unref(options.image),
+      publishedTime: publishedTime.value,
+      modifiedTime: modifiedTime.value,
+      tags: tags.value,
+    })
+  )
 
   // 使用 @vueuse/head 设置 meta 标签
   useHead({
@@ -201,7 +163,7 @@ export function useArticleSeo(article: MaybeRef<{ title: string; description: st
     title: computed(() => a.value?.title || ''),
     description: computed(() => a.value?.description || ''),
     image: computed(() => a.value?.cover),
-    url: computed(() => `#/article/${a.value?.slug || ''}`),
+    url: computed(() => `/article/${a.value?.slug || ''}`),
     type: 'article',
     publishedTime: computed(() => a.value?.date || ''),
     modifiedTime: computed(() => a.value?.date || ''),

@@ -295,7 +295,7 @@ const { t, locale } = useI18n()
 usePageSeo(
   computed(() => config.blog.title),
   computed(() => t('seo.home')),
-  '#/',
+  '/',
 )
 
 // Gramophone (Gitalk Comments)

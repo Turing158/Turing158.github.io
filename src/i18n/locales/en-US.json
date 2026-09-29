@@ -270,7 +270,7 @@
     "tokenUsageChartName": "Token Usage Chart",
     "tokenUsageChartDesc": "Upload token log files and generate a visualized usage SVG chart in the browser, with customizable styling.",
     "tokenUsageChartTags": ["Token", "Chart", "SVG", "Visualization"],
-    "clineModelsName": "Cline Free Models",
+    "clineModelsName": "Cline Model Lookup",
     "clineModelsDesc": "Fetch Cline's free and recommended AI model lists. Click a tag to copy the model ID.",
     "clineModelsTags": ["Cline", "Free", "Models"],
     "githubInfoName": "View GitHub Info",

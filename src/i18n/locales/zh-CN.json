@@ -312,7 +312,7 @@
     "tokenUsageChartName": "Token 用量图",
     "tokenUsageChartDesc": "上传 Token 日志文件，在浏览器中生成可视化的用量 SVG 图表，支持自定义样式。",
     "tokenUsageChartTags": ["Token", "图表", "SVG", "可视化"],
-    "clineModelsName": "Cline 免费模型",
+    "clineModelsName": "Cline 模型查询",
     "clineModelsDesc": "获取 Cline 提供的免费与推荐 AI 模型列表，点击标签复制模型 ID。",
     "clineModelsTags": ["Cline", "免费", "模型"],
     "githubInfoName": "查看Github信息",

@@ -107,7 +107,7 @@ const currentComponent = computed(() => {
 usePageSeo(
   computed(() => tool.value?.name || t('tools.notFoundTitle')),
   computed(() => tool.value?.description || t('tools.notFoundDescription')),
-  computed(() => `#/tools/${route.params.id || ''}`),
+  computed(() => `/tools/${route.params.id || ''}`),
 )
 
 function goBack() {

@@ -422,7 +422,7 @@ const { t } = useI18n()
 usePageSeo(
   repoName,
   computed(() => t('pageReleases.seoDescription', { repo: repoName.value })),
-  computed(() => `#/release/${repoName.value}`),
+  computed(() => `/release/${repoName.value}`),
 )
 
 const unregisterContextMenu = registerContextProvider((target) => {

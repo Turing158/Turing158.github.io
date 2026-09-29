@@ -32,6 +32,7 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          VITE_SITE_URL: ${{ vars.SITE_URL }}
           VITE_GITHUB_OWNER: ${{ secrets.GITHUB_OWNER }}
           VITE_GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
           VITE_GITALK_CLIENT_ID: ${{ secrets.GITALK_CLIENT_ID }}

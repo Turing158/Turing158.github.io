@@ -9,18 +9,9 @@ import {
   addBlankTargetToLinks,
   enhanceCodeBlocks,
 } from '../utils/htmlPostProcess'
+import { setBuildArticles, type BuildArticle } from './articles-store'
 
-interface ArticleData {
-  slug: string
-  html: string
-  content: string
-  title: string
-  date: string
-  tags: string[]
-  description: string
-  cover?: string
-  htmlFile?: string   // md5(slug) + '.html'，写文件后填充
-}
+interface ArticleData extends BuildArticle {}
 
 async function loadArticles(rootDir: string): Promise<ArticleData[]> {
   const contentDir = resolve(rootDir, 'content')
@@ -82,61 +73,8 @@ function writeArticleHtmlFiles(rootDir: string, articles: ArticleData[]) {
   console.log(`[articles-plugin] Wrote ${articles.length} article HTML files to public/articles/`)
 }
 
-function generateSitemap(rootDir: string, articles: ArticleData[]) {
-  const distDir = resolve(rootDir, 'dist')
-  if (!existsSync(distDir)) {
-    mkdirSync(distDir, { recursive: true })
-  }
-
-  const SITE_URL = 'https://turing158.github.io'
-
-  const staticPages = [
-    { path: '/', priority: '1.0', changefreq: 'daily' },
-    { path: '/#/articles', priority: '0.9', changefreq: 'daily' },
-    { path: '/#/projects', priority: '0.8', changefreq: 'weekly' },
-    { path: '/#/tools', priority: '0.8', changefreq: 'weekly' },
-    { path: '/#/about', priority: '0.7', changefreq: 'monthly' },
-    { path: '/#/friends', priority: '0.6', changefreq: 'monthly' },
-    { path: '/#/releases', priority: '0.6', changefreq: 'weekly' },
-    { path: '/#/commits', priority: '0.5', changefreq: 'daily' },
-  ]
-
-  const today = new Date().toISOString().split('T')[0]
-
-  let xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-`
-
-  for (const page of staticPages) {
-    xml += `  <url>
-    <loc>${SITE_URL}${page.path}</loc>
-    <lastmod>${today}</lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
-  </url>\n`
-  }
-
-  for (const article of articles) {
-    xml += `  <url>
-    <loc>${SITE_URL}/#/article/${article.slug}</loc>
-    <lastmod>${article.date || today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>\n`
-  }
-
-  xml += '</urlset>'
-
-  const sitemapPath = join(distDir, 'sitemap.xml')
-  writeFileSync(sitemapPath, xml, 'utf-8')
-  console.log(`[articles-plugin] Generated sitemap.xml (${staticPages.length + articles.length} URLs)`)
-}
-
 export function articlesPlugin(): Plugin {
   let generated = false
-  let rootDir = ''
-  let loadedArticles: ArticleData[] = []
-  let isBuild = false
 
   return {
     name: 'vite-plugin-articles',
@@ -145,11 +83,11 @@ export function articlesPlugin(): Plugin {
     async configResolved(config) {
       if (generated) return
       generated = true
-      rootDir = config.root
-      isBuild = config.command === 'build'
 
       const articles = await loadArticles(config.root)
-      loadedArticles = articles
+
+      // 共享给 prerender-plugin（生成文章页与 sitemap 用）
+      setBuildArticles(articles)
 
       // 每篇文章生成独立的 HTML 文件，放入 public/articles/
       writeArticleHtmlFiles(config.root, articles)
@@ -178,10 +116,7 @@ export function articlesPlugin(): Plugin {
       console.log(`[articles-plugin] Generated _articles-index.ts (${articles.length} articles)`)
     },
 
-    // sitemap 必须在 dist 写出之后生成，否则会被 emptyOutDir 清掉
-    closeBundle() {
-      if (!isBuild) return
-      generateSitemap(rootDir, loadedArticles)
-    },
+    // sitemap 与各页面的真实 HTML 由 prerender-plugin 在 dist 落盘后统一生成
+    // （必须晚于 emptyOutDir，否则会被清掉）
   }
 }

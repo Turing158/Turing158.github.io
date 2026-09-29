@@ -277,7 +277,7 @@ const { t } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.friends')),
   computed(() => t('seo.friends')),
-  '#/friends',
+  '/friends',
 )
 
 // ── 友链数据 ──

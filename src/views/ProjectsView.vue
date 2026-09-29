@@ -95,7 +95,7 @@ const { t } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.projects')),
   computed(() => t('seo.projects')),
-  '#/projects',
+  '/projects',
 )
 
 const router = useRouter()

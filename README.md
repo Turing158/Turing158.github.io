@@ -9,10 +9,10 @@
 - **Markdown 文章** — 构建时渲染（markdown-it + highlight.js），代码高亮、代码块一键复制
 - **文章目录（TOC）** — 自动生成 H2/H3 层级目录，手风琴折叠、滚动进度追踪
 - **阅读时间估算** — 中文约 300 字/分钟、英文约 200 词/分钟
-- **文章浏览量** — 基于 LeanCloud 存储，列表与详情页展示
+- **文章浏览量** — 基于 Supabase（经 Worker 代理），列表与详情页展示
 - **评论系统** — 基于 gitalk，以 GitHub Issue 作为评论存储（OAuth 经代理转发）
 - **全站搜索** — 基于 fuse.js 的全文搜索，支持文章与工具
-- **SEO 优化** — 每个页面独立设置 title / meta / OG / JSON-LD，构建时自动生成 `sitemap.xml`
+- **SEO 优化** — 每个页面都有独立真实 URL（`/article/xxx` 而非 `/#/article/xxx`），构建时为每条路由预渲染完整 HTML，首屏即含正文与 meta；canonical / og / sitemap 统一域名
 - **文章分享** — 复制链接、微信、微博、Twitter 分享按钮
 
 ### 🧰 在线工具箱（21 个纯前端工具）
@@ -62,7 +62,7 @@
 | 构建 | Vite 6 + vite-plugin-pwa |
 | 语言 | TypeScript ~5.6 (strict mode) |
 | 样式 | Less (scoped styles + CSS 变量主题) |
-| 路由 | vue-router 4 (Hash 模式) |
+| 路由 | vue-router 4 (History 模式 + 构建时预渲染) |
 | 状态管理 | pinia 3 |
 | 国际化 | vue-i18n 9 (zh-CN / en-US) |
 | Markdown | markdown-it + markdown-it-anchor + gray-matter + highlight.js |
@@ -80,6 +80,8 @@
 
 ## 🗺 页面导览
 
+URL **不带 `#`**，可直接分享、收藏与刷新（每页都有真实文件，刷新不会 404）。
+
 | 路径 | 页面 | 说明 |
 |------|------|------|
 | `/` | 主页 | 时钟 + 节假日倒计时 + 最近提交 + 最近文章 |
@@ -90,15 +92,18 @@
 | `/commits/:repo?` | 提交记录 | 追踪仓库的最近提交 |
 | `/tools` `/tools/:id` | 工具箱 | 21 个在线工具与工具详情页 |
 | `/achievements` | 成就 | 已解锁徽章与待解锁条件 |
+| `/friends` | 友链 | 友链展示与在线申请 |
 | `/about` | 关于 | 关于站长 |
 
 另有若干不套用主布局的独立落地页：`/sfmc`（StarFall 启动器）、`/starfall-forum`（论坛）、`/sfmc-jar`（JAR 下载页）。
 
+> 改版前的老链接（`/#/article/xxx`）仍可访问 —— 前端会自动跳转到对应的新地址。
+
 ## 🔍 核心模块解析
 
-- **文章系统** — 构建时 `articles-plugin` Vite 插件扫描 `content/*.md`，解析 frontmatter 并预渲染 HTML，生成文章索引（`src/generated/_articles.ts`）；运行时 `useArticles` 读取本地索引，同时可合并 GitHub API 数据，结果由 Pinia 缓存 5 分钟
+- **文章系统** — 构建时 `articles-plugin` Vite 插件扫描 `content/*.md`，解析 frontmatter 并预渲染 HTML，生成文章索引（`src/generated/_articles-index.ts`）与正文片段；`prerender-plugin` 再为每篇文章产出真实页面。运行时 `useArticles` 读取本地索引，同时可合并 GitHub API 数据，结果由 Pinia 缓存 5 分钟
 - **搜索系统** — 文章加载完成后由 `useSearch` 建立 fuse.js 索引（标题 / 标签 / 描述 / 正文），工具元数据来自 `src/data/tools.ts` 一并纳入搜索
-- **SEO 系统** — 各视图通过 `useSeo` / `useArticleSeo` 设置独立 meta，随语言切换响应式更新；`sitemap.xml` 在构建收尾阶段自动写出
+- **SEO 系统** — 各视图通过 `useSeo` / `useArticleSeo` 设置独立 meta，随语言切换响应式更新；构建时为每条路由预渲染首屏 HTML 与 meta，并生成 `sitemap.xml`。规范域名统一由 `VITE_SITE_URL` 决定
 - **主题系统** — 3 套主题以 CSS 变量定义于 `src/styles/variables.css`，通过 `<html>` 上的 `data-theme` 属性切换并持久化到 localStorage
 - **成就系统** — `useAchievements` 追踪路由访问、文章阅读、工具使用等行为，解锁记录存于 localStorage； Konami Code 彩蛋复用同一套解锁机制并触发撒花
 - **PWA** — vite-plugin-pwa 配置 `autoUpdate` 注册、SPA 离线回退与多级运行时缓存，配套安装提示、更新提示与离线降级页三个组件
@@ -118,7 +123,10 @@
 部分成就不直接显示解锁条件，需要你在站点里探索——试试键盘上那串经典的上上下下左右左右 BA。
 
 **文章浏览量数据存在哪里？**
-由 LeanCloud 提供 存储，仅记录每篇文章的累计访问次数。
+由 Supabase 存储（经自建 Cloudflare Worker 代理），仅记录每篇文章的累计访问次数。
+
+**URL 为什么不再带 `#` 了？**
+原先用 hash 路由（`/#/article/xxx`），因为 GitHub Pages 不会把未知路径交给 `index.html` —— `/article/xxx` 会直接 404。现在构建时会为**每条路由预渲染一个真实 HTML 文件**，所以 URL 变成正常的 `/article/xxx`，可以直接分享、收藏，也能被搜索引擎当作独立页面收录。老链接仍会自动跳转。
 
 **本地开发时接口报跨域（CORS）怎么办？**
 无需手动处理。后端服务的 CORS 白名单只放行线上域名，因此本地（`localhost` / `127.0.0.1` / 局域网 IP / 其它端口）会自动改走 Vite 同源代理（`vite.config.ts` 的 `API_PROXY`，`npm run dev` 与 `npm run preview` 均生效），线上 GitHub Pages 仍按原来的方式直连绝对地址。新增接口时在两个文件的映射表各加一条即可，详见 `CLAUDE.md` 的「本地跨域与接口代理」。
@@ -135,23 +143,23 @@
 │   │   ├── sidebar/       # 侧边栏图标组件
 │   │   └── tools/         # 工具箱组件（21 个在线工具）
 │   ├── composables/       # 组合式函数（useArticles、useSeo、useTheme、useAchievements 等）
-│   ├── data/              # 静态数据（项目列表、工具元数据、成就定义）
+│   ├── data/              # 静态数据（项目、工具、路由元数据、发行仓库列表）
 │   ├── generated/         # 构建时自动生成的文章索引（勿手动编辑）
 │   ├── i18n/              # 国际化语言包（zh-CN / en-US）
 │   ├── layouts/           # 主布局（侧边栏 + 内容区 + TOC）
-│   ├── plugins/           # Vite 插件（articles-plugin）与消息提示插件（blog-tip）
-│   ├── router/            # 路由配置
+│   ├── plugins/           # Vite 插件（articles / prerender）与消息提示插件（blog-tip）
+│   ├── router/            # 路由配置（history 模式 + 旧 hash 链接兜底）
 │   ├── stores/            # Pinia 状态管理
 │   ├── styles/            # 全局样式与 3 套主题变量
 │   ├── types/             # TypeScript 类型定义
-│   ├── utils/             # 工具函数（md5 等）
+│   ├── utils/             # 工具函数（siteUrl、structuredData、md5 等）
 │   ├── views/             # 页面视图
 │   │   └── standalone/    # 独立落地页（不套用主布局）
 │   ├── config.ts          # 全局配置（.env 优先，含默认值）
 │   └── main.ts            # 入口文件
-├── scripts/               # 独立脚本（sitemap、PWA 图标生成）
+├── scripts/               # 独立脚本（PWA 图标生成）
 ├── patches/               # patch-package 补丁
 ├── .github/workflows/     # GitHub Actions 部署配置
 ├── .env.example           # 环境变量模板
-└── vite.config.ts         # Vite 配置（含 PWA）
+└── vite.config.ts         # Vite 配置（含 PWA 与预渲染插件）
 ```

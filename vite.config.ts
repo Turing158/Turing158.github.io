@@ -3,6 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
 import { articlesPlugin } from './src/plugins/articles-plugin'
+import { prerenderPlugin } from './src/plugins/prerender-plugin'
 
 // ── 后端域名池 ──
 // 多个域名各自部署了同一个合并版 Worker（源码 D:\EducationalData\cf\merged），
@@ -78,6 +79,7 @@ export default defineConfig({
   plugins: [
     vue(),
     articlesPlugin(),
+    prerenderPlugin(),
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
@@ -89,8 +91,9 @@ export default defineConfig({
         theme_color: '#4a7c59',
         background_color: '#f5f0e8',
         display: 'standalone',
-        scope: './',
-        start_url: './',
+        // history 路由下必须是根路径绝对地址（原先的 './' 配 hash 路由才成立）
+        scope: '/',
+        start_url: '/',
         orientation: 'portrait-primary',
         categories: ['blog', 'technology'],
         icons: [
@@ -112,29 +115,41 @@ export default defineConfig({
             name: '文章列表',
             short_name: '文章',
             description: '查看所有文章',
-            url: './#/articles',
+            url: '/articles',
             icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
           },
           {
             name: '工具集',
             short_name: '工具',
             description: '开发者工具',
-            url: './#/tools',
+            url: '/tools',
             icons: [{ src: 'icons/icon-192.png', sizes: '192x192' }],
           },
         ],
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // 预渲染出的页面（/article/**、/tools/** 等约 50 个 HTML）不进 precache：
+        // 它们体积可观，且离线时由 navigateFallback 兜底即可，无需逐个预缓存。
+        globIgnores: [
+          '**/article/**',
+          '**/tools/**',
+          '**/release/**',
+          '**/404.html',
+        ],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB，允许大文件缓存
         skipWaiting: true,
         clientsClaim: true,
         // SPA 离线回退：导航请求失败时返回 index.html
         navigateFallback: 'index.html',
-        // 排除不需要回退的路径（如 API 请求）
+        // 排除不需要回退的路径（如 API 请求）；
+        // 预渲染页已存在真实文件，排除掉以免 SW 用 index.html 遮蔽它们
         navigateFallbackDenylist: [
           /^\/api\//, // GitHub API 请求
           /^\/icons\//, // 图标文件已在 precache 中
+          /^\/article\//, // 预渲染的文章页
+          /^\/tools\//, // 预渲染的工具详情页
+          /^\/release\//, // 预渲染的发行详情页
         ],
         runtimeCaching: [
           {
@@ -225,7 +240,10 @@ export default defineConfig({
       },
     },
   },
-  base: './',
+  // history 路由必须用根路径绝对基址。
+  // 原先的 './'（相对）会让深层页面（/article/x/）把资源解析成
+  // /article/x/assets/... → 全部 404 白屏。
+  base: '/',
   build: {
     outDir: 'dist',
   },

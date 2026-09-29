@@ -59,77 +59,60 @@
           </div>
 
           <div v-else class="cline-body">
-            <!-- 免费模型 -->
-            <div class="cline-section">
-              <label class="tool-label">{{ $t('tools.clineModels.freeSectionTitle') }}</label>
-              <div v-if="freeModels.length === 0" class="empty-state">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">{{ $t('tools.clineModels.empty') }}</span>
-              </div>
-              <div v-else class="model-tags">
-                <span
-                  v-for="model in freeModels"
-                  :key="model.id"
-                  class="model-tag px-fade"
-                  :title="tooltip(model)"
-                  @click="copyId(model)"
-                >{{ model.name }}</span>
-              </div>
-            </div>
+            <!-- 折叠面板：默认只展开「免费模型」 -->
+            <section
+              v-for="section in sections"
+              :key="section.key"
+              class="cline-collapse"
+              :class="{ open: expandedSections[section.key] }"
+            >
+              <button
+                :id="`cline-collapse-head-${section.key}`"
+                type="button"
+                class="cline-collapse-head"
+                :aria-expanded="expandedSections[section.key]"
+                :aria-controls="`cline-collapse-body-${section.key}`"
+                @click="toggleSection(section.key)"
+              >
+                <svg
+                  class="cline-collapse-chevron"
+                  :class="{ 'is-open': expandedSections[section.key] }"
+                  width="12" height="7" viewBox="0 0 12 7" fill="none" aria-hidden="true"
+                >
+                  <path
+                    d="M1 1L6 6L11 1"
+                    stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"
+                  />
+                </svg>
+                <span>{{ $t(section.titleKey) }}</span>
+                <span v-if="section.models.length" class="cline-collapse-count">{{ section.models.length }}</span>
+              </button>
 
-            <!-- 推荐模型 -->
-            <div class="cline-section">
-              <label class="tool-label">{{ $t('tools.clineModels.recommendedSectionTitle') }}</label>
-              <div v-if="recommendedModels.length === 0" class="empty-state">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">{{ $t('tools.clineModels.empty') }}</span>
+              <!-- collapsed 时 overflow + 0fr 已裁掉内容，inert 兜底防止键盘焦点落入 -->
+              <div
+                :id="`cline-collapse-body-${section.key}`"
+                class="cline-collapse-body"
+                :inert="!expandedSections[section.key]"
+              >
+                <div class="cline-collapse-inner">
+                  <div class="cline-collapse-content">
+                    <div v-if="section.models.length === 0" class="empty-state">
+                      <span class="empty-icon">📭</span>
+                      <span class="empty-text">{{ $t('tools.clineModels.empty') }}</span>
+                    </div>
+                    <div v-else class="model-tags">
+                      <span
+                        v-for="model in section.models"
+                        :key="model.id"
+                        class="model-tag px-fade"
+                        :title="tooltip(model)"
+                        @click="copyId(model)"
+                      >{{ model.name }}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div v-else class="model-tags">
-                <span
-                  v-for="model in recommendedModels"
-                  :key="model.id"
-                  class="model-tag px-fade"
-                  :title="tooltip(model)"
-                  @click="copyId(model)"
-                >{{ model.name }}</span>
-              </div>
-            </div>
-
-            <!-- Cline Pass 模型 -->
-            <div class="cline-section">
-              <label class="tool-label">{{ $t('tools.clineModels.clinePassSectionTitle') }}</label>
-              <div v-if="clinePassModels.length === 0" class="empty-state">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">{{ $t('tools.clineModels.empty') }}</span>
-              </div>
-              <div v-else class="model-tags">
-                <span
-                  v-for="model in clinePassModels"
-                  :key="model.id"
-                  class="model-tag px-fade"
-                  :title="tooltip(model)"
-                  @click="copyId(model)"
-                >{{ model.name }}</span>
-              </div>
-            </div>
-
-            <!-- Cline Cloud 模型 -->
-            <div class="cline-section">
-              <label class="tool-label">{{ $t('tools.clineModels.clineCloudSectionTitle') }}</label>
-              <div v-if="clineCloudModels.length === 0" class="empty-state">
-                <span class="empty-icon">📭</span>
-                <span class="empty-text">{{ $t('tools.clineModels.empty') }}</span>
-              </div>
-              <div v-else class="model-tags">
-                <span
-                  v-for="model in clineCloudModels"
-                  :key="model.id"
-                  class="model-tag px-fade"
-                  :title="tooltip(model)"
-                  @click="copyId(model)"
-                >{{ model.name }}</span>
-              </div>
-            </div>
+            </section>
           </div>
         </Transition>
       </div>
@@ -333,6 +316,28 @@ function onTabKeydown(event: KeyboardEvent, current: ClineTab) {
   if (!next || next.value === current) return
   switchTab(next.value)
   nextTick(() => document.getElementById(`cline-tab-${next.value}`)?.focus())
+}
+
+// ── 推荐面板折叠 ──
+type ClineSectionKey = 'free' | 'recommended' | 'clinePass' | 'clineCloud'
+
+const sections = computed(() => [
+  { key: 'free' as ClineSectionKey, titleKey: 'tools.clineModels.freeSectionTitle', models: freeModels.value },
+  { key: 'recommended' as ClineSectionKey, titleKey: 'tools.clineModels.recommendedSectionTitle', models: recommendedModels.value },
+  { key: 'clinePass' as ClineSectionKey, titleKey: 'tools.clineModels.clinePassSectionTitle', models: clinePassModels.value },
+  { key: 'clineCloud' as ClineSectionKey, titleKey: 'tools.clineModels.clineCloudSectionTitle', models: clineCloudModels.value },
+])
+
+/** 默认只展开「免费模型」 */
+const expandedSections = ref<Record<ClineSectionKey, boolean>>({
+  free: true,
+  recommended: false,
+  clinePass: false,
+  clineCloud: false,
+})
+
+function toggleSection(key: ClineSectionKey) {
+  expandedSections.value[key] = !expandedSections.value[key]
 }
 
 // ── 搜索 ──
@@ -661,17 +666,76 @@ function copyId(model: ClineModel) {
   color: var(--text-secondary);
 }
 
-/* Transition 只接受单个子节点，两个 section 需包一层；间距与 .cline-models 保持一致 */
+/* Transition 只接受单个子节点，各折叠面板需包一层 */
 .cline-body {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
-.cline-section {
+/* ── 折叠面板 ── */
+.cline-collapse-head {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
+  width: 100%;
+  padding: 7px 12px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.cline-collapse-head:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-secondary));
+}
+
+.cline-collapse-chevron {
+  flex-shrink: 0;
+  transition: transform 0.25s ease;
+}
+
+.cline-collapse-chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.cline-collapse-count {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  padding: 1px 8px;
+  --pxs: 2px; clip-path: var(--pxc);
+}
+
+/* 折叠动画：grid 行高 0fr ↔ 1fr（与 FriendsView 的 apply-more 同款） */
+.cline-collapse-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.cline-collapse.open .cline-collapse-body {
+  grid-template-rows: 1fr;
+}
+
+.cline-collapse-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* 内边距放在最里层，折叠时才能随行高一起收拢 */
+.cline-collapse-content {
+  padding: 10px 2px 2px;
 }
 
 .model-tags {

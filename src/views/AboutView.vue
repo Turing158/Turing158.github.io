@@ -139,7 +139,7 @@ const { t } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.about')),
   computed(() => t('seo.about')),
-  '#/about',
+  '/about',
 )
 
 const name = 'Turing_ICE'

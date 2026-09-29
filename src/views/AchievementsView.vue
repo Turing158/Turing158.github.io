@@ -67,7 +67,7 @@ const { t } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.achievements')),
   computed(() => t('seo.achievements')),
-  '#/achievements',
+  '/achievements',
 )
 
 const {

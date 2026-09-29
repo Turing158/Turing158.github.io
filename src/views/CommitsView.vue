@@ -377,7 +377,7 @@ const { t } = useI18n()
 usePageSeo(
   repoName,
   computed(() => t('pageCommits.seoDescription', { repo: repoName.value })),
-  computed(() => `#/commits/${repoName.value}`),
+  computed(() => (repoName.value ? `/commits/${repoName.value}` : '/commits')),
 )
 
 const unregisterContextMenu = registerContextProvider((target) => {

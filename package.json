@@ -8,6 +8,7 @@
     "build": "vite build",
     "build:icons": "node scripts/generate-icons.mjs",
     "preview": "vite preview",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
     "postinstall": "patch-package",
     "typecheck": "vue-tsc --noEmit"
   },

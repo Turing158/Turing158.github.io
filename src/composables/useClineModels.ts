@@ -4,7 +4,8 @@
  * 数据源（均经 tool-proxy 转发，规避浏览器 CORS）：
  * - `config.cline.apiBase`（/cline/model/recommended）：免费 + 推荐模型的精选列表，驱动「推荐」面板；
  * - `config.cline.allApi`（/cline/model/all）：OpenRouter 全量模型目录（{ data: [...] }），
- *   驱动搜索 Tab —— 目录一次加载后做本地过滤，无需后端搜索接口。
+ *   驱动搜索 Tab —— 目录一次加载后做本地过滤，无需后端搜索接口；
+ *   搜索时免费 / Cline Pass / Cline Cloud 三组精选数据也并入搜索范围（这些模型可能不在目录里）。
  *
  * 含 5 分钟模块级缓存，供 ClineModelsTool 组件使用。
  */
@@ -270,11 +271,24 @@ export function useClineModels() {
     return ok && cachedAll !== null
   }
 
-  /** 本地过滤：在全量目录里按关键词匹配（关键词为空则返回完整目录） */
+  /**
+   * 搜索池：目录之外并入「免费 / Cline Pass / Cline Cloud」三组精选数据，
+   * 按 id 去重且精选数据优先（同名模型以 Cline 精选的名称 / 描述为准）。
+   */
+  function buildSearchPool(): ClineModel[] {
+    return dedupeById([
+      ...(cachedFree ?? []),
+      ...(cachedClinePass ?? []),
+      ...(cachedClineCloud ?? []),
+      ...(cachedAll ?? []),
+    ])
+  }
+
+  /** 本地过滤：按关键词在搜索池里匹配；关键词为空则返回目录本身（默认列表） */
   function filterAllModels(query: string): ClineModel[] {
     const needle = query.toLowerCase()
-    const pool = cachedAll ?? []
-    return needle ? pool.filter((model) => matchesKeyword(model, needle)) : pool
+    if (!needle) return cachedAll ?? []
+    return buildSearchPool().filter((model) => matchesKeyword(model, needle))
   }
 
   /**
@@ -290,9 +304,10 @@ export function useClineModels() {
     visibleCount.value = SEARCH_PAGE_SIZE
 
     try {
-      // 全量目录是搜索的数据源；拉取失败时给出重试入口，而不是谎报「无结果」
-      const ok = await fetchClineAll()
-      if (!ok) {
+      // 目录与免费/PASS/CLOUD 精选并行拉取（推荐面板通常已拉过，这里直接命中缓存）；
+      // 精选拉取失败只让搜索范围退回目录，不阻塞搜索本身
+      const [, allOk] = await Promise.all([fetchClineModels(), fetchClineAll()])
+      if (!allOk) {
         await waitPanelShown()
         searchError.value = true
         return

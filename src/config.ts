@@ -85,6 +85,17 @@ const GITHUB_USER_API = (
 // --- Gitee 配置 ---
 const GITEE_OWNER = import.meta.env.VITE_GITEE_OWNER || 'turing-ice'
 
+// --- 站点域名 ---
+// canonical / og:url / sitemap.xml 的**唯一**来源。
+// ⚠️ 必须与 CNAME 文件里的 GitHub Pages 自定义域一致：GH Pages 会把
+// `*.github.io` 301 到自定义域，若这里写 turing158.github.io，canonical 就指向
+// 一个 301 地址，Google 会自行另选规范 URL。
+// 构建时（prerender-plugin / articles-plugin）走 process.env.VITE_SITE_URL，
+// 运行时走 import.meta.env，两侧取值保持一致。
+const SITE_URL = (
+  import.meta.env.VITE_SITE_URL || 'https://blog.turing158.cc.cd'
+).replace(/\/+$/, '')
+
 // --- 博客元信息 ---
 const BLOG_TITLE = 'Turing_ICE'
 const BLOG_AUTHOR = 'Turing158'
@@ -126,6 +137,10 @@ const CLINE_MODELS_ALL_API = import.meta.env.VITE_CLINE_ALL_API
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 export const config = {
+  /** 站点域名：canonical / og:url / sitemap 的唯一来源（见上方 SITE_URL 注释） */
+  site: {
+    url: SITE_URL,
+  },
   /** 统一后端基址：合并后的单个 Worker（见文件头注释的路径分工）；= 域名池首项 */
   backendBase: BACKEND_BASE,
   /**

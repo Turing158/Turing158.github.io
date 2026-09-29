@@ -114,7 +114,7 @@ const { t } = useI18n()
 usePageSeo(
   computed(() => t('pageTitle.releases')),
   computed(() => t('seo.releases')),
-  '#/releases',
+  '/releases',
 )
 
 const { loading, error, releases, fetchReleases } = useReleases()

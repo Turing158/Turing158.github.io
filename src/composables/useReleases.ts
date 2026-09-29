@@ -8,15 +8,8 @@ import { ref } from 'vue'
 import axios from 'axios'
 import type { Release } from '@/types/search'
 import { githubOptions, githubUrl } from '@/utils/githubApi'
+import { RELEASE_REPOS } from '@/data/releases'
 
-const RELEASE_REPOS = [
-  'StarFall-Minecraft-Launcher',
-  'SFMC',
-  'StarFall-Vue',
-  'StarFall-SpringBoot',
-  'MemeMomo',
-  'CodeCraft',
-]
 const CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
 // 模块级缓存
