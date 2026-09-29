@@ -70,7 +70,7 @@
                   {{ $t('releases.download') }}
                   <ExternalLinkIcon />
                 </Button>
-                <!-- 暂无独立页面的仓库保留按钮但禁用（如 MemeMomo / CodeCraft） -->
+                <!-- 暂无独立页面的仓库保留按钮但禁用（如 MemeMomo） -->
                 <Button
                   size="small"
                   :disabled="!getStandalonePage(release.repo)"
@@ -137,6 +137,7 @@ function getStandalonePage(repo: string): string | null {
     'SFMC': '/sfmc-jar',
     'StarFall-Vue': '/starfall-forum',
     'StarFall-SpringBoot': '/starfall-forum',
+    'CodeCraft': 'https://codecraft.cc.cd/',
   }
   return map[repo] ?? null
 }
@@ -145,7 +146,12 @@ function goToStandalone(repo: string) {
   // 无独立页面的仓库按钮为禁用态，点击不生效
   const path = getStandalonePage(repo)
   if (!path) return
-  router.push(path)
+  // 外部站点（如 CodeCraft 官网）新标签页打开，站内路由走 router
+  if (/^https?:\/\//.test(path)) {
+    open(path)
+  } else {
+    router.push(path)
+  }
 }
 
 onMounted(() => {

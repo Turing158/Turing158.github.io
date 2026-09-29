@@ -23,6 +23,9 @@
         </h1>
       </div>
 
+      <!-- 选项区顶部条带：苔藓洞顶，替换原虚线分隔 -->
+      <div class="sidebar-nav-divider sidebar-nav-divider--top" aria-hidden="true"></div>
+
       <nav class="sidebar-nav">
         <router-link
           v-for="item in navItems"
@@ -62,6 +65,9 @@
           </span>
         </a>
       </nav>
+
+      <!-- 选项区底部条带：草皮地面，替换原虚线分隔 -->
+      <div class="sidebar-nav-divider sidebar-nav-divider--bottom" aria-hidden="true"></div>
 
       <div class="sidebar-footer">
         <div class="theme-switcher">
@@ -448,7 +454,6 @@ const toggleLang = () => {
 .sidebar-header {
   padding: 32px 24px 24px;
   text-align: center;
-  border-bottom: 2px dashed rgba(255, 255, 255, 0.14);
 }
 
 .avatar-wrap {
@@ -508,10 +513,30 @@ const toggleLang = () => {
   50% { opacity: 0; }
 }
 
+/* 选项区上下装饰条带：苔藓洞顶 + 草皮地面（120px 无缝平铺单元）。
+   放在滚动区之外，导航滚动时固定不动；nav 的上下 padding
+   为条带里垂下的浆果 / 耸起的花丛预留间距（26 / 14px）。 */
+.sidebar-nav-divider {
+  flex: none;
+  height: 18px;
+  background-repeat: repeat-x;
+  background-position: 0 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+.sidebar-nav-divider--top {
+  background-image: url('@/assets/sidebar-moss-top.svg');
+}
+
+.sidebar-nav-divider--bottom {
+  background-image: url('@/assets/sidebar-grass-bottom.svg');
+}
+
 .sidebar-nav {
   flex: 1;
   min-height: 0;
-  padding: 16px 12px;
+  padding: 26px 12px 14px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -677,7 +702,6 @@ const toggleLang = () => {
 .sidebar-footer {
   padding: 16px;
   padding-bottom: max(16px, env(safe-area-inset-bottom, 16px));
-  border-top: 2px dashed rgba(255, 255, 255, 0.14);
   display: flex;
   flex-direction: column;
   gap: 12px;

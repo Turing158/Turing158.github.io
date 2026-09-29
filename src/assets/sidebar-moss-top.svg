@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="18" viewBox="0 0 120 18">
+  <!-- 选项区顶部条带：苔藓洞顶。120×18 无缝平铺单元（240px 侧边栏恰好重复 2 次），
+       苔盖压住条带上缘，垂滴、叶片与浆果悬在条带内部，导航项由 .sidebar-nav 的 padding-top 让位 -->
+  <!-- 苔藓主体 -->
+  <rect x="0" y="0" width="120" height="8" fill="#2E3E26"/>
+  <!-- 色块补丁 -->
+  <rect x="6" y="2" width="10" height="4" fill="#3A4C2C"/>
+  <rect x="28" y="0" width="14" height="6" fill="#3A4C2C"/>
+  <rect x="52" y="3" width="8" height="4" fill="#3A4C2C"/>
+  <rect x="70" y="1" width="10" height="5" fill="#3A4C2C"/>
+  <rect x="96" y="2" width="12" height="4" fill="#3A4C2C"/>
+  <!-- 亮部 -->
+  <rect x="10" y="1" width="6" height="2" fill="#526B2E"/>
+  <rect x="33" y="4" width="4" height="2" fill="#526B2E"/>
+  <rect x="58" y="1" width="4" height="2" fill="#526B2E"/>
+  <rect x="86" y="3" width="6" height="2" fill="#526B2E"/>
+  <rect x="110" y="0" width="6" height="2" fill="#526B2E"/>
+  <rect x="20" y="5" width="2" height="2" fill="#6C8037"/>
+  <rect x="76" y="5" width="2" height="2" fill="#6C8037"/>
+  <rect x="108" y="5" width="2" height="2" fill="#6C8037"/>
+  <!-- 参差下缘 -->
+  <rect x="0" y="8" width="14" height="2" fill="#2E3E26"/>
+  <rect x="18" y="8" width="12" height="2" fill="#3A4C2C"/>
+  <rect x="34" y="8" width="12" height="2" fill="#2E3E26"/>
+  <rect x="50" y="8" width="12" height="2" fill="#3A4C2C"/>
+  <rect x="66" y="8" width="12" height="2" fill="#2E3E26"/>
+  <rect x="82" y="8" width="12" height="2" fill="#3A4C2C"/>
+  <rect x="98" y="8" width="12" height="2" fill="#2E3E26"/>
+  <rect x="114" y="8" width="6" height="2" fill="#3A4C2C"/>
+  <!-- 垂滴与短藤 -->
+  <rect x="8" y="10" width="2" height="2" fill="#3A4C2C"/>
+  <rect x="40" y="10" width="2" height="2" fill="#3C592B"/>
+  <rect x="72" y="10" width="2" height="2" fill="#526B2E"/>
+  <rect x="104" y="10" width="2" height="2" fill="#3C592B"/>
+  <rect x="40" y="12" width="2" height="2" fill="#3C592B"/>
+  <rect x="104" y="12" width="2" height="2" fill="#3C592B"/>
+  <!-- 叶片与浆果 -->
+  <rect x="38" y="14" width="4" height="2" fill="#779146"/>
+  <rect x="70" y="12" width="4" height="4" fill="#9D511D"/>
+  <rect x="71" y="13" width="2" height="2" fill="#FFDB68"/>
+  <rect x="102" y="14" width="4" height="4" fill="#9D511D"/>
+  <rect x="103" y="15" width="2" height="2" fill="#FFDB68"/>
+</svg>

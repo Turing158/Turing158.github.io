@@ -11,21 +11,21 @@
 </template>
 
 <script setup lang="ts">
-// 移植自繁茂洞穴上边框 HTML：苔藓洞顶 + 垂藤 + 发光浆果 + 孢子飘落。
+// 移植自繁茂洞穴上边框 HTML：苔藓洞顶 + 垂藤 + 发光浆果。
 // 纹理、随机种子、动画与全部绘制逻辑均来自原文件，仅做组件化封装
 // （原 getElementById 改为模板 ref，初始化挂到 onMounted，销毁时断开 ResizeObserver）。
 //
 // GPU 优化：SVG 内部元素的 CSS 动画无法被合成器加速，每帧都要在 GPU 进程
-// 重新光栅化。这里进一步把所有动画元素拆成独立合成层：每株植物是一个绝对
-// 定位的 div（围绕悬挂点 transform-origin 摆动），内部放 1~3 个静态小 svg
-// 片段；浆果光晕、飘落孢子是纯 div。transform/opacity 动画完全由合成器
-// 驱动——纹理只光栅化一次，之后每帧零重绘、零光栅化。地表态 SVG 同样
-// 独立成层长期缓存。完全滚出视口时暂停全部动画（相位保留）。
+// 重新光栅化。这里把每株植物拆成独立合成层：一个绝对定位的 div（围绕悬挂点
+// transform-origin 摆动），内部放静态小 svg 片段，摆动由合成器驱动——纹理
+// 只光栅化一次，之后每帧零重绘、零光栅化。地表态 SVG 同样独立成层长期缓存。
+// 完全滚出视口时暂停全部动画（相位保留）。
 //
-// 画面一致性：包裹盒多留了最大摆角的旋转投影余量；SVG 的 px 是用户单位
-// （×pixel 才是屏幕 px），HTML 的 px 就是屏幕 px，故孢子轨迹的 39 单位
-// 落差写作 39×pixel；光晕 div 与其前后 svg 片段按原绘制顺序穿插，遮挡
-// 关系逐像素不变（已用多相位冻结截图 + pixelmatch 验证）。
+// 原版的浆果光晕（.berry-light）与飘落孢子（.spore）已移除：二者各占一个
+// 独立合成层且动画永不停止，宽卡片上层数随宽度线性膨胀（每 320px 约 25 层），
+// 合成器满帧空转、GPU 进程占用过高。浆果保留精灵本体，静态高光像素已足够「发光」。
+//
+// 画面一致性：包裹盒多留了最大摆角的旋转投影余量，保证内容永不溢出。
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const props = withDefaults(
@@ -222,34 +222,8 @@ function vine(x: number, y: number, length: number, seed: number) {
   const phase = Math.abs(seed)
   const vb = { x: -16, y: -3, w: 32, h: length + 17 }
 
-  // 外层 div 定位包围盒并围绕悬挂点（vb 原点）摆动。
-  let out = `
-    <div
-      class="cave-sway"
-      style="
-        left:${(x + 8 + vb.x) * px}px;
-        top:${(y + vb.y) * px}px;
-        width:${vb.w * px}px;
-        height:${vb.h * px}px;
-        transform-origin:${-vb.x * px}px ${-vb.y * px}px;
-        --wind-left: -2.4deg;
-        --wind-right: 3.2deg;
-        --wind-middle: -.8deg;
-        --wind-duration: ${5.2 + (phase % 9) * .21}s;
-        --wind-delay: ${-(phase % 37) * .23}s;
-      "
-    >`
-
-  // 光晕是独立合成层（opacity 动画），把它前后的静态画面切成
-  // 多个小 svg 片段，保持与原版完全一致的绘制与遮挡顺序。
+  // 藤蔓是纯静态画面，整段合成一个 svg 片段，随外层 div 一起摆动。
   let art = ''
-  const flush = () => {
-    if (art) {
-      out += fragment(vb, art)
-      art = ''
-    }
-  }
-
   art += rect(-1, 0, 2, length, '#3c592b')
   art += rect(-1, 0, 1, length - 2, '#779146')
 
@@ -265,47 +239,36 @@ function vine(x: number, y: number, length: number, seed: number) {
     )
 
     if (rng() > .43) {
-      const bx = left ? -1 : -6
-      const by = n + 2
-
-      flush()
-
-      // 三层静态透明矩形垫在光晕层纹理里，外层 opacity 呼吸时
-      // 一次性套用（与 SVG 组 opacity 的「先展平再套透明度」一致）。
-      out += `
-        <div
-          class="berry-light"
-          style="
-            left:${(bx - 6 - vb.x) * px}px;
-            top:${(by - 4 - vb.y) * px}px;
-            width:${19 * px}px;
-            height:${17 * px}px;
-            --glow-delay:-${(rng() * 5).toFixed(2)}s;
-          "
-        >
-          <div style="left:0;top:0;width:100%;height:100%;background:#f2b94c;opacity:.035"></div>
-          <div style="left:${3 * px}px;top:${2 * px}px;width:${13 * px}px;height:${13 * px}px;background:#f2b94c;opacity:.07"></div>
-          <div style="left:${5 * px}px;top:${4 * px}px;width:${9 * px}px;height:${9 * px}px;background:#f5c85c;opacity:.08"></div>
-        </div>
-      `
-
-      art = sprite('top-berry', bx, by, 7, 9)
+      art += sprite('top-berry', left ? -1 : -6, n + 2, 7, 9)
     }
   }
 
   art += sprite('top-leaf-left', -7, length - 3, 8, 7)
-  flush()
 
-  return out + `</div>`
+  return `
+    <div
+      class="cave-sway"
+      style="
+        left:${(x + 8 + vb.x) * px}px;
+        top:${(y + vb.y) * px}px;
+        width:${vb.w * px}px;
+        height:${vb.h * px}px;
+        transform-origin:${-vb.x * px}px ${-vb.y * px}px;
+        --wind-left: -2.4deg;
+        --wind-right: 3.2deg;
+        --wind-middle: -.8deg;
+        --wind-duration: ${5.2 + (phase % 9) * .21}s;
+        --wind-delay: ${-(phase % 37) * .23}s;
+      "
+    >${fragment(vb, art)}</div>`
 }
 
 function blossom(x: number, y: number, seed: number) {
-  const rng = random(seed)
   const px = props.pixel
   const phase = Math.abs(seed)
   const vb = { x: -14, y: -2, w: 28, h: 28 }
 
-  let out = `
+  return `
     <div
       class="cave-sway"
       style="
@@ -321,32 +284,6 @@ function blossom(x: number, y: number, seed: number) {
         --wind-delay: ${-(phase % 37) * .23}s;
       "
     >${fragment(vb, sprite('top-flower', -12, 0, 24, 22))}</div>`
-
-  // 粒子独立于花朵摆动，飘落后不会跟随花朵旋转。
-  for (let i = 0; i < 10; i++) {
-    const dx = Math.floor(rng() * 9) - 4
-    const drift = 3 + Math.floor(rng() * 12)
-    const duration = 4.5 + rng() * 4
-    const delay = -rng() * 10
-
-    out += `
-      <div
-        class="spore"
-        style="
-          left:${(x + 12 + dx) * px}px;
-          top:${(y + 19 + Math.floor(rng() * 3)) * px}px;
-          width:${(i % 4 === 0 ? 2 : 1) * px}px;
-          height:${px}px;
-          background:${i % 3 === 0 ? '#d1d789' : '#a6bd68'};
-          --drift:${drift * px}px;
-          --fall:${39 * px}px;
-          --duration:${duration.toFixed(2)}s;
-          --delay:${delay.toFixed(2)}s;
-        "
-      ></div>`
-  }
-
-  return out
 }
 
 function draw() {
@@ -443,8 +380,8 @@ watch(
 
 <!--
   运行时通过 innerHTML 注入的元素无法获得 scoped 属性，
-  样式保持全局；类名（cave-top / cave-top-plants / cave-sway /
-  berry-light / spore）已确认与站点现有样式无冲突。
+  样式保持全局；类名（cave-top / cave-top-plants / cave-sway）
+  已确认与站点现有样式无冲突。
 -->
 <style lang="less">
 .cave-top {
@@ -506,32 +443,8 @@ watch(
     infinite;
 }
 
-.berry-light {
-  position: absolute;
-  will-change: opacity;
-  animation: berry-breathe
-    5s ease-in-out var(--glow-delay, 0s) infinite alternate;
-}
-
-.berry-light > div {
-  position: absolute;
-}
-
-.spore {
-  position: absolute;
-  opacity: 0;
-  will-change: transform, opacity;
-  animation: spore-fall
-    var(--duration, 7s)
-    linear
-    var(--delay, 0s)
-    infinite;
-}
-
 /* 完全滚出视口时暂停所有动画，避免滚动阅读时的无效合成。 */
-.cave-top.cave-paused .cave-sway,
-.cave-top.cave-paused .berry-light,
-.cave-top.cave-paused .spore {
+.cave-top.cave-paused .cave-sway {
   animation-play-state: paused;
 }
 
@@ -544,31 +457,6 @@ watch(
   }
   72% {
     transform: rotate(var(--wind-middle, -.7deg));
-  }
-}
-
-@keyframes berry-breathe {
-  from { opacity: .45; }
-  to   { opacity: .95; }
-}
-
-@keyframes spore-fall {
-  0% {
-    opacity: 0;
-    transform: translate(0, 0);
-  }
-  12% {
-    opacity: .85;
-  }
-  55% {
-    opacity: .6;
-  }
-  100% {
-    opacity: 0;
-    /* 原轨迹：drift 逻辑单位 × 39 逻辑单位；SVG 里 px=用户单位
-       （×pixel 才是屏幕 px），HTML 里 px 就是屏幕 px，故按 pixel
-       换算：drift 单位 → drift×pixel px，39 单位 → 78px（pixel=2）。 */
-    transform: translate(var(--drift, 16px), var(--fall, 78px));
   }
 }
 </style>

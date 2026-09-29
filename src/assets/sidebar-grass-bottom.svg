@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="18" viewBox="0 0 120 18">
+  <!-- 选项区底部条带：草皮地面。120×18 无缝平铺单元（240px 侧边栏恰好重复 2 次），
+       草缘与花丛从条带上缘耸起，泥土沉底，导航项由 .sidebar-nav 的 padding-bottom 让位 -->
+  <!-- 泥土 -->
+  <rect x="0" y="10" width="120" height="8" fill="#262E20"/>
+  <!-- 泥土颗粒 -->
+  <rect x="12" y="12" width="4" height="2" fill="#1F261B"/>
+  <rect x="44" y="14" width="6" height="2" fill="#1F261B"/>
+  <rect x="76" y="12" width="4" height="2" fill="#1F261B"/>
+  <rect x="104" y="14" width="6" height="2" fill="#1F261B"/>
+  <rect x="24" y="12" width="4" height="2" fill="#313A27"/>
+  <rect x="60" y="15" width="4" height="1" fill="#313A27"/>
+  <rect x="92" y="12" width="4" height="2" fill="#313A27"/>
+  <rect x="116" y="14" width="4" height="2" fill="#313A27"/>
+  <!-- 草皮带 -->
+  <rect x="0" y="6" width="120" height="4" fill="#4A7A32"/>
+  <!-- 参差草缘 -->
+  <rect x="4" y="4" width="12" height="2" fill="#4A7A32"/>
+  <rect x="22" y="4" width="8" height="2" fill="#4A7A32"/>
+  <rect x="36" y="4" width="14" height="2" fill="#4A7A32"/>
+  <rect x="56" y="4" width="6" height="2" fill="#4A7A32"/>
+  <rect x="68" y="4" width="12" height="2" fill="#4A7A32"/>
+  <rect x="86" y="4" width="10" height="2" fill="#4A7A32"/>
+  <rect x="102" y="4" width="10" height="2" fill="#4A7A32"/>
+  <!-- 亮草 -->
+  <rect x="8" y="6" width="8" height="2" fill="#5D9C3C"/>
+  <rect x="30" y="6" width="10" height="2" fill="#5D9C3C"/>
+  <rect x="60" y="6" width="8" height="2" fill="#5D9C3C"/>
+  <rect x="90" y="6" width="8" height="2" fill="#5D9C3C"/>
+  <rect x="112" y="6" width="6" height="2" fill="#5D9C3C"/>
+  <!-- 草丛 -->
+  <rect x="10" y="2" width="2" height="2" fill="#4A7A32"/>
+  <rect x="26" y="2" width="2" height="2" fill="#4A7A32"/>
+  <rect x="44" y="2" width="2" height="2" fill="#5D9C3C"/>
+  <rect x="64" y="2" width="2" height="2" fill="#4A7A32"/>
+  <rect x="84" y="2" width="2" height="2" fill="#5D9C3C"/>
+  <rect x="100" y="2" width="2" height="2" fill="#4A7A32"/>
+  <rect x="116" y="2" width="2" height="2" fill="#5D9C3C"/>
+  <!-- 草叶 -->
+  <rect x="18" y="0" width="2" height="2" fill="#5D9C3C"/>
+  <rect x="52" y="0" width="2" height="2" fill="#4A7A32"/>
+  <rect x="94" y="0" width="2" height="2" fill="#5D9C3C"/>
+  <!-- 小花 -->
+  <rect x="36" y="0" width="4" height="4" fill="#B9607B"/>
+  <rect x="37" y="1" width="2" height="2" fill="#DF8C9E"/>
+  <rect x="78" y="0" width="2" height="2" fill="#FFDB68"/>
+  <rect x="78" y="2" width="2" height="2" fill="#4A7A32"/>
+</svg>
