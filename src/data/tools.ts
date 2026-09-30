@@ -30,6 +30,7 @@ export const toolKeys: readonly ToolMeta[] = [
   { key: 'holidayQuery', component: 'HolidayQueryTool', icon: '🎉' },
   { key: 'md5', component: 'Md5Tool', icon: '🔑' },
   { key: 'sha', component: 'ShaTool', icon: '🔒' },
+  { key: 'cipher', component: 'CipherTool', icon: '🔮' },
   { key: 'diff', component: 'DiffCheckerTool', icon: '📑' },
   { key: 'codeRunner', component: 'CodeRunnerTool', icon: '▶' },
   { key: 'apiTest', component: 'ApiTestTool', icon: '🌐' },

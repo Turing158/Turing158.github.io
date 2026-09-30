@@ -8,6 +8,7 @@ import { computed, ref, watch } from 'vue'
 import confetti from 'canvas-confetti'
 import { ACHIEVEMENTS } from '@/data/achievements'
 import type { Achievement, AchievementCategory } from '@/data/achievements'
+import { toolKeys } from '@/data/tools'
 
 // ===== 常量 =====
 const STORAGE_KEY = 'blog-achievements'
@@ -189,11 +190,11 @@ function addVisitedProjectRepo(repo: string) {
   }
 }
 
-// ===== 检查 tool-master 成就（使用全部 17 个工具）=====
+// ===== 检查 tool-master 成就（使用全部工具）=====
 function checkToolMaster() {
   if (isUnlocked('tool-master')) return
-  // 工具总数为 17，全部使用过即解锁
-  if (state.value.usedTools.length >= 17) {
+  // 全部工具都用过即解锁（阈值跟随 toolKeys，新增工具自动纳入）
+  if (state.value.usedTools.length >= toolKeys.length) {
     doUnlock('tool-master')
   }
 }

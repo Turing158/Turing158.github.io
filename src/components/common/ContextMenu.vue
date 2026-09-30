@@ -69,7 +69,8 @@ function handleItemClick(item: ContextMenuItem) {
 <style lang="less" scoped>
 .context-menu {
   position: fixed;
-  z-index: 9999;
+  /* 高于全部弹层（Dialog 10000、下拉/提示 10001、图片查看器 10050），在 Dialog 内右键也能置顶显示 */
+  z-index: 10060;
   min-width: 180px;
   padding: 6px;
   background: var(--bg-card);

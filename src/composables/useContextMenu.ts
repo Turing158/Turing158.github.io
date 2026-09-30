@@ -101,20 +101,24 @@ export function useContextMenu() {
     if (visible.value) hide()
   }
 
+  // 捕获阶段拦截 Esc：菜单打开时只关菜单，避免事件冒泡到底下的 Dialog / 图片查看器把它们一起关掉
   function handleEscape(e: KeyboardEvent) {
-    if (e.key === 'Escape' && visible.value) hide()
+    if (e.key === 'Escape' && visible.value) {
+      e.stopPropagation()
+      hide()
+    }
   }
 
   onMounted(() => {
     document.addEventListener('contextmenu', show)
     document.addEventListener('click', handleGlobalClick)
-    document.addEventListener('keydown', handleEscape)
+    document.addEventListener('keydown', handleEscape, true)
   })
 
   onUnmounted(() => {
     document.removeEventListener('contextmenu', show)
     document.removeEventListener('click', handleGlobalClick)
-    document.removeEventListener('keydown', handleEscape)
+    document.removeEventListener('keydown', handleEscape, true)
   })
 
   return {

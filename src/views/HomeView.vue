@@ -78,190 +78,119 @@
         </div>
       </div>
 
-      <!-- Commits Widget -->
-      <div class="widget commits-widget">
+      <!-- 近日动态 Widget（提交 + GitHub + Gitee 合并流，方案 A） -->
+      <div class="widget log-widget">
         <div class="widget-header">
-          <div class="widget-title">📦 {{ $t('home.recentCommits') }}</div>
+          <div class="widget-title">
+            <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M2 1 h12 v8 H2 Z M4 3 h8 v1 H4 Z M4 5 h5 v1 H4 Z M7 9 h2 v6 H7 Z" />
+            </svg>
+            <span class="title-text">{{ $t('home.recentLog') }}</span>
+            <span class="title-en">RECENT LOG</span>
+          </div>
+          <div class="widget-sub">{{ $t('home.recentLogSub') }}</div>
         </div>
         <Transition name="loader-pop" mode="out-in" appear>
-          <div v-if="commitsLoading" class="widget-content cube-anim">
+          <div v-if="logLoading" class="widget-content cube-anim">
             <CubeLoader :text="$t('common.loading')" />
           </div>
           <div v-else-if="!hasGitHubConfig" class="widget-content">{{ $t('home.githubNotConfigured') }}</div>
-          <div v-else-if="recentCommits.length === 0" class="widget-content">{{ $t('home.noCommits') }}</div>
-          <div v-else class="commits-list">
+          <div v-else-if="logFailed && recentLog.length === 0" class="widget-content">{{ $t('home.loadFailed') }}</div>
+          <div v-else-if="recentLog.length === 0" class="widget-content">{{ $t('home.noActivity') }}</div>
+          <div v-else class="log-stream">
             <a
-              v-for="(commit, i) in recentCommits"
-              :key="i"
-              :href="commit.url"
+              v-for="(row, i) in recentLog"
+              :key="row.id"
+              :href="row.url"
               target="_blank"
-              class="commit-card px-fade"
-              :title="commit.fullMessage"
-              :style="{ '--commit-index': i }"
+              rel="noopener"
+              class="log-row"
+              :title="row.text"
+              :style="{ '--log-index': i }"
             >
-              <div class="commit-header">
-                <div class="commit-repo">
-                  <span class="repo-icon">📁</span>
-                  <span class="repo-name">{{ commit.repo }}</span>
-                </div>
-                <div class="commit-date" :title="formatFullTime(commit.date)">
-                  {{ formatRelativeTime(commit.date) }}
-                </div>
-              </div>
-              <div class="commit-msg" :title="commit.fullMessage">
-                {{ commit.message }}
-              </div>
-              <div class="commit-footer">
-                <span class="commit-hash">{{ commit.sha?.substring(0, 7) || 'unknown' }}</span>
-                <span class="commit-link-icon">↗</span>
-              </div>
+              <span class="log-icon" :style="{ color: row.iconColor }">
+                <svg class="px" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" v-html="row.iconBody"></svg>
+              </span>
+              <span class="log-body">
+                <span class="log-action">{{ row.text }}</span>
+                <span class="log-repo">{{ row.repo }}</span>
+              </span>
+              <span class="log-time" :title="formatFullTime(row.date)">
+                {{ formatRelativeTime(row.date) }}
+              </span>
             </a>
           </div>
         </Transition>
+        <router-link to="/commits" class="view-all">
+          <span>{{ $t('home.logViewAll') }}</span>
+          <span class="view-all-arrow">→</span>
+        </router-link>
       </div>
 
-      <!-- Articles Widget -->
-      <div class="widget articles-widget">
-        <div class="widget-header">
-          <div class="widget-title">📝 {{ $t('home.recentArticles') }}</div>
-        </div>
-        <Transition name="loader-pop" mode="out-in" appear>
-          <div v-if="loading" class="widget-content cube-anim">
-            <CubeLoader :text="$t('common.loading')" />
+      <div class="home-duo">
+        <!-- 新写成的心得 Widget（方案 A） -->
+        <div class="widget writings-widget">
+          <div class="widget-header">
+            <div class="widget-title">
+              <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M2 2 h5 v12 H2 Z M9 2 h5 v12 H9 Z M7 2 h2 v12 H7 Z M3 4 h3 v1 H3 Z M10 4 h3 v1 h-3 Z M3 7 h3 v1 H3 Z M10 7 h3 v1 h-3 Z" />
+              </svg>
+              <span class="title-text">{{ $t('home.writings') }}</span>
+              <span class="title-en">LATEST WRITINGS</span>
+            </div>
           </div>
-          <div v-else-if="recentArticles.length === 0" class="widget-content">{{ $t('home.noArticles') }}</div>
-          <div v-else class="article-list">
-            <router-link
-              v-for="(article, index) in recentArticles"
-              :key="article.slug"
-              :to="`/article/${article.slug}`"
-              class="article-item"
-              :style="{ '--item-index': index }"
-            >
-              <div class="article-content">
-                <div class="article-title-row">
-                  <span class="article-number">{{ String(index + 1).padStart(2, '0') }}</span>
-                  <span class="article-title">{{ article.title }}</span>
-                </div>
-                <div class="article-meta">
-                  <span class="article-date" :title="formatFullTime(article.date)">
-                    {{ formatRelativeTime(article.date) }}
+          <Transition name="loader-pop" mode="out-in" appear>
+            <div v-if="loading" class="widget-content cube-anim">
+              <CubeLoader :text="$t('common.loading')" />
+            </div>
+            <div v-else-if="recentArticles.length === 0" class="widget-content">{{ $t('home.noArticles') }}</div>
+            <div v-else class="writings-list">
+              <router-link
+                v-for="(article, index) in recentArticles"
+                :key="article.slug"
+                :to="`/article/${article.slug}`"
+                class="writing-row"
+                :style="{ '--item-index': index }"
+              >
+                <span class="writing-num">{{ String(index + 1).padStart(2, '0') }}</span>
+                <span class="writing-body">
+                  <span class="writing-title">{{ article.title }}</span>
+                  <span class="writing-meta">
+                    <span class="writing-date" :title="formatFullTime(article.date)">
+                      {{ formatRelativeTime(article.date) }}
+                    </span>
+                    <span v-if="article.tags && article.tags.length > 0" class="writing-tag">
+                      {{ article.tags[0] }}
+                    </span>
                   </span>
-                  <span v-if="article.tags && article.tags.length > 0" class="article-tag">
-                    {{ article.tags[0] }}
-                  </span>
-                </div>
-              </div>
-              <div class="article-arrow">→</div>
-            </router-link>
-            <router-link to="/articles" class="view-all">
-              <span>{{ $t('home.viewAll') }}</span>
-              <span class="view-all-arrow">→</span>
-            </router-link>
-          </div>
-        </Transition>
-      </div>
+                </span>
+                <span class="writing-arrow">→</span>
+              </router-link>
+            </div>
+          </Transition>
+          <router-link to="/articles" class="view-all">
+            <span>{{ $t('home.viewAllArticles', { n: articleTotal }) }}</span>
+            <span class="view-all-arrow">→</span>
+          </router-link>
+        </div>
 
-      <!-- Gramophone Widget (Comments) -->
-      <div class="widget gramophone-widget">
-        <div class="widget-header">
-          <div class="widget-title">🎵 {{ $t('home.gramophone') }}</div>
+        <!-- 留言板 Widget（方案 A，Gitalk 留声机） -->
+        <div class="widget board-widget">
+          <div class="widget-header">
+            <div class="widget-title">
+              <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M8 1 a7 7 0 1 0 0 14 a7 7 0 1 0 0 -14 Z M8 6 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z" />
+              </svg>
+              <span class="title-text">{{ $t('home.messageBoard') }}</span>
+              <span class="title-en">GRAMOPHONE</span>
+            </div>
+            <div class="widget-sub">{{ $t('home.messageBoardNote') }}</div>
+          </div>
+          <div class="board-content">
+            <div id="gitalk-container-home" class="gitalk-container"></div>
+          </div>
         </div>
-        <div class="gramophone-content">
-          <div id="gitalk-container-home" class="gitalk-container"></div>
-        </div>
-      </div>
 
-      <!-- Gitee Activity Widget -->
-      <div class="widget activity-widget">
-        <div class="widget-header">
-          <div class="widget-title">🦊 {{ $t('home.recentGiteeActivity') }}</div>
-        </div>
-        <Transition name="loader-pop" mode="out-in" appear>
-          <div v-if="giteeLoading" class="widget-content cube-anim">
-            <CubeLoader :text="$t('common.loading')" />
-          </div>
-          <div v-else-if="giteeError" class="widget-content">{{ $t('home.loadFailed') }}</div>
-          <div v-else-if="giteeActivities.length === 0" class="widget-content">{{ $t('home.noGiteeActivity') }}</div>
-          <div v-else class="activity-list">
-            <a
-              v-for="(act, i) in giteeActivities"
-              :key="act.id"
-              :href="act.url"
-              target="_blank"
-              rel="noopener"
-              class="activity-item gitee-item px-fade"
-              :style="{ '--activity-index': i }"
-            >
-              <div class="activity-icon">{{ act.icon }}</div>
-              <div class="activity-body">
-                <div class="activity-text">
-                  <span class="activity-action">{{ act.action }}</span>
-                  <span class="activity-repo">{{ act.repo }}</span>
-                </div>
-                <div class="activity-time" :title="formatFullTime(act.date)">
-                  {{ formatRelativeTime(act.date) }}
-                </div>
-              </div>
-              <div class="activity-arrow">↗</div>
-            </a>
-            <a
-              :href="giteeProfileUrl"
-              target="_blank"
-              rel="noopener"
-              class="view-all"
-            >
-              <span>{{ $t('home.viewMoreGiteeActivity') }}</span>
-              <span class="view-all-arrow">→</span>
-            </a>
-          </div>
-        </Transition>
-      </div>
-
-      <!-- GitHub Activity Widget -->
-      <div class="widget activity-widget">
-        <div class="widget-header">
-          <div class="widget-title">📊 {{ $t('home.recentActivity') }}</div>
-        </div>
-        <Transition name="loader-pop" mode="out-in" appear>
-          <div v-if="activityLoading" class="widget-content cube-anim">
-            <CubeLoader :text="$t('common.loading')" />
-          </div>
-          <div v-else-if="activityError" class="widget-content">{{ $t('home.loadFailed') }}</div>
-          <div v-else-if="activities.length === 0" class="widget-content">{{ $t('home.noActivity') }}</div>
-          <div v-else class="activity-list">
-            <a
-              v-for="(act, i) in activities"
-              :key="act.id"
-              :href="act.url"
-              target="_blank"
-              rel="noopener"
-              class="activity-item px-fade"
-              :style="{ '--activity-index': i }"
-            >
-              <div class="activity-icon" :class="`type-${act.type}`">{{ act.icon }}</div>
-              <div class="activity-body">
-                <div class="activity-text">
-                  <span class="activity-action">{{ act.action }}</span>
-                  <span class="activity-repo">{{ act.repo }}</span>
-                </div>
-                <div class="activity-time" :title="formatFullTime(act.date)">
-                  {{ formatRelativeTime(act.date) }}
-                </div>
-              </div>
-              <div class="activity-arrow">↗</div>
-            </a>
-            <a
-              :href="githubProfileUrl"
-              target="_blank"
-              rel="noopener"
-              class="view-all"
-            >
-              <span>{{ $t('home.viewMoreActivity') }}</span>
-              <span class="view-all-arrow">→</span>
-            </a>
-          </div>
-        </Transition>
       </div>
     </div>
   </div>
@@ -753,6 +682,100 @@ onMounted(async () => {
     })
   }
 })
+
+// ── 近日动态（方案 A）：提交 + GitHub + Gitee 合并成一条村民日志 ──
+// 行内像素小图标：自绘 16×16，fill=currentColor，颜色按事件类型固定
+const LOG_ICONS: Record<string, { color: string; body: string }> = {
+  pickaxe: {
+    color: 'var(--accent)',
+    body: '<path d="M7 6 h2 l4 8 -2 1 Z M3 2 c3 -1.5 7 -1.5 10 1.5 L12 6 C10 4 6 4 4 5.5 Z"/>',
+  },
+  arrow: {
+    color: 'var(--border-strong)',
+    body: '<path d="M8 2 L14 8 h-3 v6 H5 V8 H2 Z"/>',
+  },
+  sprout: {
+    color: '#6ba53a',
+    body: '<path d="M7 8 h2 v7 H7 Z M8 7 c0 -3 2 -5 5 -5 c0 3 -2 5 -5 5 Z M7 7 C7 4.5 5.5 3 3 3 c0 2.5 1.5 4 4 4 Z"/>',
+  },
+  door: {
+    color: 'var(--text-secondary)',
+    body: '<path fill-rule="evenodd" d="M4 1 h8 v14 H4 Z M6 3 h4 v10 H6 Z M9 8 h1 v2 H9 Z"/>',
+  },
+  star: {
+    color: '#C9A227',
+    body: '<path d="M7 1 h2 v4 h4 v2 h-4 v4 h-2 v-4 H3 V5 h4 Z"/>',
+  },
+  heart: {
+    color: '#B0553A',
+    body: '<path d="M2 3 h4 v2 h4 V3 h4 v4 l-6 6 -6 -6 Z"/>',
+  },
+  merge: {
+    color: '#58707F',
+    body: '<path d="M4 2 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z M11 10 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z M6 3 h2 v7 h3 v-1 l2 2 -2 2 v-1 H6 Z"/>',
+  },
+  bubble: {
+    color: 'var(--accent)',
+    body: '<path d="M2 2 h12 v9 H8 l-4 4 v-4 H2 Z"/>',
+  },
+  flag: {
+    color: '#C9A227',
+    body: '<path d="M3 1 h2 v14 H3 Z M5 2 h8 v6 H5 Z"/>',
+  },
+  gem: {
+    color: 'var(--accent)',
+    body: '<path d="M8 2 L14 6 8 14 2 6 Z"/>',
+  },
+}
+
+function logIconFor(type: string): string {
+  const k = (type || '').toLowerCase()
+  if (k === 'commit') return 'pickaxe'
+  if (k.includes('push')) return 'arrow'
+  if (k.includes('create')) return 'sprout'
+  if (k.includes('delete') || k.includes('destroy') || k === 'left') return 'door'
+  if (k.includes('follow') || k.includes('star') || k.includes('watch')) return 'star'
+  if (k.includes('fork') || k.includes('merge') || k.includes('pullrequest')) return 'merge'
+  if (k.includes('comment')) return 'bubble'
+  if (k.includes('release')) return 'flag'
+  return 'gem'
+}
+
+interface LogRow {
+  id: string
+  text: string
+  repo: string
+  url: string
+  date: string
+  iconBody: string
+  iconColor: string
+}
+
+const recentLog = computed<LogRow[]>(() => {
+  const rows: Array<{ id: string; kind: string; text: string; repo: string; url: string; date: string }> = []
+  recentCommits.value.forEach((c: any, i: number) => {
+    rows.push({ id: `commit-${c.sha || i}`, kind: 'commit', text: c.message, repo: c.repo, url: c.url, date: c.date })
+  })
+  for (const a of activities.value) {
+    rows.push({ id: `gh-${a.id}`, kind: a.type, text: a.action, repo: a.repo, url: a.url, date: a.date })
+  }
+  for (const a of giteeActivities.value) {
+    rows.push({ id: `gitee-${a.id}`, kind: a.type, text: a.action, repo: a.repo, url: a.url, date: a.date })
+  }
+  return rows
+    .filter(r => r.date && r.text)
+    .sort((x, y) => (new Date(y.date).getTime() || 0) - (new Date(x.date).getTime() || 0))
+    .slice(0, 8)
+    .map(r => {
+      const meta = LOG_ICONS[logIconFor(r.kind)] ?? LOG_ICONS.gem
+      return { id: r.id, text: r.text, repo: r.repo, url: r.url, date: r.date, iconBody: meta.body, iconColor: meta.color }
+    })
+})
+
+const logLoading = computed(() => commitsLoading.value || activityLoading.value || giteeLoading.value)
+const logFailed = computed(() => activityError.value && giteeError.value)
+
+const articleTotal = computed(() => store.articles.length)
 </script>
 
 <style lang="less" scoped>
@@ -1010,312 +1033,282 @@ onMounted(async () => {
   color: var(--text-secondary);
 }
 
-// Commits Widget
+// ── 方案 A 三卡：近日动态 / 新写成的心得 / 留言板 ──────────
 .widget-content {
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
 
-.commits-list {
+.widget-title {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.commit-card {
-  display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 10px;
-  padding: 16px;
-  background: var(--bg-secondary);
-  --pxs: 3px; clip-path: var(--pxc);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  /* 原 overflow: hidden 会裁掉外扩的 px-fade 叠加层；卡片内并无越界内容，移除 */
-  cursor: pointer;
-  animation: commit-fade-in 0.5s ease forwards;
-  animation-delay: calc(var(--commit-index) * 0.08s);
-  opacity: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.3s ease;
-  }
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px var(--shadow);
-
-    &::before {
-      transform: scaleX(1);
-    }
-
-    .commit-link-icon {
-      opacity: 1;
-      transform: translate(2px, -2px);
-    }
-
-    .repo-icon {
-      transform: scale(1.1) rotate(-5deg);
-    }
-
-    .commit-hash {
-      background: var(--accent);
-      color: #fff;
-    }
-  }
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
-@keyframes commit-fade-in {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.title-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--accent);
+  flex-shrink: 0;
 }
 
-.commit-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
+.title-en {
+  margin-left: auto;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
 }
 
-.commit-repo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
+.widget-sub {
+  margin-top: 4px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+// 心得 + 留言板双列（心得更宽）
+.home-duo {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 20px;
   min-width: 0;
 }
 
-.repo-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-  transition: transform 0.3s ease;
+// 近日动态：提交 + GitHub + Gitee 合并流
+.log-widget {
+  grid-column: span 2;
 }
 
-.repo-name {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--accent);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.commit-date {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  flex-shrink: 0;
-  padding: 2px 8px;
-  background: var(--bg-card);
-  --pxs: 3px; clip-path: var(--pxc);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-}
-
-.commit-msg {
-  font-size: 0.9rem;
-  color: var(--text-primary);
-  line-height: 1.5;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  font-weight: 500;
-}
-
-.commit-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.commit-hash {
-  font-size: 0.75rem;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  padding: 3px 8px;
-  --pxs: 2px; clip-path: var(--pxc);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  transition: all 0.3s ease;
-}
-
-.commit-link-icon {
-  font-size: 1.1rem;
-  color: var(--accent);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
-// Articles Widget
-.article-list {
+.log-stream {
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
-.article-item {
+.log-row {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  padding: 16px 12px;
-  --pxs: 3px; clip-path: var(--pxc);
+  gap: 14px;
+  padding: 11px 6px;
+  border-bottom: 2px dashed var(--border);
   text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  animation: article-fade-in 0.5s ease forwards;
-  animation-delay: calc(var(--item-index) * 0.08s);
+  transition: background 0.3s ease;
+  animation: home-row-fade-in 0.5s ease forwards;
+  animation-delay: calc(var(--log-index) * 0.06s);
   opacity: 0;
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--accent);
-    transform: scaleY(0);
-    transition: transform 0.3s ease;
+  &:last-of-type {
+    border-bottom: 0;
   }
 
   &:hover {
     background: var(--bg-secondary);
-    transform: translateX(8px);
 
-    &::before {
-      transform: scaleY(1);
-    }
-
-    .article-arrow {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .article-number {
-      color: var(--accent);
-      transform: scale(1.1);
-    }
-
-    .article-title {
-      color: var(--accent);
+    .log-repo {
+      color: var(--accent-hover);
     }
   }
 }
 
-@keyframes article-fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.article-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-
-.article-title-row {
+.log-icon {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  background: var(--bg-secondary);
+  --pxs: 3px; clip-path: var(--pxc);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  transition: transform 0.3s ease;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
 }
 
-.article-number {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--text-secondary);
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  flex-shrink: 0;
-  transition: all 0.3s ease;
+.log-row:hover .log-icon {
+  transform: scale(1.08) rotate(-6deg);
 }
 
-.article-title {
-  color: var(--text-primary);
+.log-body {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.log-action {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.log-repo {
+  flex-shrink: 0;
+  max-width: 40%;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
   white-space: nowrap;
-  font-size: 0.95rem;
-  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: color 0.3s ease;
 }
 
-.article-meta {
+.log-time {
+  flex-shrink: 0;
+  font-family: var(--font-pixel);
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+// 新写成的心得
+.writings-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.writing-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-left: 32px;
+  gap: 14px;
+  padding: 12px 6px;
+  border-bottom: 2px dashed var(--border);
+  text-decoration: none;
+  transition: background 0.3s ease;
+  animation: home-row-fade-in 0.5s ease forwards;
+  animation-delay: calc(var(--item-index) * 0.08s);
+  opacity: 0;
+
+  &:last-of-type {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: var(--bg-secondary);
+
+    .writing-title {
+      color: var(--accent);
+    }
+
+    .writing-num {
+      color: var(--accent-bright);
+    }
+
+    .writing-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
 }
 
-.article-date {
-  color: var(--text-secondary);
-  font-size: 0.75rem;
+.writing-num {
+  width: 30px;
   flex-shrink: 0;
+  font-family: var(--font-pixel);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 1px 1px 0 var(--shadow);
 }
 
-.article-tag {
+.writing-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.writing-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.writing-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.writing-tag {
   display: inline-block;
-  padding: 2px 8px;
-  background: var(--bg-secondary);
+  padding: 2px 10px;
+  background: var(--bg-card);
   border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   --pxs: 3px; clip-path: var(--pxc);
-  font-size: 0.7rem;
-  color: var(--accent);
+  font-size: 0.68rem;
   font-weight: 500;
+  color: var(--accent);
 }
 
-.article-arrow {
-  font-size: 1.2rem;
-  color: var(--accent);
+.writing-arrow {
   flex-shrink: 0;
+  color: var(--accent);
   opacity: 0;
   transform: translateX(-8px);
   transition: all 0.3s ease;
 }
 
-.view-all {
+// 留言板（Gitalk 留声机）
+.board-widget {
   display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.board-content {
+  flex: 1;
+  max-height: 520px;
+  overflow-y: auto;
+  padding-right: 8px;
+
+  // Gitalk 在窄栏里的适配
+  :deep(.gt-container) {
+    max-height: none;
+  }
+
+  :deep(.gt-copyright) {
+    display: none;
+  }
+}
+
+// 「查看全部」像素描边按钮
+.view-all {
+  display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  margin-top: 16px;
-  padding: 12px;
-  text-align: center;
-  font-size: 0.9rem;
+  margin-top: 14px;
+  align-self: flex-start;
+  padding: 8px 14px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--accent);
   --pxs: 3px; clip-path: var(--pxc);
-  transition: all 0.3s ease;
+  border: 1px solid transparent; border-image: var(--px-frame-accent) 6 / calc(2 * var(--pxs)) stretch;
   text-decoration: none;
+  transition: background 0.3s ease, transform 0.3s ease;
 
   &:hover {
-    background: var(--bg-secondary);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
     transform: translateY(-2px);
 
     .view-all-arrow {
@@ -1325,113 +1318,10 @@ onMounted(async () => {
 }
 
 .view-all-arrow {
-  font-size: 1.1rem;
   transition: transform 0.3s ease;
 }
 
-// Gramophone Widget
-.gramophone-widget {
-  grid-column: span 2;
-  height: auto;
-  max-height: 600px;
-  display: flex;
-  flex-direction: column;
-}
-
-.gramophone-content {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.gitalk-container {
-  max-height: 600px;
-  overflow-y: auto;
-  padding-right: 8px;
-
-  // Override gitalk theme styles for gramophone widget
-  :deep(.gt-container) {
-    max-height: none;
-  }
-
-  // Hide footer in gramophone widget
-  :deep(.gt-copyright) {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .gramophone-widget {
-    grid-column: span 1;
-    max-height: 500px;
-  }
-
-  .gramophone-content,
-  .gitalk-container {
-    max-height: 500px;
-  }
-}
-
-// Activity Widget
-.activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.activity-item {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 14px;
-  background: var(--bg-secondary);
-  --pxs: 3px; clip-path: var(--pxc);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  text-decoration: none;
-  position: relative;
-  /* 原 overflow: hidden 会裁掉外扩的 px-fade 叠加层；卡片内并无越界内容，移除 */
-  cursor: pointer;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-  animation: activity-fade-in 0.5s ease forwards;
-  animation-delay: calc(var(--activity-index) * 0.06s);
-  opacity: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--accent);
-    transform: scaleY(0);
-    transform-origin: center;
-    transition: transform 0.3s ease;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px var(--shadow);
-
-    &::before {
-      transform: scaleY(1);
-    }
-
-    .activity-icon {
-      transform: scale(1.1) rotate(-6deg);
-    }
-
-    .activity-arrow {
-      opacity: 1;
-      transform: translate(2px, -2px);
-    }
-
-    .activity-repo {
-      color: var(--accent);
-    }
-  }
-}
-
-@keyframes activity-fade-in {
+@keyframes home-row-fade-in {
   from {
     opacity: 0;
     transform: translateX(-12px);
@@ -1442,80 +1332,21 @@ onMounted(async () => {
   }
 }
 
-.activity-icon {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.1rem;
-  background: var(--bg-card);
-  --pxs: 3px; clip-path: var(--pxc);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  transition: transform 0.3s ease;
-}
-
-.activity-body {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.activity-text {
-  font-size: 0.88rem;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.activity-action {
-  color: var(--text-secondary);
-  margin-right: 4px;
-  word-break: break-all;
-  overflow-wrap: break-word;
-}
-
-.activity-repo {
-  color: var(--text-primary);
-  font-weight: 600;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.85rem;
-  transition: color 0.3s ease;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.activity-time {
-  font-size: 0.72rem;
-  color: var(--text-secondary);
-}
-
-.activity-arrow {
-  flex-shrink: 0;
-  font-size: 1rem;
-  color: var(--accent);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-
 @media (max-width: 768px) {
   .widgets-grid {
     grid-template-columns: 1fr;
   }
 
-  .activity-text {
+  .home-duo {
+    grid-template-columns: 1fr;
+  }
+
+  .log-action {
     font-size: 0.82rem;
   }
 
-  .activity-icon {
-    width: 32px;
-    height: 32px;
-    font-size: 1rem;
+  .board-content {
+    max-height: 500px;
   }
 }
 </style>

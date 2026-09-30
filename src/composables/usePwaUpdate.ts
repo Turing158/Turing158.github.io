@@ -33,8 +33,19 @@ export function usePwaUpdate() {
   const setupUpdateListener = () => {
     if (!('serviceWorker' in navigator)) return
 
+    // 记录监听器挂上时页面是否已被 SW 控制。首次访问时 SW 安装完成会 clients.claim()
+    // 接管未受控页面，这同样会触发 controllerchange —— 但那不是「新版本」，此时整页
+    // 刷新会洗掉刚打开的界面（实测踩过：/tools?tool= 深链的弹窗被首次接管的重载关掉）。
+    // 只有「已受控页面的 controller 换人」才是真正的版本更新，才需要刷新。
+    let wasControlled = !!navigator.serviceWorker.controller
+
     // 监听 controllerchange 事件（当新 SW 激活时触发）
     navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!wasControlled) {
+        // SW 首次安装接管页面：记为已受控，不刷新
+        wasControlled = true
+        return
+      }
       // 新 SW 已激活，刷新页面以加载新内容
       window.location.reload()
     })

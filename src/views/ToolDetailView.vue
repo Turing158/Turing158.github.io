@@ -73,6 +73,7 @@ const componentMap = {
   HolidayQueryTool: defineAsyncComponent(() => import('@/components/tools/HolidayQueryTool.vue')),
   Md5Tool: defineAsyncComponent(() => import('@/components/tools/Md5Tool.vue')),
   ShaTool: defineAsyncComponent(() => import('@/components/tools/ShaTool.vue')),
+  CipherTool: defineAsyncComponent(() => import('@/components/tools/CipherTool.vue')),
   DiffCheckerTool: defineAsyncComponent(() => import('@/components/tools/DiffCheckerTool.vue')),
   CodeRunnerTool: defineAsyncComponent(() => import('@/components/tools/CodeRunnerTool.vue')),
   ApiTestTool: defineAsyncComponent(() => import('@/components/tools/ApiTestTool.vue')),
