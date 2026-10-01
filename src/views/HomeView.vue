@@ -1337,6 +1337,12 @@ const articleTotal = computed(() => store.articles.length)
     grid-template-columns: 1fr;
   }
 
+  // span 2 在单列网格里会撑出隐式第二列，把时钟与资料卡挤进同一行，必须重置
+  .log-widget,
+  .home-duo {
+    grid-column: auto;
+  }
+
   .home-duo {
     grid-template-columns: 1fr;
   }
