@@ -1,6 +1,6 @@
 <template>
   <div class="about-view">
-    <h1 class="page-title">{{ $t('about.title') }}</h1>
+    <PageTitle icon="oak-hanging-sign">{{ $t('about.title') }}</PageTitle>
 
     <div class="about-card">
       <!-- 繁茂洞穴上边框：垂藤悬挂在卡片顶部；植物右移 60 逻辑像素（120px），让最长的垂藤避开站点名 -->
@@ -132,6 +132,7 @@ import { usePageSeo } from '@/composables/useSeo'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 import CaveTopBorder from '@/components/common/CaveTopBorder.vue'
 import CaveBottomBorder from '@/components/common/CaveBottomBorder.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const { t } = useI18n()
 

@@ -7,7 +7,7 @@
 <template>
   <div class="achievements-view">
     <!-- 页面标题 -->
-    <h1 class="page-title">{{ $t('achievements.title') }}</h1>
+    <PageTitle icon="enchanted-golden-apple">{{ $t('achievements.title') }}</PageTitle>
     <p class="page-desc">{{ $t('achievements.description') }}</p>
 
     <!-- 进度条 -->
@@ -59,6 +59,7 @@ import { useAchievements } from '@/composables/useAchievements'
 import { usePageSeo } from '@/composables/useSeo'
 import AchievementCard from '@/components/achievements/AchievementCard.vue'
 import AchievementProgress from '@/components/achievements/AchievementProgress.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import type { AchievementCategory } from '@/data/achievements'
 
 const { t } = useI18n()

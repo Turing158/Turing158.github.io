@@ -33,7 +33,7 @@
     </div>
 
     <!-- 项目名称 -->
-    <h1 class="page-title">{{ repoName }}</h1>
+    <PageTitle icon="dispenser">{{ repoName }}</PageTitle>
 
     <!-- 分割线 -->
     <GrassTerrainDivider class="release-divider" />
@@ -200,6 +200,7 @@ import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
 

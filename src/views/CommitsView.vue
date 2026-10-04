@@ -24,7 +24,7 @@
     </div>
 
     <!-- 页面标题 -->
-    <h1 class="page-title">{{ repoName }}</h1>
+    <PageTitle icon="compass">{{ repoName }}</PageTitle>
 
     <!-- 加载 / 错误 / 空 -->
     <Transition name="loader-pop" mode="out-in" appear>
@@ -175,6 +175,7 @@ import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import GlowberryVine from '@/components/common/GlowberryVine.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
 

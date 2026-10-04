@@ -47,6 +47,9 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { usePageSeo } from '@/composables/useSeo'
 import { toolKeys } from '@/data/tools'
+// 工具组件共享样式：本页直接打开时（新标签 / 刷新 / 外链）ToolsView 的
+// 样式不会加载，工具组件依赖的 .tool-form 等必须由本页自行引入
+import '@/styles/tool-content.css'
 
 const route = useRoute()
 const router = useRouter()
@@ -108,7 +111,8 @@ const currentComponent = computed(() => {
 usePageSeo(
   computed(() => tool.value?.name || t('tools.notFoundTitle')),
   computed(() => tool.value?.description || t('tools.notFoundDescription')),
-  computed(() => `/tools/${route.params.id || ''}`),
+  // 尾斜杠与路由模板 /tools/:id/ 及预渲染注入的 canonical 保持逐字节一致
+  computed(() => `/tools/${route.params.id || ''}/`),
 )
 
 function goBack() {

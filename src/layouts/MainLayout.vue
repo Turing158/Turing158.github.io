@@ -526,11 +526,11 @@ const toggleLang = () => {
 }
 
 .sidebar-nav-divider--top {
-  background-image: url('@/assets/sidebar-moss-top.svg');
+  background-image: url('/sidebar/sidebar-moss-top.svg');
 }
 
 .sidebar-nav-divider--bottom {
-  background-image: url('@/assets/sidebar-grass-bottom.svg');
+  background-image: url('/sidebar/sidebar-grass-bottom.svg');
 }
 
 .sidebar-nav {

@@ -1,6 +1,6 @@
 <template>
   <div class="releases-view">
-    <h1 class="page-title">{{ $t('releases.title') }}</h1>
+    <PageTitle icon="dispenser">{{ $t('releases.title') }}</PageTitle>
 
     <Transition name="loader-pop" mode="out-in" appear>
       <div v-if="loading" class="loading-container cube-anim">
@@ -104,6 +104,7 @@ import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import { usePageSeo } from '@/composables/useSeo'
 
 const router = useRouter()

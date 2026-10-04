@@ -10,7 +10,7 @@
  */
 <template>
   <div class="tools-view">
-    <h1 class="page-title">{{ $t('tools.title') }}</h1>
+    <PageTitle icon="anvil">{{ $t('tools.title') }}</PageTitle>
     <div class="page-header">
       <p class="page-desc">{{ $t('tools.description') }}</p>
       <button
@@ -114,6 +114,7 @@ import { ref, computed, nextTick, onMounted, onUnmounted, watch, defineAsyncComp
 import { useI18n } from 'vue-i18n'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import ToolDialogActions from '@/components/tools/ToolDialogActions.vue'
 import { usePageSeo } from '@/composables/useSeo'
@@ -121,6 +122,8 @@ import { useAchievements } from '@/composables/useAchievements'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { toolKeys } from '@/data/tools'
 import { useRoute, useRouter } from 'vue-router'
+// 工具组件共享样式（弹窗内渲染的工具组件依赖）
+import '@/styles/tool-content.css'
 
 // 分隔符编辑弹窗：低频使用，异步加载
 const SeparatorEditorDialog = defineAsyncComponent(
@@ -753,39 +756,8 @@ onUnmounted(() => {
   color: var(--text-primary);
 }
 
-/* 工具表单共享样式 —— 子组件继承 */
-.tool-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.tool-label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.tool-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.tool-output {
-  background: var(--bg-secondary);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  --pxs: 3px; clip-path: var(--pxc);
-  padding: 14px;
-  font-size: 0.85rem;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  white-space: pre-wrap;
-  word-break: break-all;
-  max-height: 240px;
-  overflow-y: auto;
-  color: var(--text-primary);
-  margin: 0;
-}
+/* 工具表单共享样式（.tool-form 等）已抽到 styles/tool-content.css，
+   由本视图与 ToolDetailView 共同引入；勿再在此处重复定义 */
 
 /* 标题区 + 重置顺序按钮 */
 .page-header {

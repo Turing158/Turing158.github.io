@@ -285,6 +285,39 @@ body { color: var(--text-primary); }
   border-radius: 0;
 }
 
+/* 代码块内横向滚动条：内层 code 承担滚动，滚动条因此距底边框还有
+   pre 的 padding-bottom，不再与像素圆角打架；细轨道 + 方块滑块贴合像素风。
+   scrollbar-width 系标准属性与 ::-webkit-scrollbar 互斥（新 Chromium 二选一），
+   故仅在无 webkit 伪元素的 Firefox 上启用标准属性，否则 Chrome 会画出原生箭头 */
+.markdown-body pre > code {
+  display: block;
+  overflow-x: auto;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .markdown-body pre > code {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong) transparent;
+  }
+}
+
+.markdown-body pre > code::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-body pre > code::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.markdown-body pre > code::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+/* 去掉 webkit 默认的滚动条两端箭头按钮，只留方块滑块 */
+.markdown-body pre > code::-webkit-scrollbar-button {
+  display: none;
+}
+
 .markdown-body code {
   background-color: var(--code-bg) !important;
   border: 1px solid var(--border);
@@ -309,6 +342,12 @@ body { color: var(--text-primary); }
 .markdown-body .code-block-wrapper pre {
   margin: 0;
   padding-top: 1.2rem;
+  /* 底部留出内层 code 滚动条的位置，滑块不悬在半空 */
+  padding-bottom: 10px;
+  /* 横向滚动交给内层 code（见下）：pre 自己的滚动条贴着底边框，
+     会被像素圆角 clip-path 裁碎、还压掉底边描边，左下/右下角显示残缺。
+     只收窄到 wrapper 内的 pre；评论区等未包装的 pre 保持原有 overflow:auto */
+  overflow: hidden;
 }
 
 .markdown-body .code-lang {
@@ -316,8 +355,11 @@ body { color: var(--text-primary); }
   position: absolute;
   right: 0;
   top: 0;
-  padding: 4px 10px;
+  /* 高度须小于 pre 的 padding-top(1.2rem)，否则盖住首行代码；
+     line-height:1 压掉行高撑出的余量 */
+  padding: 3px 8px;
   font-size: 0.6rem;
+  line-height: 1;
   font-weight: 600;
   color: var(--bg-card);
   background: var(--px-ink);
@@ -399,6 +441,8 @@ body { color: var(--text-primary); }
 
 .markdown-body blockquote {
   border-left-color: var(--accent) !important;
+  /* 叠一层主题绿低透明底色，与正文底色拉开层次（暗色主题同样成立） */
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 /* ── Markdown HR：红石线路像素分割线（hr 由 MarkdownRenderer 替换为 .redstone-divider，随指针"通电"发光） ── */

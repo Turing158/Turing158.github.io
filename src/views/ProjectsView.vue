@@ -1,6 +1,6 @@
 <template>
   <div class="projects-view">
-    <h1 class="page-title">{{ $t('projects.title') }}</h1>
+    <PageTitle icon="crafting-table">{{ $t('projects.title') }}</PageTitle>
 
     <div v-for="category in categories" :key="category.key" class="project-category">
       <div class="category-header">
@@ -88,6 +88,7 @@ import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const { t } = useI18n()
 

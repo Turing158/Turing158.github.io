@@ -12,7 +12,6 @@ import { formatViewCount } from '@/utils/formatViewCount'
  * - 挂载时从 0 滚动到目标值（用于浏览量加载完成后的入场动画）
  * - 外部数值变化时从旧值平滑滚动到新值
  * - 显示格式复用 formatViewCount（万/亿 缩写）
- * - 尊重 prefers-reduced-motion，直接显示最终值
  */
 interface Props {
   /** 目标数字 */
@@ -28,14 +27,9 @@ const props = withDefaults(defineProps<Props>(), {
 const displayText = ref('0')
 let rafId = 0
 
-const prefersReducedMotion =
-  typeof window !== 'undefined' &&
-  !!window.matchMedia &&
-  window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
 function animate(from: number, to: number, duration: number) {
   cancelAnimationFrame(rafId)
-  if (prefersReducedMotion || duration <= 0 || from === to) {
+  if (duration <= 0 || from === to) {
     displayText.value = formatViewCount(to)
     return
   }

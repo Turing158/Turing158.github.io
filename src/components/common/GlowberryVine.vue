@@ -7,17 +7,17 @@
       role="group"
       :aria-label="label"
     >
-      <!-- Only the bundled, trusted artwork is inserted as SVG markup. -->
-      <defs v-html="definitions" />
-      <defs>
+      <!-- Only same-origin public artwork (public/vertical-line/) is inserted as SVG markup. -->
+      <defs v-if="loaded" v-html="definitions" />
+      <defs v-if="loaded">
         <pattern :id="`${prefix}-continuation`" width="64" height="90" patternUnits="userSpaceOnUse">
           <use :href="`#${prefix}-foliage`" />
         </pattern>
       </defs>
 
-      <use class="gb-base" :href="`#${prefix}-vine-base`" />
-      <g class="gb-decoration" v-html="growthVariants[variant % growthVariants.length]" />
-      <g class="gb-berry" tabindex="0" focusable="true" role="img" :aria-label="label">
+      <use v-if="loaded" class="gb-base" :href="`#${prefix}-vine-base`" />
+      <g v-if="loaded" class="gb-decoration" v-html="growthVariants[variant % growthVariants.length]" />
+      <g v-if="loaded" class="gb-berry" tabindex="0" focusable="true" role="img" :aria-label="label">
         <g class="gb-halo">
           <ellipse cx="32" cy="44" rx="27" ry="28" :fill="`url(#${prefix}-light)`" />
           <ellipse cx="32" cy="44" rx="16" ry="18" :fill="`url(#${prefix}-light)`" />
@@ -29,7 +29,7 @@
       </g>
 
       <!-- Keep full slices and fill the remainder with fixed-size, alternating leaves. -->
-      <g class="gb-base" shape-rendering="crispEdges">
+      <g v-if="loaded" class="gb-base" shape-rendering="crispEdges">
         <rect x="0" y="90" width="64" :height="continuationHeight" :fill="`url(#${prefix}-continuation)`" />
         <rect x="30" :y="90 + continuationHeight" width="4" :height="stemHeight" fill="#3e5935" />
         <rect x="31" :y="90 + continuationHeight" width="2" :height="stemHeight" fill="#7f9950" />
@@ -46,20 +46,33 @@
 </template>
 
 <script lang="ts">
-import vineSvg from '@/assets/glowberry-vine.svg?raw'
+// 垂藤贴图存放于 public/vertical-line/glowberry-vine.svg（public 资源无法被构建内联），
+// 运行时取回并解析一次；页面上的所有藤蔓实例共享同一份请求与解析结果。
+let artworkPromise: Promise<{ sourceDefinitions: string; growthVariants: string[] }> | undefined
 
-// Artwork from the referenced task, including its seven fixed random growth variants.
-// Parse once; each instance namespaces definitions so routes and rows cannot share IDs.
-const artwork = new DOMParser().parseFromString(vineSvg, 'image/svg+xml')
-const foliage = artwork.querySelector('#gb-vine-base')!.cloneNode(true) as Element
-foliage.id = 'gb-foliage'
-// The last two paths are the stalks that hold the berries, absent from continuation slices.
-foliage.lastElementChild!.remove()
-foliage.lastElementChild!.remove()
-const sourceDefinitions = artwork.querySelector('defs')!.innerHTML + foliage.outerHTML
-const growthVariants = Array.from(artwork.querySelectorAll('.gb-segment'), segment =>
-  Array.from(segment.querySelectorAll('.gb-decoration'), decoration => decoration.outerHTML).join(''),
-)
+function loadArtwork() {
+  artworkPromise ??= fetch('/vertical-line/glowberry-vine.svg')
+    .then(res => {
+      if (!res.ok) throw new Error(`glowberry-vine.svg HTTP ${res.status}`)
+      return res.text()
+    })
+    .then(svg => {
+      // Same-origin, first-party artwork; including its seven fixed random growth variants.
+      // Parse once; each instance namespaces definitions so routes and rows cannot share IDs.
+      const artwork = new DOMParser().parseFromString(svg, 'image/svg+xml')
+      const foliage = artwork.querySelector('#gb-vine-base')!.cloneNode(true) as Element
+      foliage.id = 'gb-foliage'
+      // The last two paths are the stalks that hold the berries, absent from continuation slices.
+      foliage.lastElementChild!.remove()
+      foliage.lastElementChild!.remove()
+      const sourceDefinitions = artwork.querySelector('defs')!.innerHTML + foliage.outerHTML
+      const growthVariants = Array.from(artwork.querySelectorAll('.gb-segment'), segment =>
+        Array.from(segment.querySelectorAll('.gb-decoration'), decoration => decoration.outerHTML).join(''),
+      )
+      return { sourceDefinitions, growthVariants }
+    })
+  return artworkPromise
+}
 </script>
 
 <script setup lang="ts">
@@ -69,8 +82,11 @@ const props = defineProps<{ variant: number; label: string }>()
 
 const container = ref<HTMLElement | null>(null)
 const height = ref(90)
+const loaded = ref(false)
+const sourceDefinitions = ref('')
+const growthVariants = ref<string[]>([])
 const prefix = `commit-vine-${useId()}`
-const definitions = sourceDefinitions.replace(/gb-/g, `${prefix}-`)
+const definitions = computed(() => sourceDefinitions.value.replace(/gb-/g, `${prefix}-`))
 const continuationHeight = computed(() => Math.floor(Math.max(0, height.value - 90) / 90) * 90)
 const stemHeight = computed(() => Math.max(0, height.value - 90 - continuationHeight.value))
 const stemLeaves = computed(() => {
@@ -85,6 +101,11 @@ const stemLeaves = computed(() => {
 let observer: ResizeObserver | undefined
 
 onMounted(() => {
+  loadArtwork().then(artwork => {
+    sourceDefinitions.value = artwork.sourceDefinitions
+    growthVariants.value = artwork.growthVariants
+    loaded.value = true
+  })
   observer = new ResizeObserver(([entry]) => {
     const { width, height: measuredHeight } = entry.contentRect
     if (width > 0) height.value = measuredHeight * 64 / width

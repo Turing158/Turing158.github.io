@@ -167,7 +167,11 @@ export const DYNAMIC_ROUTE_TEMPLATES: readonly StaticRouteMeta[] = [
     indexable: true,
   },
   {
-    path: '/tools/:id',
+    // 尾斜杠是刻意为之：GitHub Pages 会把无斜杠路径 301 到目录形式
+    // （/tools/x → /tools/x/），站内导航必须产出同样的地址，
+    // 否则「弹窗切换」（/tools/x）与「跳转新标签页」（301 后的 /tools/x/）
+    // 地址栏不一致；无斜杠路径靠 router 守卫归一化（见 router/index.ts）。
+    path: '/tools/:id/',
     name: 'tool-detail',
     titleKey: 'pageTitle.toolDetail',
     indexable: true,

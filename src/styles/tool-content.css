@@ -1,0 +1,38 @@
+/* 工具表单共享样式
+   所有工具组件（src/components/tools/*.vue）共用的布局类。
+   必须由渲染工具组件的视图自行引入（ToolsView 弹窗 / ToolDetailView 工具页），
+   不能放进某个视图的非 scoped 样式块里 —— 否则样式只随那个视图的
+   chunk 加载，直接打开 /tools/:id 时（新标签、刷新、外链）会丢失样式。 */
+
+.tool-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tool-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.tool-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tool-output {
+  background: var(--bg-secondary);
+  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  --pxs: 3px; clip-path: var(--pxc);
+  padding: 14px;
+  font-size: 0.85rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 240px;
+  overflow-y: auto;
+  color: var(--text-primary);
+  margin: 0;
+}

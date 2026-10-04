@@ -104,15 +104,31 @@ function legacyHashRedirect(to: RouteLocationNormalized): RouteLocationRaw | tru
   return { path, query, hash: '', replace: true }
 }
 
+/**
+ * tool-detail 地址归一化：无斜杠的 /tools/x 统一改写成 /tools/x/。
+ *
+ * 路由模板定义为 `/tools/:id/`（理由见 routes.ts），vue-router 默认 strict:false
+ * 对两种形式都能匹配，但地址栏写什么由到达方式决定：直接访问会被 GitHub Pages
+ * 301 成带斜杠形式，而站内 resolve / 旧 hash 兜底产出的是无斜杠形式。
+ * 在守卫里补一次客户端改写，保证同一工具页无论怎么到达地址栏都是同一个 URL。
+ */
+function normalizeToolDetailPath(to: RouteLocationNormalized): RouteLocationRaw | true {
+  if (to.name !== 'tool-detail' || to.path.endsWith('/')) return true
+  return { path: `${to.path}/`, query: to.query, hash: to.hash, replace: true }
+}
+
 export function registerProgress(listener: { onStart: () => void; onDone: () => void }) {
   progressListeners.push(listener)
 }
 
 router.beforeEach((to) => {
   // 页面标题 / meta 由各视图的 useSeo / usePageSeo 设置（响应语言与异步数据）。
-  // 独立页面自行调用 useHead，这里只负责进度条与旧链接兜底。
+  // 独立页面自行调用 useHead，这里只负责进度条、旧链接兜底与地址归一化。
   const redirect = legacyHashRedirect(to)
   if (redirect !== true) return redirect
+
+  const normalized = normalizeToolDetailPath(to)
+  if (normalized !== true) return normalized
 
   progressListeners.forEach(l => l.onStart())
   return true

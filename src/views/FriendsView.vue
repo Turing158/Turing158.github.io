@@ -1,6 +1,6 @@
 <template>
   <div class="friends-view">
-    <h1 class="page-title">{{ $t('pageTitle.friends') }}</h1>
+    <PageTitle icon="spyglass">{{ $t('pageTitle.friends') }}</PageTitle>
 
     <!-- 大卡片 1：友链列表 -->
     <div class="friends-card">
@@ -270,6 +270,7 @@ import BlogTagSelect from '@/components/common/BlogTagSelect.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 
 const { t } = useI18n()
 

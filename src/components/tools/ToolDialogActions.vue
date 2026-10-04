@@ -3,7 +3,8 @@
   收起时是与关闭按钮同款的方形图标按钮（地球图标），
   悬停 / 键盘聚焦（focus-within）时横向展开出「切换 / 跳转」两个操作按钮，
   展开动画由 grid 0fr → 1fr 过渡驱动；高亮指示块跟随悬停按钮平滑滑动。
-  两个按钮目前只发出 switch / jump 事件，具体逻辑暂未接入。
+  两个按钮发出的 switch / jump 由 ToolsView 监听：
+  switch 当前列表页内跳到 /tools/:id/，jump 在新标签页打开同一地址。
 -->
 <template>
   <div class="tda-select px-fade" role="group" :aria-label="t('tools.dialogNavLabel')" @mouseleave="hovered = null">

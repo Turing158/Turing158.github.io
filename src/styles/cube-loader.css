@@ -56,36 +56,36 @@
 /* 六个面：四面草侧、顶面草皮、底面泥土 */
 .cube3d > *:nth-child(1) {
   transform: translateZ(calc(var(--cube-size) / -2)) rotateY(180deg);
-  background-image: url('../assets/cube-loader/grass.png');
+  background-image: url('/cube-loader/grass.png');
 }
 
 .cube3d > *:nth-child(2) {
   transform: rotateY(-270deg) translateX(50%);
   transform-origin: top right;
-  background-image: url('../assets/cube-loader/grass.png');
+  background-image: url('/cube-loader/grass.png');
 }
 
 .cube3d > *:nth-child(3) {
   transform: rotateY(270deg) translateX(-50%);
   transform-origin: center left;
-  background-image: url('../assets/cube-loader/grass.png');
+  background-image: url('/cube-loader/grass.png');
 }
 
 .cube3d > *:nth-child(4) {
   transform: rotateX(90deg) translateY(-50%);
   transform-origin: top center;
-  background-image: url('../assets/cube-loader/grasstop.png');
+  background-image: url('/cube-loader/grasstop.png');
 }
 
 .cube3d > *:nth-child(5) {
   transform: rotateX(-90deg) translateY(50%);
   transform-origin: bottom center;
-  background-image: url('../assets/cube-loader/grassbottom.png');
+  background-image: url('/cube-loader/grassbottom.png');
 }
 
 .cube3d > *:nth-child(6) {
   transform: translateZ(calc(var(--cube-size) / 2));
-  background-image: url('../assets/cube-loader/grass.png');
+  background-image: url('/cube-loader/grass.png');
 }
 
 @keyframes cube-loader-rotate {
@@ -97,12 +97,6 @@
   }
   100% {
     transform: rotate(45deg) rotateX(-385deg) rotateY(385deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cube3d {
-    animation-duration: 3s;
   }
 }
 
@@ -118,16 +112,4 @@
 .cube-anim.loader-pop-leave-to {
   opacity: 0;
   transform: scale(0.8);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cube-anim.loader-pop-enter-active,
-  .cube-anim.loader-pop-leave-active {
-    transition: opacity 0.25s ease;
-  }
-
-  .cube-anim.loader-pop-enter-from,
-  .cube-anim.loader-pop-leave-to {
-    transform: none;
-  }
 }

@@ -396,11 +396,14 @@ export function prerenderPlugin(): Plugin {
 
       // ── 3. 工具详情页 ──
       // 运行时标题是工具名本身（usePageSeo 的第一参），描述取自 tools.<key>Desc
+      // canonical 用带尾斜杠的目录形式（/tools/<key>/），与路由模板 /tools/:id/
+      // 及 GitHub Pages 的 301 归一化方向一致（见 routes.ts 的说明）；
+      // writePage 的落盘路径仍是不带斜杠的目录名。
       for (const tool of toolKeys) {
         const name = pick(messages, `tools.${tool.key}Name`) || tool.key
         const description = pick(messages, `tools.${tool.key}Desc`) || DEFAULT_DESCRIPTION
         const meta: PageMeta = {
-          path: `/tools/${tool.key}`,
+          path: `/tools/${tool.key}/`,
           title: buildTitle(name),
           description,
           heading: name,

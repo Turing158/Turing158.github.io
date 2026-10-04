@@ -1,6 +1,6 @@
 <template>
   <div class="articles-view">
-    <h1 class="page-title">{{ $t('articles.title') }}</h1>
+    <PageTitle icon="enchanted-book">{{ $t('articles.title') }}</PageTitle>
 
     <Transition name="loader-pop" mode="out-in" appear>
       <div v-if="loading" class="status cube-anim">
@@ -177,6 +177,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { useI18n } from 'vue-i18n'
 import BlogTip from '@/plugins/blog-tip'
 import BlogSelect from '@/components/common/BlogSelect.vue'
+import PageTitle from '@/components/common/PageTitle.vue'
 import { articleTime } from '@/utils/articleDate'
 
 const { t } = useI18n()
