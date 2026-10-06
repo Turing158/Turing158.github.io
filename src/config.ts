@@ -18,6 +18,7 @@
 //   <BASE>/github/access_token  Gitalk OAuth token（原 tool-proxy；
 //                               旧路径 /github_access_token 已随合并废弃）
 //   <BASE>/cline/model/*        Cline 模型目录（原 tool-proxy.turing158.de5.net）
+//   <BASE>/coding/data          Vibe Coding 请求数据（首页活动卡）
 //   <BASE>/friend-link/find/all 友链读取（原 blog.friendlink.de5.net）
 //   <BASE>/friend-link/apply    友链申请（原 blog.add-friendlink.de5.net）
 // 可用环境变量 VITE_BACKEND_BASE 覆盖；换域名时需同步 .env，vite.config.ts 与
@@ -133,6 +134,13 @@ const CLINE_MODELS_API = import.meta.env.VITE_CLINE_API_BASE
 const CLINE_MODELS_ALL_API = import.meta.env.VITE_CLINE_ALL_API
   ?? `${BACKEND_BASE}/cline/model/all`
 
+// --- Vibe Coding 活动 API ---
+// 首页 VibeCodingWidget 用：GET {BASE}/coding/data 返回
+// { online, request_data[], time }，request_data 为 date × model 逐条请求记录
+// （含 token / 延迟明细），字段见组件头注释。前端自行按 date / model 聚合；
+// Worker 侧建议边缘缓存 30min。可用环境变量 VITE_CODING_DATA_API 覆盖
+const VIBE_API = import.meta.env.VITE_CODING_DATA_API ?? `${BACKEND_BASE}/coding/data`
+
 // --- 缓存 TTL（毫秒） ---
 const ARTICLES_CACHE_TTL = 5 * 60 * 1000 // 5 分钟
 
@@ -175,6 +183,9 @@ export const config = {
   cline: {
     apiBase: CLINE_MODELS_API,
     allApi: CLINE_MODELS_ALL_API,
+  },
+  vibe: {
+    api: VIBE_API,
   },
   cache: {
     articlesTTL: ARTICLES_CACHE_TTL,

@@ -174,23 +174,26 @@
           </router-link>
         </div>
 
-        <!-- 留言板 Widget（方案 A，Gitalk 留声机） -->
-        <div class="widget board-widget">
-          <div class="widget-header">
-            <div class="widget-title">
-              <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M8 1 a7 7 0 1 0 0 14 a7 7 0 1 0 0 -14 Z M8 6 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z" />
-              </svg>
-              <span class="title-text">{{ $t('home.messageBoard') }}</span>
-              <span class="title-en">GRAMOPHONE</span>
-            </div>
-            <div class="widget-sub">{{ $t('home.messageBoardNote') }}</div>
-          </div>
-          <div class="board-content">
-            <div id="gitalk-container-home" class="gitalk-container"></div>
-          </div>
-        </div>
+        <!-- Vibe Coding 活动卡（方案 B · 浓度热力） -->
+        <VibeCodingWidget />
 
+      </div>
+
+      <!-- 留言板 Widget（方案 A，Gitalk 留声机），独占一整行 -->
+      <div class="widget board-widget">
+        <div class="widget-header">
+          <div class="widget-title">
+            <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M8 1 a7 7 0 1 0 0 14 a7 7 0 1 0 0 -14 Z M8 6 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z" />
+            </svg>
+            <span class="title-text">{{ $t('home.messageBoard') }}</span>
+            <span class="title-en">GRAMOPHONE</span>
+          </div>
+          <div class="widget-sub">{{ $t('home.messageBoardNote') }}</div>
+        </div>
+        <div class="board-content">
+          <div id="gitalk-container-home" class="gitalk-container"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -202,6 +205,7 @@ import { useI18n } from 'vue-i18n'
 import { Divider } from 'animal-island-vue'
 import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import VibeCodingWidget from '@/components/home/VibeCodingWidget.vue'
 import { useArticles } from '@/composables/useArticles'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
@@ -1069,7 +1073,7 @@ const articleTotal = computed(() => store.articles.length)
   color: var(--text-secondary);
 }
 
-// 心得 + 留言板双列（心得更宽）
+// 心得 + Vibe Coding 活动卡双列（心得更宽），留言板独占下一行
 .home-duo {
   grid-column: span 2;
   display: grid;
@@ -1268,8 +1272,9 @@ const articleTotal = computed(() => store.articles.length)
   transition: all 0.3s ease;
 }
 
-// 留言板（Gitalk 留声机）
+// 留言板（Gitalk 留声机），独占一整行
 .board-widget {
+  grid-column: span 2;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -1339,7 +1344,8 @@ const articleTotal = computed(() => store.articles.length)
 
   // span 2 在单列网格里会撑出隐式第二列，把时钟与资料卡挤进同一行，必须重置
   .log-widget,
-  .home-duo {
+  .home-duo,
+  .board-widget {
     grid-column: auto;
   }
 
