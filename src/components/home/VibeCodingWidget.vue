@@ -3,23 +3,26 @@
     <div v-if="loading" class="widget-content cube-anim">
       <CubeLoader :text="$t('common.loading')" />
     </div>
-    <div v-else-if="!hasData" class="widget-content">{{ $t('home.vibe.empty') }}</div>
     <template v-else>
         <div class="vibe-header">
           <div class="vibe-title">
             <span class="slot"><img :src="ICON.diamondPickaxe" alt="" draggable="false" /></span>
             <span class="vibe-name">{{ $t('home.vibe.title') }}</span>
-            <span class="live-chip" :class="{ off: !summary?.online }">
-              <span class="lamp" :class="{ on: summary?.online }">
+            <span class="live-chip" :class="{ off: !online }">
+              <span class="lamp" :class="{ on: online }">
                 <img :src="ICON.redstoneLamp" alt="" draggable="false" />
               </span>
-              <span>{{ summary?.online ? $t('home.vibe.online') : $t('home.vibe.offline') }}</span>
-              <span class="en">{{ summary?.online ? 'LIVE' : 'IDLE' }}</span>
+              <span>{{ online ? $t('home.vibe.online') : $t('home.vibe.offline') }}</span>
+              <span class="en">{{ online ? 'LIVE' : 'IDLE' }}</span>
             </span>
           </div>
         </div>
 
-        <div class="vibe-grid">
+        <!-- 窗口区：未命中缓存时显示加载态；无记录时渲染 28 个空格子 -->
+        <div v-if="windowLoading" class="window-loading">
+          <CubeLoader :text="$t('common.loading')" />
+        </div>
+        <div v-else class="vibe-grid">
           <div
             v-for="(cell, i) in days"
             :key="cell.date"
@@ -82,7 +85,8 @@
           </span>
         </div>
 
-        <div class="vibe-stats">
+        <!-- 统计与格子同窗：窗口拉取中先隐藏，避免闪现全 0 -->
+        <div v-if="!windowLoading" class="vibe-stats">
           <span v-if="topModel" class="chip">
             <img :src="ICON.netherStar" alt="" draggable="false" />
             {{ $t('home.vibe.topModel', { name: topModel }) }}
@@ -105,30 +109,50 @@
           </span>
         </div>
 
+        <!-- 排行：标题常驻，窗口拉取中在标题下原地显示 loading，翻页不再整块消失 -->
         <div class="vibe-rank">
           <div class="rank-head">
             {{ $t('home.vibe.rankTitle') }}
             <span class="en">MODEL RANKS · TOP 3</span>
           </div>
-          <div v-for="(m, i) in rankTop" :key="m.model" class="rank-row">
-            <span class="slot sm"><img :src="ICON[rankIcon(i)]" alt="" draggable="false" /></span>
-            <span class="rank-main">
-              <span class="rank-line1">
-                <span class="rank-name" :title="m.model">{{ m.model }}</span>
-                <span class="rank-val">{{ fmtN(m.requests) }}</span>
-              </span>
-              <span class="rank-line2">
-                <XpBar class="rank-xp" :value="barWidth(m)" />
-                <span class="rank-tok">
-                  <img :src="ICON.experienceBottle" alt="" draggable="false" />
-                  {{ fmtK(m.tokens) }}
+          <div v-if="windowLoading" class="rank-loading">
+            <CubeLoader :text="$t('common.loading')" />
+          </div>
+          <template v-else-if="rankTop.length > 0">
+            <div v-for="(m, i) in rankTop" :key="m.model" class="rank-row">
+              <span class="slot sm"><img :src="ICON[rankIcon(i)]" alt="" draggable="false" /></span>
+              <span class="rank-main">
+                <span class="rank-line1">
+                  <span class="rank-name" :title="m.model">{{ m.model }}</span>
+                  <span class="rank-val">{{ fmtN(m.requests) }}</span>
+                </span>
+                <span class="rank-line2">
+                  <XpBar class="rank-xp" :value="barWidth(m)" />
+                  <span class="rank-tok">
+                    <img :src="ICON.experienceBottle" alt="" draggable="false" />
+                    {{ fmtK(m.tokens) }}
+                  </span>
                 </span>
               </span>
-            </span>
-          </div>
-          <div v-if="rankRestCount > 0" class="rank-rest">
-            {{ $t('home.vibe.rankRest', { n: rankRestCount, m: fmtN(rankRestRequests) }) }}
-          </div>
+            </div>
+            <div v-if="rankRestCount > 0" class="rank-rest">
+              {{ $t('home.vibe.rankRest', { n: rankRestCount, m: fmtN(rankRestRequests) }) }}
+            </div>
+          </template>
+          <!-- 无数据占位：3 行同构骨架撑住布局，出数据时高度不跳动 -->
+          <template v-else>
+            <div v-for="i in 3" :key="'sk' + i" class="rank-row rank-skel" :style="{ '--i': i }">
+              <span class="slot sm"></span>
+              <span class="rank-main">
+                <span class="rank-line1">
+                  <i class="sk sk-name"></i><i class="sk sk-val"></i>
+                </span>
+                <span class="rank-line2">
+                  <i class="sk sk-bar"></i><i class="sk sk-tok"></i>
+                </span>
+              </span>
+            </div>
+          </template>
         </div>
       </template>
   </div>
@@ -144,7 +168,9 @@ import { config } from '@/config'
 
 /** 首页 Vibe Coding 活动卡（方案 B · 浓度热力）。
  *
- *  数据：GET config.vibe.api → { online, request_data, time }
+ *  数据：GET config.vibe.api?date=YYYY-MM-DD → { online, request_data, time }
+ *  - date    窗口结束日，缺省 = 今天（上海时区）；接口固定返回以该日期结尾的
+ *            连续 28 天记录，历史窗口由前端翻页时逐窗拉取并缓存
  *  - online   当前是否正在 vibe → 红石灯
  *  - request_data  date × model 逐条请求记录（requests / failed_requests /
  *    *_tokens / *_latency_ns 明细），组件内按 date 聚合成 4×7=28 格浓度热力
@@ -199,23 +225,32 @@ interface VibeSummary {
 }
 
 const loading = ref(true)
-const summary = ref<VibeSummary | null>(null)
-const hasData = computed(() => (summary.value?.request_data?.length ?? 0) > 0)
+const online = ref<boolean | null>(null)
+/** 各窗口原始记录缓存：key = 窗口结束日（YYYY-MM-DD），value = 该 28 天记录 */
+const windowsCache = ref(new Map<string, VibeRecord[]>())
+/** 在途请求（同窗口去重；失败不落缓存，翻走再翻回即可重试） */
+const inflight = ref(new Set<string>())
 
-onMounted(async () => {
+/** 拉取一个窗口：接口固定返回以 date 结尾的连续 28 天记录 */
+async function fetchWindow(endKey: string) {
+  if (windowsCache.value.has(endKey) || inflight.value.has(endKey)) return
+  inflight.value.add(endKey)
   try {
-    const res = await apiFetch(config.vibe.api)
-    if (res.ok) summary.value = await res.json()
+    const res = await apiFetch(`${config.vibe.api}?date=${endKey}`)
+    if (res.ok) {
+      const data: VibeSummary = await res.json()
+      online.value = data.online
+      windowsCache.value.set(endKey, data.request_data ?? [])
+    }
   } catch {
     /* 接口失败按空数据处理 */
   } finally {
-    loading.value = false
+    inflight.value.delete(endKey)
   }
-})
+}
 
-// ── 时间窗：固定 28 天、按行铺满 4×7，右下角 = 今天 ──
-const today = new Date(); today.setHours(0, 0, 0, 0)
 // ── 时间窗：每页 28 天，offset 0 = 右下角今天；负数向过去翻页 ──
+const today = new Date(); today.setHours(0, 0, 0, 0)
 const offset = ref(0)
 /** 最多回看 12 页（336 天），防止无限翻进没有数据的过去 */
 const MIN_OFFSET = -12
@@ -224,14 +259,29 @@ const windowEnd = computed(() => {
   d.setDate(d.getDate() + offset.value * 28)
   return d
 })
+
+const isoDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+/** 当前窗口结束日，即请求参数 ?date= 的值 */
+const activeEnd = computed(() => isoDate(windowEnd.value))
+/** 当前窗口的记录（命中缓存秒切；未命中时窗口区显示加载态） */
+const activeRecords = computed<VibeRecord[]>(() => windowsCache.value.get(activeEnd.value) ?? [])
+const windowLoading = computed(() =>
+  !windowsCache.value.has(activeEnd.value) && inflight.value.has(activeEnd.value))
+
+
 const canGoPrev = computed(() => offset.value > MIN_OFFSET)
 const canGoNext = computed(() => offset.value < 0)
 function shiftWindow(dir: number) {
   offset.value = Math.min(0, Math.max(MIN_OFFSET, offset.value + dir))
+  void fetchWindow(activeEnd.value)
 }
 
-const isoDate = (d: Date) =>
-  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+onMounted(async () => {
+  await fetchWindow(activeEnd.value)
+  loading.value = false
+})
 
 interface DayCell {
   date: string
@@ -244,7 +294,7 @@ interface DayCell {
 
 const days = computed<DayCell[]>(() => {
   const byDate = new Map<string, VibeRecord[]>()
-  for (const r of summary.value?.request_data ?? []) {
+  for (const r of activeRecords.value) {
     const list = byDate.get(r.date)
     if (list) list.push(r)
     else byDate.set(r.date, [r])
@@ -276,7 +326,7 @@ const days = computed<DayCell[]>(() => {
 const windowRecords = computed<VibeRecord[]>(() => {
   const start = days.value[0]?.date ?? ''
   const end = days.value[days.value.length - 1]?.date ?? ''
-  return (summary.value?.request_data ?? []).filter(r => r.date >= start && r.date <= end)
+  return activeRecords.value.filter(r => r.date >= start && r.date <= end)
 })
 
 /** 窗口日期范围标签（如 2026-09-08 ~ 10-05） */
@@ -373,6 +423,7 @@ img {
 
 .vibe-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   font-size: 1.05rem;
@@ -381,9 +432,11 @@ img {
   min-width: 0;
 }
 
+/* 标题按内容宽收缩（min-width: max-content）保证不缩写出省略号：
+   卡片放不下「标题 + 徽章」时徽章整体换到第二行右端，而不是挤掉标题 */
 .vibe-name {
   flex: 1;
-  min-width: 0;
+  min-width: max-content;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -481,18 +534,27 @@ img {
 
 /* ── 4 高 × 7 宽 格子（28 天按行铺满，右下角 = 今天）──
    扁平化：无内嵌描边，空格 / 亮格都是平涂色块，仅保留像素圆角切角；
-   壳层不裁剪（clip-path 会裁掉子树），视觉面在 .face，tooltip 留在壳层 */
-/* ── 4 高 × 7 宽 格子（28 天按行铺满，右下角 = 今天）──
-   卡片作为容器（inline-size）：格子基准 36px，间距在 4~10px 间随卡片宽度
-   优先伸缩，卡片窄到间距触底后格子才开始收缩 */
+   壳层不裁剪（clip-path 会裁掉子树），视觉面在 .face，tooltip 留在壳层。
+   格子用 1fr 平分卡片宽度（外层上限 312px = 7×36 + 6×10，超出居中留白），
+   数学上不可能溢出卡片 —— 不依赖容器单位的解析结果（旧 iOS Safari 会把
+   cqw 按边框盒 / viewport 兜底，按整屏宽排格子就会挤出卡片右缘）；
+   间距仍随卡片宽度在 4~10px 间伸缩（cqw），不认识的浏览器回退固定 8px */
 .vibe-grid {
-  --cell: min(36px, calc((100cqw - 24px) / 7));
-  --gap: clamp(4px, calc((100cqw - 7 * var(--cell)) / 6), 10px);
+  --gap: clamp(4px, calc((100cqw - 252px) / 6), 10px);
   display: grid;
-  grid-template-columns: repeat(7, var(--cell));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
   gap: var(--gap);
-  width: max-content;
+  width: 100%;
+  max-width: 312px;
   margin: 0 auto;
+}
+
+/* 窗口加载态：占位高度约等于 4 行格子，翻页时卡片不跳动 */
+.window-loading {
+  min-height: 176px;
+  display: grid;
+  place-items: center;
 }
 
 .vibe-cell {
@@ -732,6 +794,44 @@ img {
     letter-spacing: 1px;
     opacity: 0.75;
   }
+}
+
+/* 排行加载态：标题常驻，下方原地占位约 3 行排行高度，翻页不跳动 */
+.rank-loading {
+  min-height: 96px;
+  display: grid;
+  place-items: center;
+}
+
+/* 无数据骨架占位：与真实排行同构（空槽位 + 灰条 + XP 底槽），步进闪烁 */
+.rank-skel {
+  .slot {
+    opacity: 0.5;
+  }
+
+  .rank-line1,
+  .rank-line2 {
+    align-items: center;
+  }
+
+  .sk {
+    display: block;
+    height: 8px;
+    background: color-mix(in srgb, var(--text-secondary) 25%, transparent);
+    --pxs: 2px; clip-path: var(--pxc);
+    animation: rank-skel-blink 1.4s steps(2) infinite;
+    animation-delay: calc(var(--i) * 160ms);
+  }
+
+  .sk-name { flex: 1; max-width: 55%; }
+  .sk-val { flex: none; width: 22px; margin-left: auto; }
+  .sk-bar { flex: 1; background: color-mix(in srgb, var(--text-secondary) 14%, transparent); }
+  .sk-tok { flex: none; width: 30px; }
+}
+
+@keyframes rank-skel-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* 排行一行两行制：第一行 = 模型名 + 成功次数（像素字），第二行 = 经验条 + token 用量 */

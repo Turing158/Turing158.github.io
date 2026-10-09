@@ -73,7 +73,7 @@
       "dayTokens": "{n} tokens",
       "avgLatency": "平均 {s}s",
       "mainModel": "主力 {name}",
-      "empty": "近 28 天暂无 vibe 记录",
+      "empty": "该时段暂无 vibe 记录",
       "weekday": {
         "sun": "周日",
         "mon": "周一",

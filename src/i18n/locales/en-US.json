@@ -43,7 +43,7 @@
       "dayTokens": "{n} tokens",
       "avgLatency": "avg {s}s",
       "mainModel": "Top {name}",
-      "empty": "No vibe activity in the last 28 days",
+      "empty": "No vibe records in this period",
       "weekday": {
         "sun": "Sun",
         "mon": "Mon",
