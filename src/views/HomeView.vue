@@ -1,90 +1,145 @@
 <template>
   <div class="home-view">
     <div class="widgets-grid">
-      <!-- Clock Widget -->
-      <div class="widget clock-widget">
-        <ResponsiveTime class="clock-time" />
-        <Divider />
-        <Transition name="loader-pop" mode="out-in" appear>
-          <div v-if="!holidaysLoaded" class="holiday-loading cube-anim">
-            <CubeLoader :text="$t('home.loading')" />
+      <!-- A · 森林手札：时间组件整体复用，装饰与节日围绕组件排布。 -->
+      <section class="widget journal-card clock-widget" aria-labelledby="journal-clock-title">
+        <header class="journal-header">
+          <h2 id="journal-clock-title"><img :src="minecraftClock" class="minecraft-item" width="24" height="24" alt="" />{{ $t('home.journal.clockTitle') }}</h2>
+          <span class="journal-header-meta">{{ clockTimezone }}</span>
+        </header>
+        <div class="journal-clock-face">
+          <div class="journal-time-wrap"><ResponsiveTime class="clock-time" /></div>
+          <div class="journal-camp">
+            <div class="camp-caption">
+              <img :src="minecraftCompass" class="minecraft-item" width="24" height="24" alt="" />
+              <div class="camp-caption-copy">
+                <h3>{{ $t('home.journal.campTitle') }}</h3>
+                <p class="journal-clock-note">{{ $t('home.journal.clockNote') }}</p>
+              </div>
+              <span class="camp-world" aria-hidden="true">OVERWORLD</span>
+            </div>
+            <JournalCampScene />
           </div>
-          <div v-else-if="holidaysError" class="holiday-loading">{{ $t('home.loadFailed') }}</div>
-          <div v-else-if="!countdown" class="holiday-loading">{{ $t('home.holidayNoMore') }}</div>
-          <div v-else class="holiday-content">
-            <div class="holiday-name">{{ countdown.holiday.name }}</div>
-            <div v-if="countdown.isToday" class="holiday-countdown">
-              <div class="holiday-today">{{ $t('home.holidayToday') }}</div>
-              <div class="holiday-greeting">{{ countdown.greeting }}</div>
+        </div>
+        <div class="journal-holiday" aria-live="polite">
+          <Transition name="loader-pop" mode="out-in">
+            <div v-if="holidaysError" class="holiday-loading">{{ $t('home.loadFailed') }}</div>
+            <div v-else-if="!holidaysLoaded" class="holiday-loading cube-anim">
+              <CubeLoader :text="$t('home.loading')" />
             </div>
-            <div v-else-if="countdown.hoursLeft !== undefined && countdown.hoursLeft > 0" class="holiday-countdown">
-              <div class="holiday-urgent">{{ $t('home.hoursLeft', { n: countdown.hoursLeft }) }}</div>
-              <div class="holiday-greeting">{{ countdown.greeting }}</div>
+            <div v-else-if="!countdown" class="holiday-empty">
+              <span class="holiday-book"><img :src="minecraftBook" class="minecraft-item" width="32" height="32" alt="" /></span>
+              <div class="holiday-empty-copy">
+                <p class="holiday-empty-title">{{ $t('home.journal.ordinaryDay') }}</p>
+                <p class="holiday-empty-caption">{{ $t('home.holidayNoMore') }}</p>
+              </div>
+              <router-link to="/articles" class="journal-notes-link">
+                <span>{{ $t('home.journal.readNotes') }}</span>
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M9 3h2v2h2v2h2v2h-2v2h-2v2H9V9H1V7h8z" /></svg>
+              </router-link>
             </div>
-            <div v-else class="holiday-countdown">
-              <div class="holiday-days">{{ $t('home.daysLeft', { n: countdown.daysLeft }) }}</div>
+            <div v-else class="holiday-content">
+              <div class="holiday-heading">
+                <p class="holiday-label">{{ $t(countdown.isToday ? 'home.journal.holidayDate' : 'home.journal.nextHoliday', { date: countdown.holiday.date.split('-').join('.') }) }}</p>
+                <h3 class="holiday-name"><img :src="minecraftFirework" class="minecraft-item" width="24" height="24" alt="" />{{ countdown.holiday.name }}</h3>
+              </div>
+              <div v-if="countdown.isToday" class="holiday-countdown">
+                <div class="holiday-today">{{ $t('home.holidayToday') }}</div>
+                <div class="holiday-greeting">{{ countdown.greeting }}</div>
+              </div>
+              <div v-else-if="countdown.hoursLeft !== undefined && countdown.hoursLeft > 0" class="holiday-countdown">
+                <div class="holiday-urgent">{{ $t('home.hoursLeft', { n: countdown.hoursLeft }) }}</div>
+                <div class="holiday-greeting">{{ countdown.greeting }}</div>
+              </div>
+              <div v-else class="holiday-countdown">
+                <i18n-t keypath="home.journal.daysUntil" tag="p" class="holiday-days">
+                  <template #n><strong>{{ countdown.daysLeft }}</strong></template>
+                </i18n-t>
+              </div>
             </div>
-          </div>
-        </Transition>
-      </div>
+          </Transition>
+        </div>
+      </section>
 
-      <!-- Profile Widget -->
-      <div class="widget profile-widget">
-        <div class="profile-avatar-wrap">
-          <img :src="avatarUrl" alt="avatar" class="profile-avatar" @click="onAvatarClick" />
+      <section class="widget journal-card profile-widget" aria-labelledby="journal-profile-title">
+        <svg class="journal-leaf" viewBox="0 0 16 16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M8 1h6v6h-2v3h-3v2H6v3H4v-4H2V7h3V4h3zm2 3v2H8v2H6v2h2V8h2V6h2V4z" /></svg>
+        <header class="journal-header">
+          <h2 id="journal-profile-title"><img :src="minecraftTotem" class="minecraft-item" width="24" height="24" alt="" />{{ $t('home.journal.welcome') }}</h2>
+          <span class="journal-header-meta">FIELD NOTES</span>
+        </header>
+        <div class="profile-summary">
+          <div class="profile-copy">
+            <div class="profile-identity">
+              <button type="button" class="profile-avatar-wrap" :aria-label="$t('home.journal.avatar', { name: fullBlogName })" @click="onAvatarClick">
+                <img :src="avatarUrl" alt="" width="70" height="70" class="profile-avatar" />
+              </button>
+              <div class="profile-identity-text">
+                <h3 class="profile-name typewriter" :aria-label="fullBlogName">
+                  <span class="typewriter-text" aria-hidden="true">{{ blogName }}</span>
+                  <span v-if="showBlogCursor" class="typewriter-cursor" aria-hidden="true"></span>
+                </h3>
+                <p class="profile-handle">@{{ githubUser }}</p>
+              </div>
+            </div>
+            <p class="profile-bio">{{ profileBio }}</p>
+            <div v-if="profile?.location" class="profile-location">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M5 1h6v2h2v8h-2v2H9v2H7v-2H5v-2H3V3h2zm1 3v5h4V4z" /></svg>
+              <span>{{ profile.location }}</span>
+            </div>
+          </div>
+          <aside class="profile-corner" :aria-label="$t('home.journal.workingOn')">
+            <p class="corner-kicker"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true"><path d="M5 3H3v3H1v4h2v3h2v-2H4V5h1zm6 0h2v3h2v4h-2v3h-2v-2h1V5h-1z" /></svg>{{ $t('home.journal.workingOn') }}</p>
+            <svg class="corner-art" viewBox="0 0 112 64" fill="none" shape-rendering="crispEdges" aria-hidden="true">
+              <path fill="var(--journal-edge)" opacity=".45" d="M4 60h104v4H4z" />
+              <path class="corner-sparks" fill="var(--journal-bright)" opacity=".45" d="M84 8h4v4h-4zM94 2h4v4h-4z" />
+              <path fill="var(--journal-accent)" d="M4 6h64v38H4z" />
+              <path fill="var(--bg-card)" d="M8 10h56v29H8z" />
+              <path fill="var(--journal-edge)" d="M8 10h56v5H8zM28 44h16v9H28zM21 53h30v4H21z" />
+              <path fill="var(--journal-accent)" d="M17 20h4v4h-4zM21 24h4v4h-4zM17 28h4v4h-4z" />
+              <path class="corner-terminal-cursor" fill="var(--journal-accent)" d="M30 29h16v3H30z" />
+              <path class="corner-screen-scan" fill="var(--journal-accent)" d="M8 16h56v2H8z" />
+              <path fill="var(--journal-bright)" d="M54 21h6v3h-6zM54 27h6v3h-6zM81 20h8v4h-8zM88 14h8v10h-8zM97 22h10v8H97zM81 28h15v6H81z" />
+              <path fill="var(--journal-accent)" d="M92 22h4v23h-4zM86 26h6v5h-6zM96 27h7v4h-7z" />
+              <path fill="var(--journal-edge)" d="M82 42h23v6h-23zM85 48h17v10H85z" />
+              <path fill="var(--journal-dim)" d="M0 58h112v3H0z" />
+            </svg>
+            <strong class="corner-title">{{ $t('home.journal.project') }}</strong>
+            <p class="corner-caption">{{ $t('home.journal.projectNote') }}</p>
+            <span class="corner-foot"><i aria-hidden="true"></i>{{ $t('home.journal.projectStatus') }}</span>
+          </aside>
         </div>
-        <div class="profile-name typewriter">
-          <span class="typewriter-text">{{ blogName }}</span>
-          <span v-if="showBlogCursor" class="typewriter-cursor"></span>
+        <div v-if="profile" class="profile-collection">
+          <div class="collection-heading" aria-hidden="true">
+            <i class="collection-rune"></i>
+            <span>{{ $t('home.journal.collection') }}</span>
+            <i class="collection-rune"></i>
+          </div>
+          <nav class="profile-stats" :aria-label="$t('home.journal.stats')">
+            <a v-for="stat in profileStats" :key="stat.tab" class="profile-stat" :href="`${githubProfileUrl}?tab=${stat.tab}`" :aria-label="`${$t(stat.label)} ${stat.value}`" target="_blank" rel="noopener noreferrer">
+              <span class="collection-plinth" aria-hidden="true">
+                <img :src="stat.icon" class="minecraft-item" width="32" height="32" alt="" />
+              </span>
+              <span class="stat-num" :title="String(stat.value)">{{ stat.displayValue }}</span>
+              <span class="stat-label">{{ $t(stat.label) }}</span>
+            </a>
+          </nav>
+          <div class="collection-desk" aria-hidden="true">
+            <span class="collection-prop"><img :src="minecraftAmethyst" class="minecraft-item" width="24" height="24" alt="" /></span>
+            <span class="collection-prop collection-book"><img :src="minecraftEnchantedBook" class="minecraft-item" width="32" height="32" alt="" /></span>
+            <span class="collection-prop"><img :src="minecraftExperienceBottle" class="minecraft-item" width="24" height="24" alt="" /></span>
+          </div>
         </div>
-        <div class="profile-bio">{{ profileBio }}</div>
-        <div v-if="profile?.location" class="profile-location">
-          <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-            <path
-              fill="currentColor"
-              d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z"
-            />
-          </svg>
-          <span>{{ profile.location }}</span>
-        </div>
-        <div v-if="profile" class="profile-stats">
-          <a
-            class="profile-stat px-fade"
-            :href="`${githubProfileUrl}?tab=repositories`"
-            target="_blank"
-            rel="noopener"
-          >
-            <span class="stat-num">{{ profile.public_repos }}</span>
-            <span class="stat-label">{{ $t('home.repos') }}</span>
-          </a>
-          <a
-            class="profile-stat px-fade"
-            :href="`${githubProfileUrl}?tab=followers`"
-            target="_blank"
-            rel="noopener"
-          >
-            <span class="stat-num">{{ profile.followers }}</span>
-            <span class="stat-label">{{ $t('home.followers') }}</span>
-          </a>
-          <a
-            class="profile-stat px-fade"
-            :href="`${githubProfileUrl}?tab=following`"
-            target="_blank"
-            rel="noopener"
-          >
-            <span class="stat-num">{{ profile.following }}</span>
-            <span class="stat-label">{{ $t('home.following') }}</span>
-          </a>
-        </div>
-      </div>
+        <a class="profile-github" :href="githubProfileUrl" target="_blank" rel="noopener noreferrer">
+          {{ $t('home.journal.githubLink') }}
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" shape-rendering="crispEdges" aria-hidden="true"><path d="M9 3h2v2h2v2h2v2h-2v2h-2v2H9V9H1V7h8z" /></svg>
+        </a>
+      </section>
 
       <!-- 近日动态 Widget（提交 + GitHub + Gitee 合并流，方案 A） -->
       <div class="widget log-widget">
         <div class="widget-header">
           <div class="widget-title">
-            <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M2 1 h12 v8 H2 Z M4 3 h8 v1 H4 Z M4 5 h5 v1 H4 Z M7 9 h2 v6 H7 Z" />
-            </svg>
+            <img :src="minecraftSign" class="minecraft-item title-icon" width="24" height="24" alt="" />
             <span class="title-text">{{ $t('home.recentLog') }}</span>
             <span class="title-en">RECENT LOG</span>
           </div>
@@ -108,8 +163,8 @@
               :title="row.text"
               :style="{ '--log-index': i }"
             >
-              <span class="log-icon" :style="{ color: row.iconColor }">
-                <svg class="px" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true" v-html="row.iconBody"></svg>
+              <span class="log-icon">
+                <img :src="row.iconSrc" class="minecraft-item" width="24" height="24" alt="" />
               </span>
               <span class="log-body">
                 <span class="log-action">{{ row.text }}</span>
@@ -132,9 +187,7 @@
         <div class="widget writings-widget">
           <div class="widget-header">
             <div class="widget-title">
-              <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-                <path fill-rule="evenodd" d="M2 2 h5 v12 H2 Z M9 2 h5 v12 H9 Z M7 2 h2 v12 H7 Z M3 4 h3 v1 H3 Z M10 4 h3 v1 h-3 Z M3 7 h3 v1 H3 Z M10 7 h3 v1 h-3 Z" />
-              </svg>
+              <img :src="minecraftBook" class="minecraft-item title-icon" width="24" height="24" alt="" />
               <span class="title-text">{{ $t('home.writings') }}</span>
               <span class="title-en">LATEST WRITINGS</span>
             </div>
@@ -183,9 +236,7 @@
       <div class="widget board-widget">
         <div class="widget-header">
           <div class="widget-title">
-            <svg class="px title-icon" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-              <path fill-rule="evenodd" d="M8 1 a7 7 0 1 0 0 14 a7 7 0 1 0 0 -14 Z M8 6 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z" />
-            </svg>
+            <img :src="minecraftMusicDisc" class="minecraft-item title-icon" width="24" height="24" alt="" />
             <span class="title-text">{{ $t('home.messageBoard') }}</span>
             <span class="title-en">GRAMOPHONE</span>
           </div>
@@ -202,10 +253,30 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Divider } from 'animal-island-vue'
 import ResponsiveTime from '@/components/common/ResponsiveTime.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import VibeCodingWidget from '@/components/home/VibeCodingWidget.vue'
+import JournalCampScene from '@/components/home/JournalCampScene.vue'
+import minecraftClock from '@/assets/minecraft-items/clock_00.png'
+import minecraftTotem from '@/assets/minecraft-items/totem_of_undying.png'
+import minecraftFirework from '@/assets/minecraft-items/firework_rocket.png'
+import minecraftMinecart from '@/assets/minecraft-items/chest_minecart.png'
+import minecraftEmerald from '@/assets/minecraft-items/emerald.png'
+import minecraftEnderEye from '@/assets/minecraft-items/ender_eye.png'
+import minecraftCompass from '@/assets/minecraft-items/compass_00.png'
+import minecraftBook from '@/assets/minecraft-items/writable_book.png'
+import minecraftAmethyst from '@/assets/minecraft-items/amethyst_shard.png'
+import minecraftEnchantedBook from '@/assets/minecraft-items/enchanted_book.png'
+import minecraftExperienceBottle from '@/assets/minecraft-items/experience_bottle.png'
+import minecraftSign from '@/assets/minecraft-items/oak_sign.png'
+import minecraftMusicDisc from '@/assets/minecraft-items/music_disc_cat.png'
+import minecraftPickaxe from '@/assets/minecraft-items/diamond_pickaxe.png'
+import minecraftArrow from '@/assets/minecraft-items/arrow.png'
+import minecraftSeeds from '@/assets/minecraft-items/wheat_seeds.png'
+import minecraftDoor from '@/assets/minecraft-items/oak_door.png'
+import minecraftNetherStar from '@/assets/minecraft-items/nether_star.png'
+import minecraftRepeater from '@/assets/minecraft-items/repeater.png'
+import minecraftDiamond from '@/assets/minecraft-items/diamond.png'
 import { useArticles } from '@/composables/useArticles'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAppStore } from '@/stores/app'
@@ -278,6 +349,16 @@ interface GitHubProfile {
 }
 const profile = ref<GitHubProfile | null>(null)
 const profileBio = computed(() => profile.value?.bio || t('home.profileBio'))
+const profileStats = computed(() => [
+  { tab: 'repositories', label: 'home.repos', value: profile.value?.public_repos, icon: minecraftMinecart },
+  { tab: 'followers', label: 'home.followers', value: profile.value?.followers, icon: minecraftEmerald },
+  { tab: 'following', label: 'home.following', value: profile.value?.following, icon: minecraftEnderEye },
+].map(stat => ({
+  ...stat,
+  displayValue: stat.value !== undefined && stat.value >= 1000
+    ? `${(stat.value / 1000).toFixed(1).replace(/\.0$/, '')}k`
+    : stat.value,
+})))
 onMounted(async () => {
   try {
     // 经 tool-proxy 转发（Worker 侧带 PAT，规避浏览器匿名限流）
@@ -298,6 +379,12 @@ onMounted(async () => {
 
 // Clock — Time 组件自带定时器，无需手动管理
 const now = ref(new Date())
+const clockTimezone = computed(() => {
+  const offset = -now.value.getTimezoneOffset()
+  const hours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0')
+  const minutes = Math.abs(offset) % 60
+  return `UTC ${offset >= 0 ? '+' : '-'}${hours}${minutes ? ':' + String(minutes).padStart(2, '0') : ''}`
+})
 
 // Commits
 const commitsLoading = ref(true)
@@ -688,61 +775,18 @@ onMounted(async () => {
 })
 
 // ── 近日动态（方案 A）：提交 + GitHub + Gitee 合并成一条村民日志 ──
-// 行内像素小图标：自绘 16×16，fill=currentColor，颜色按事件类型固定
-const LOG_ICONS: Record<string, { color: string; body: string }> = {
-  pickaxe: {
-    color: 'var(--accent)',
-    body: '<path d="M7 6 h2 l4 8 -2 1 Z M3 2 c3 -1.5 7 -1.5 10 1.5 L12 6 C10 4 6 4 4 5.5 Z"/>',
-  },
-  arrow: {
-    color: 'var(--border-strong)',
-    body: '<path d="M8 2 L14 8 h-3 v6 H5 V8 H2 Z"/>',
-  },
-  sprout: {
-    color: '#6ba53a',
-    body: '<path d="M7 8 h2 v7 H7 Z M8 7 c0 -3 2 -5 5 -5 c0 3 -2 5 -5 5 Z M7 7 C7 4.5 5.5 3 3 3 c0 2.5 1.5 4 4 4 Z"/>',
-  },
-  door: {
-    color: 'var(--text-secondary)',
-    body: '<path fill-rule="evenodd" d="M4 1 h8 v14 H4 Z M6 3 h4 v10 H6 Z M9 8 h1 v2 H9 Z"/>',
-  },
-  star: {
-    color: '#C9A227',
-    body: '<path d="M7 1 h2 v4 h4 v2 h-4 v4 h-2 v-4 H3 V5 h4 Z"/>',
-  },
-  heart: {
-    color: '#B0553A',
-    body: '<path d="M2 3 h4 v2 h4 V3 h4 v4 l-6 6 -6 -6 Z"/>',
-  },
-  merge: {
-    color: '#58707F',
-    body: '<path d="M4 2 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z M11 10 a2 2 0 1 1 0 4 a2 2 0 1 1 0 -4 Z M6 3 h2 v7 h3 v-1 l2 2 -2 2 v-1 H6 Z"/>',
-  },
-  bubble: {
-    color: 'var(--accent)',
-    body: '<path d="M2 2 h12 v9 H8 l-4 4 v-4 H2 Z"/>',
-  },
-  flag: {
-    color: '#C9A227',
-    body: '<path d="M3 1 h2 v14 H3 Z M5 2 h8 v6 H5 Z"/>',
-  },
-  gem: {
-    color: 'var(--accent)',
-    body: '<path d="M8 2 L14 6 8 14 2 6 Z"/>',
-  },
-}
-
+// 原版物品纹理按动态类型映射，所有主题保留物品原色。
 function logIconFor(type: string): string {
   const k = (type || '').toLowerCase()
-  if (k === 'commit') return 'pickaxe'
-  if (k.includes('push')) return 'arrow'
-  if (k.includes('create')) return 'sprout'
-  if (k.includes('delete') || k.includes('destroy') || k === 'left') return 'door'
-  if (k.includes('follow') || k.includes('star') || k.includes('watch')) return 'star'
-  if (k.includes('fork') || k.includes('merge') || k.includes('pullrequest')) return 'merge'
-  if (k.includes('comment')) return 'bubble'
-  if (k.includes('release')) return 'flag'
-  return 'gem'
+  if (k === 'commit') return minecraftPickaxe
+  if (k.includes('push')) return minecraftArrow
+  if (k.includes('create')) return minecraftSeeds
+  if (k.includes('delete') || k.includes('destroy') || k === 'left') return minecraftDoor
+  if (k.includes('follow') || k.includes('star') || k.includes('watch')) return minecraftNetherStar
+  if (k.includes('fork') || k.includes('merge') || k.includes('pullrequest')) return minecraftRepeater
+  if (k.includes('comment')) return minecraftBook
+  if (k.includes('release')) return minecraftFirework
+  return minecraftDiamond
 }
 
 interface LogRow {
@@ -751,8 +795,7 @@ interface LogRow {
   repo: string
   url: string
   date: string
-  iconBody: string
-  iconColor: string
+  iconSrc: string
 }
 
 const recentLog = computed<LogRow[]>(() => {
@@ -770,10 +813,7 @@ const recentLog = computed<LogRow[]>(() => {
     .filter(r => r.date && r.text)
     .sort((x, y) => (new Date(y.date).getTime() || 0) - (new Date(x.date).getTime() || 0))
     .slice(0, 8)
-    .map(r => {
-      const meta = LOG_ICONS[logIconFor(r.kind)] ?? LOG_ICONS.gem
-      return { id: r.id, text: r.text, repo: r.repo, url: r.url, date: r.date, iconBody: meta.body, iconColor: meta.color }
-    })
+    .map(r => ({ id: r.id, text: r.text, repo: r.repo, url: r.url, date: r.date, iconSrc: logIconFor(r.kind) }))
 })
 
 const logLoading = computed(() => commitsLoading.value || activityLoading.value || giteeLoading.value)
@@ -823,219 +863,7 @@ const articleTotal = computed(() => store.articles.length)
   color: var(--text-primary);
 }
 
-// Clock Widget
-.clock-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.clock-time {
-  margin: 8px auto;
-}
-
-.holiday-loading {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.holiday-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.holiday-name {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--accent);
-}
-
-.holiday-countdown {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
-
-.holiday-days {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.holiday-today {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #e74c3c;
-}
-
-.holiday-urgent {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #e67e22;
-}
-
-.holiday-greeting {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-// Profile Widget
-.profile-widget {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-.profile-avatar-wrap {
-  position: relative;
-  width: 72px;
-  height: 72px;
-  margin-bottom: 12px;
-  /* 1 个像素网格单位 = 72px / 16 = 4.5px，环宽即 1 单位 */
-  padding: 4.5px;
-  background: var(--accent);
-  clip-path: var(--pxc-circle);
-  overflow: hidden;
-  cursor: pointer;
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 50%;
-    height: 100%;
-    background: linear-gradient(
-      90deg,
-      transparent,
-      rgba(255, 255, 255, 0.35),
-      transparent
-    );
-    transform: skewX(-20deg);
-    pointer-events: none;
-  }
-
-  &:hover::after {
-    animation: avatar-shine 0.6s ease;
-  }
-}
-
-.profile-avatar {
-  width: 100%;
-  height: 100%;
-  clip-path: var(--pxc-circle-in);
-  display: block;
-}
-
-@keyframes avatar-shine {
-  0% { left: -100%; }
-  100% { left: 150%; }
-}
-
-.profile-name {
-  font-weight: 600;
-  font-size: 1.1rem;
-  margin-bottom: 4px;
-  color: var(--text-primary);
-}
-
-// Typewriter effect — JS-driven loop with blinking cursor
-.typewriter {
-  display: inline-flex;
-  align-items: center;
-}
-
-.typewriter-text {
-  white-space: nowrap;
-  min-height: 1.2em;
-  line-height: 1.2em;
-}
-
-.typewriter-cursor {
-  display: inline-block;
-  width: 2px;
-  height: 1em;
-  background: var(--accent);
-  margin-left: 2px;
-  animation: typewriter-blink 0.8s step-end infinite;
-  vertical-align: text-bottom;
-}
-
-@keyframes typewriter-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.profile-bio {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-}
-
-.profile-location {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 8px;
-  color: var(--text-secondary);
-  font-size: 0.78rem;
-
-  svg {
-    color: var(--accent);
-    flex-shrink: 0;
-  }
-}
-
-.profile-stats {
-  display: flex;
-  align-items: stretch;
-  gap: 8px;
-  margin-top: 16px;
-  width: 100%;
-  max-width: 240px;
-}
-
-.profile-stat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 8px 4px;
-  --pxs: 3px; clip-path: var(--pxc);
-  text-decoration: none;
-  background: var(--bg-secondary);
-  border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 14px var(--shadow);
-
-    .stat-num {
-      color: var(--accent);
-    }
-  }
-}
-
-.stat-num {
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  transition: color 0.3s ease;
-}
-
-.stat-label {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-}
+@import '../styles/home-journal.less';
 
 // ── 方案 A 三卡：近日动态 / 新写成的心得 / 留言板 ──────────
 .widget-content {
@@ -1053,9 +881,8 @@ const articleTotal = computed(() => store.articles.length)
 }
 
 .title-icon {
-  width: 22px;
-  height: 22px;
-  color: var(--accent);
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -1129,9 +956,9 @@ const articleTotal = computed(() => store.articles.length)
   border: 1px solid transparent; border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
   transition: transform 0.3s ease;
 
-  svg {
-    width: 20px;
-    height: 20px;
+  .minecraft-item {
+    width: 24px;
+    height: 24px;
   }
 }
 

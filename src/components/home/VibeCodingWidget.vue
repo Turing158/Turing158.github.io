@@ -23,17 +23,23 @@
           <CubeLoader :text="$t('common.loading')" />
         </div>
         <div v-else class="vibe-grid">
-          <div
+          <button
             v-for="(cell, i) in days"
             :key="cell.date"
+            type="button"
             class="vibe-cell"
-            :class="{ on: cell.requests > 0, ['lv' + levelOf(cell.requests)]: cell.requests > 0, today: i === 27 && offset === 0 }"
+            :class="{ on: cell.requests > 0, ['lv' + levelOf(cell.requests)]: cell.requests > 0, today: i === 27 && offset === 0, selected: selectedDate === cell.date }"
             :style="{ '--i': i }"
+            :aria-label="$t('home.vibe.selectDay', { date: cell.date, n: fmtN(cell.requests) })"
+            :aria-pressed="selectedDate === cell.date"
+            :aria-controls="rankId"
+            @click="selectedDate = cell.date"
           >
-            <i class="face"></i>
+            <i class="face" aria-hidden="true"></i>
             <span
               class="vibe-tip"
               :class="{ below: Math.floor(i / 7) === 0, 'align-l': i % 7 <= 1, 'align-r': i % 7 >= 5 }"
+              aria-hidden="true"
             >
               <i>
                 <span class="d">{{ cell.dateLabel }}</span>
@@ -54,7 +60,7 @@
                 </template>
               </i>
             </span>
-          </div>
+          </button>
         </div>
         <div class="vibe-foot">
           <div class="win-nav">
@@ -110,10 +116,23 @@
         </div>
 
         <!-- 排行：标题常驻，窗口拉取中在标题下原地显示 loading，翻页不再整块消失 -->
-        <div class="vibe-rank">
+        <div :id="rankId" class="vibe-rank">
           <div class="rank-head">
             {{ $t('home.vibe.rankTitle') }}
             <span class="en">MODEL RANKS · TOP 3</span>
+            <!-- 选中日期后压缩成一颗按钮：平时显示日期，悬停切换为回到 28 天汇总 -->
+            <button
+              v-if="selectedDate"
+              type="button"
+              class="rank-reset"
+              :aria-label="`${selectedDate} · ${$t('home.vibe.resetRank')}`"
+              @click="selectedDate = null"
+            >
+              <span class="swap" aria-hidden="true">
+                <span class="d">{{ selectedDate }}</span>
+                <span class="c">{{ $t('home.vibe.resetRank') }}</span>
+              </span>
+            </button>
           </div>
           <div v-if="windowLoading" class="rank-loading">
             <CubeLoader :text="$t('common.loading')" />
@@ -139,7 +158,11 @@
               {{ $t('home.vibe.rankRest', { n: rankRestCount, m: fmtN(rankRestRequests) }) }}
             </div>
           </template>
-          <!-- 无数据占位：3 行同构骨架撑住布局，出数据时高度不跳动 -->
+          <div v-else-if="selectedDate" class="rank-empty">
+            <img :src="ICON.bookAndQuill" alt="" draggable="false" />
+            <span>{{ $t('home.vibe.emptyDay') }}</span>
+          </div>
+          <!-- 汇总无数据占位：3 行同构骨架撑住布局 -->
           <template v-else>
             <div v-for="i in 3" :key="'sk' + i" class="rank-row rank-skel" :style="{ '--i': i }">
               <span class="slot sm"></span>
@@ -159,7 +182,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CubeLoader from '@/components/common/CubeLoader.vue'
 import XpBar from '@/components/home/XpBar.vue'
@@ -179,6 +202,7 @@ import { config } from '@/config'
  *
  *  物品图标：minecraft.wiki 原版物品栏贴图（public/vibe-icons/），与 PageTitle 同源 */
 const { t, locale } = useI18n()
+const rankId = useId()
 
 const ICON_BASE = '/vibe-icons'
 const ICON_FILES = {
@@ -252,6 +276,8 @@ async function fetchWindow(endKey: string) {
 // ── 时间窗：每页 28 天，offset 0 = 右下角今天；负数向过去翻页 ──
 const today = new Date(); today.setHours(0, 0, 0, 0)
 const offset = ref(0)
+/** 仅筛选已经获取的窗口记录；null 表示 28 天汇总。 */
+const selectedDate = ref<string | null>(null)
 /** 最多回看 12 页（336 天），防止无限翻进没有数据的过去 */
 const MIN_OFFSET = -12
 const windowEnd = computed(() => {
@@ -275,6 +301,7 @@ const canGoPrev = computed(() => offset.value > MIN_OFFSET)
 const canGoNext = computed(() => offset.value < 0)
 function shiftWindow(dir: number) {
   offset.value = Math.min(0, Math.max(MIN_OFFSET, offset.value + dir))
+  selectedDate.value = null
   void fetchWindow(activeEnd.value)
 }
 
@@ -309,14 +336,14 @@ const days = computed<DayCell[]>(() => {
     const requests = rows.reduce((a, r) => a + successOf(r), 0)
     const tokens = rows.reduce((a, r) => a + r.total_tokens, 0)
     const latNs = rows.reduce((a, r) => a + r.total_latency_ns, 0)
-    const top = rows.length ? rows.reduce((a, b) => (successOf(b) > successOf(a) ? b : a)) : null
+    const dayTopModel = rankModels(rows)[0]?.model ?? ''
     cells.push({
       date: key,
       dateLabel: `${fmtDay.format(date)} · ${dateLabelWeekday(date)}`,
       requests,
       tokens,
       avgLatS: requests > 0 ? (latNs / requests / 1e9).toFixed(2) : '0.00',
-      topModel: top?.model ?? '',
+      topModel: dayTopModel,
     })
   }
   return cells
@@ -367,18 +394,22 @@ const totalRequests = computed(() => days.value.reduce((a, d) => a + d.requests,
 const totalTokens = computed(() => windowRecords.value.reduce((a, r) => a + r.total_tokens, 0))
 
 interface ModelStat { model: string; requests: number; tokens: number }
-const modelsRanked = computed<ModelStat[]>(() => {
+function rankModels(records: VibeRecord[]): ModelStat[] {
   const map = new Map<string, ModelStat>()
-  for (const r of windowRecords.value) {
+  for (const r of records) {
     const m = map.get(r.model) ?? { model: r.model, requests: 0, tokens: 0 }
     m.requests += successOf(r)
     m.tokens += r.total_tokens
     map.set(r.model, m)
   }
   return [...map.values()].sort((a, b) => b.requests - a.requests)
-})
-/** 使用过最多的模型 */
-const topModel = computed(() => modelsRanked.value[0]?.model ?? '')
+}
+const windowModelsRanked = computed(() => rankModels(windowRecords.value))
+const modelsRanked = computed(() => selectedDate.value
+  ? rankModels(windowRecords.value.filter(r => r.date === selectedDate.value))
+  : windowModelsRanked.value)
+/** 统计 chips 始终展示当前 28 天窗口，日期选择只切换下方排行。 */
+const topModel = computed(() => windowModelsRanked.value[0]?.model ?? '')
 const rankTop = computed(() => modelsRanked.value.slice(0, 3))
 const rankRestCount = computed(() => Math.max(0, modelsRanked.value.length - 3))
 const rankRestRequests = computed(() =>
@@ -559,21 +590,52 @@ img {
 
 .vibe-cell {
   position: relative;
+  display: block;
+  min-width: 0;
   aspect-ratio: 1;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
   animation: vibe-cell-pop 0.44s steps(2) both;
   animation-delay: calc(var(--i) * 20ms);
 
   /* 进场动画（fill both）让每个格子都是独立层叠上下文，内部 tooltip 的
      z-index 出不去、会被后绘制的下方行格子盖住 —— 悬停时抬高格子本身 */
-  &:hover {
+  &:hover, &:focus-visible {
     z-index: 7;
   }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    /* 外扩描边与色块使用相同的 3px 台阶，四个转角才能连续衔接。 */
+    --pxs: 3px; clip-path: var(--pxc);
+    background: var(--accent-bright);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s, transform .18s steps(2, end);
+  }
+
+  &:focus-visible { outline: none; }
+  &:hover::before, &:focus-visible::before, &.selected::before { opacity: 1; }
+  &:hover::before, &:focus-visible::before { transform: translateY(-2px); }
+  &:hover .face, &:focus-visible .face { transform: translateY(-2px); filter: brightness(1.2); }
+  &:active .face, &:active::before { transform: translateY(0); }
 
   .face {
     position: absolute;
     inset: 0;
     --pxs: 3px; clip-path: var(--pxc);
     background: var(--bg-secondary);
+    pointer-events: none;
+    transition: transform .18s steps(2, end), filter .18s;
   }
 
   &.on .face {
@@ -596,8 +658,8 @@ img {
     pointer-events: none;
   }
 
-  &.today.on::after {
-    --pxs: 4px; clip-path: var(--pxc);
+  &.today.on:not(:hover):not(:focus-visible):not(.selected)::after {
+    --pxs: 3px; clip-path: var(--pxc);
     background: color-mix(in srgb, var(--accent-bright) 55%, transparent);
     animation: vibe-cell-pulse 2.6s 0.9s steps(2) infinite;
   }
@@ -736,7 +798,7 @@ img {
   }
 }
 
-.vibe-cell:hover .vibe-tip {
+.vibe-cell:hover .vibe-tip, .vibe-cell:focus-visible .vibe-tip {
   opacity: 1;
 }
 
@@ -794,6 +856,66 @@ img {
     letter-spacing: 1px;
     opacity: 0.75;
   }
+}
+
+/* 选中日期后的压缩按钮：常驻标题行最右，默认显示日期，悬停淡入"查看 28 天汇总" */
+.rank-reset {
+  --pxs: 2px; clip-path: var(--pxc);
+  align-self: center;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 20px;
+  padding: 1px 8px 0;
+  border: 1px solid transparent;
+  border-image: var(--px-frame) 6 / calc(2 * var(--pxs)) stretch;
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: .62rem;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+
+  .swap {
+    display: inline-grid;
+    justify-items: center;
+
+    > span {
+      grid-area: 1 / 1;
+      white-space: nowrap;
+      transition: opacity .18s;
+    }
+  }
+
+  .d {
+    font-family: var(--font-pixel);
+    font-size: 9px;
+    letter-spacing: .5px;
+    line-height: 1.9;
+  }
+
+  .c { opacity: 0; }
+
+  &:hover {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    .d { opacity: 0; }
+    .c { opacity: 1; }
+  }
+
+  &:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+}
+
+.rank-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 96px;
+  color: var(--text-secondary);
+  font-size: .7rem;
+  img { width: 24px; height: 24px; }
 }
 
 /* 排行加载态：标题常驻，下方原地占位约 3 行排行高度，翻页不跳动 */

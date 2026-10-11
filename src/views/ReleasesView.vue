@@ -70,7 +70,7 @@
                   {{ $t('releases.download') }}
                   <ExternalLinkIcon />
                 </Button>
-                <!-- 暂无独立页面的仓库保留按钮但禁用（如 MemeMomo） -->
+                <!-- 暂无独立页面的仓库保留按钮但禁用 -->
                 <Button
                   size="small"
                   :disabled="!getStandalonePage(release.repo)"
@@ -139,6 +139,7 @@ function getStandalonePage(repo: string): string | null {
     'StarFall-Vue': '/starfall-forum',
     'StarFall-SpringBoot': '/starfall-forum',
     'CodeCraft': 'https://codecraft.cc.cd/',
+    'MemeMomo': 'https://mememomo.cc.cd/',
   }
   return map[repo] ?? null
 }

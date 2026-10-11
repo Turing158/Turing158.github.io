@@ -1,0 +1,400 @@
+// The finished preview A, using the site's theme tokens. Imported by HomeView
+// so these styles stay scoped; ResponsiveTime keeps its own styles and layout.
+.journal-card {
+  --journal-panel: color-mix(in srgb, var(--bg-card) 74%, var(--bg-secondary));
+  --journal-accent: var(--accent-hover);
+  --journal-dim: color-mix(in srgb, var(--text-secondary) 95%, var(--text-primary));
+  --journal-edge: var(--border);
+  --journal-bright: color-mix(in srgb, var(--accent-bright) 45%, var(--journal-panel));
+  --journal-sun: #d1c28e;
+  --journal-mono: 'Cascadia Code', Consolas, 'Courier New', monospace;
+  position: relative;
+  isolation: isolate;
+  min-height: 362px;
+  padding: 25px;
+  border: 0;
+  background: var(--journal-edge);
+  box-shadow: none;
+  color: var(--text-primary);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    clip-path: var(--pxc);
+    background: var(--bg-card);
+    z-index: -1;
+  }
+
+  &:hover { transform: none; box-shadow: none; }
+  :focus-visible { outline: 3px solid var(--journal-accent); outline-offset: -3px; }
+}
+
+[data-theme='ocean'] .journal-card { --journal-sun: #b5d9e6; }
+[data-theme='sunset'] .journal-card { --journal-sun: #e9b46c; }
+[data-theme='dark'] .journal-card {
+  --journal-panel: var(--bg-card-hover);
+  --journal-accent: var(--accent-bright);
+  --journal-edge: var(--border-strong);
+  --journal-sun: #a3cce0;
+}
+
+.journal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.6;
+    letter-spacing: .3px;
+  }
+}
+.journal-header-meta { flex-shrink: 0; font: 10px/1.5 var(--journal-mono); letter-spacing: 1px; color: var(--journal-dim); }
+.minecraft-item { display: block; flex-shrink: 0; object-fit: contain; image-rendering: pixelated; filter: none; }
+
+.clock-widget { container: journal-clock / inline-size; padding-bottom: 19px; }
+.journal-clock-face { display: flex; flex-direction: column; flex: 1; min-height: 240px; padding-top: 25px; }
+.journal-time-wrap { display: flex; justify-content: center; }
+.journal-camp { margin-top: auto; padding-top: 24px; }
+.camp-caption { display: flex; align-items: center; gap: 10px; }
+.camp-caption-copy { min-width: 0; }
+.camp-caption h3 { margin: 0; font-size: 12px; font-weight: 600; line-height: 1.6; letter-spacing: .5px; }
+.journal-clock-note { margin: 3px 0 0; color: var(--journal-dim); font-size: 11px; line-height: 1.8; }
+.camp-world { margin-left: auto; align-self: flex-start; padding-top: 4px; color: var(--journal-dim); font: 8px/1.5 var(--journal-mono); letter-spacing: 1.4px; }
+.journal-camp .camp-art { margin: 0 -10px; }
+.journal-holiday { position: relative; min-height: 83px; margin-top: 14px; padding-top: 1px; }
+.holiday-loading { display: flex; align-items: center; min-height: 70px; color: var(--journal-dim); font-size: 13px; }
+.holiday-empty { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 70px; }
+.holiday-book { display: grid; place-items: center; width: 40px; height: 44px; background: var(--journal-panel); clip-path: var(--pxc); }
+.holiday-empty-copy { min-width: 0; }
+.holiday-empty-title { margin: 0; font-size: 12px; line-height: 1.8; font-weight: 600; }
+.holiday-empty-caption { margin: 3px 0 0; font-size: 10px; line-height: 1.8; color: var(--journal-dim); }
+.journal-notes-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px;
+  color: var(--journal-accent);
+  font-size: 11px;
+  line-height: 1.5;
+  text-decoration: none;
+  svg { flex-shrink: 0; }
+}
+.holiday-content { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 70px; }
+.holiday-heading { min-width: 0; }
+.holiday-label { margin: 0 0 3px; font-size: 10px; line-height: 1.7; color: var(--journal-dim); }
+.holiday-name { display: flex; align-items: center; gap: 7px; margin: 0; font-size: 16px; line-height: 1.5; font-weight: 700; overflow-wrap: anywhere; }
+.holiday-countdown { flex-shrink: 0; max-width: 55%; text-align: right; }
+.holiday-days { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: flex-end; gap: 5px; margin: 0; font-size: 11px; line-height: 1.5; color: var(--journal-accent); }
+.holiday-days strong { font: 700 33px/1 var(--journal-mono); letter-spacing: -1px; }
+.holiday-today, .holiday-urgent { font-size: 17px; line-height: 1.5; font-weight: 700; color: var(--journal-accent); }
+.holiday-greeting { margin-top: 4px; color: var(--journal-dim); font-size: 11px; line-height: 1.7; }
+
+.profile-widget { container: journal-profile / inline-size; padding-bottom: 12px; }
+.profile-widget .journal-header { margin-bottom: 23px; }
+.profile-widget .journal-header-meta { font-size: 9px; }
+.journal-leaf { position: absolute; top: -2px; right: 22px; width: 18px; height: 18px; color: var(--journal-bright); pointer-events: none; }
+.profile-summary { display: grid; grid-template-columns: minmax(0, 1fr) 136px; gap: 20px; align-items: start; margin-bottom: 22px; }
+.profile-copy, .profile-identity-text { min-width: 0; }
+.profile-identity { display: flex; align-items: center; gap: 17px; }
+.profile-avatar-wrap {
+  display: block;
+  flex-shrink: 0;
+  width: 70px;
+  height: 70px;
+  padding: 3px;
+  border: 0;
+  clip-path: var(--pxc);
+  background: var(--journal-edge);
+  cursor: pointer;
+  transition: background .18s;
+  &:hover { background: var(--journal-accent); }
+}
+.profile-avatar { display: block; width: 100%; height: 100%; object-fit: cover; clip-path: var(--pxc); }
+.profile-name { display: flex; align-items: baseline; min-height: 1.35em; margin: 0; font: 700 23px/1.35 var(--journal-mono); letter-spacing: -.8px; }
+.typewriter-text { min-width: 0; overflow-wrap: anywhere; }
+.typewriter-cursor { flex-shrink: 0; width: 2px; height: 1em; background: var(--journal-accent); margin-left: 2px; animation: typewriter-blink .8s step-end infinite; }
+@keyframes typewriter-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.profile-handle { margin: 6px 0 0; color: var(--journal-dim); font: 10px/1.7 var(--journal-mono); letter-spacing: .8px; overflow-wrap: anywhere; }
+.profile-bio { margin: 19px 0 8px; font-size: 14px; line-height: 1.8; color: var(--journal-dim); overflow-wrap: anywhere; }
+.profile-location { display: flex; align-items: center; gap: 5px; font-size: 11px; line-height: 1.6; color: var(--journal-dim); overflow-wrap: anywhere; }
+.profile-location svg { flex-shrink: 0; }
+.profile-corner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 158px;
+  padding: 12px;
+  border: 1px solid var(--journal-edge);
+  background: linear-gradient(180deg, var(--journal-panel), var(--bg-card));
+  box-shadow: 3px 3px 0 color-mix(in srgb, var(--journal-edge) 38%, transparent);
+  transition: transform .2s steps(2, end), border-color .2s, box-shadow .2s steps(2, end);
+  &::after { content: ''; position: absolute; right: 8px; top: -4px; width: 18px; height: 7px; background: var(--journal-bright); opacity: .65; }
+}
+.corner-kicker { display: flex; align-items: center; gap: 6px; margin: 0; font: 10px/1.5 var(--journal-mono); color: var(--journal-dim); }
+.corner-kicker svg { flex-shrink: 0; color: var(--journal-accent); }
+.corner-art { width: 100%; height: 63px; margin: 8px 0 9px; flex-shrink: 0; transition: transform .2s steps(2, end); }
+.corner-sparks { transition: transform .2s steps(2, end), opacity .2s; }
+.corner-screen-scan { opacity: 0; pointer-events: none; }
+.corner-title { font-size: 15px; line-height: 1.5; letter-spacing: .3px; }
+.corner-caption { margin: 3px 0 0; color: var(--journal-dim); font-size: 11px; line-height: 1.6; }
+.corner-foot { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 9px; font-size: 10px; line-height: 1.4; color: var(--journal-accent); }
+.corner-foot i { width: 5px; height: 5px; background: currentColor; flex-shrink: 0; }
+.profile-collection {
+  --collection-magic: color-mix(in srgb, #ab7cd9 60%, var(--journal-accent));
+  --collection-edge: var(--border-strong);
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  margin-top: auto;
+  padding: 0 16px 7px;
+  border-bottom: 4px solid var(--collection-edge);
+  background: linear-gradient(transparent 5%, color-mix(in srgb, var(--collection-magic) 7%, var(--bg-card)) 60%, var(--journal-panel));
+
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    bottom: 0;
+    width: 10px;
+    border-inline: 2px solid var(--collection-edge);
+    background: repeating-linear-gradient(180deg, var(--collection-edge) 0 4px, var(--journal-panel) 4px 22px, var(--border) 22px 25px);
+    pointer-events: none;
+  }
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+.collection-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 33px;
+  margin: 0 -16px 2px;
+  padding: 4px;
+  border-top: 4px solid var(--collection-edge);
+  border-bottom: 2px solid var(--collection-edge);
+  background: var(--journal-panel);
+  clip-path: var(--pxc);
+  color: var(--journal-dim);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: 1px;
+  pointer-events: none;
+  user-select: none;
+}
+.collection-rune {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  margin-right: 14px;
+  border: 2px solid var(--collection-magic);
+  box-shadow: 11px 0 color-mix(in srgb, var(--collection-magic) 45%, transparent);
+}
+.profile-stats {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+  min-width: 0;
+}
+.profile-stat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+  padding: 9px 3px 8px;
+  text-decoration: none;
+  cursor: pointer;
+  .minecraft-item { position: relative; z-index: 1; margin-bottom: 15px; transition: transform .2s steps(2, end); }
+  &:hover, &:focus-visible {
+    .minecraft-item { transform: translateY(-5px); }
+    .stat-num { color: var(--journal-accent); }
+    .collection-plinth::after { opacity: 1; transform: translateY(-4px); }
+  }
+}
+.collection-plinth {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  max-width: 100%;
+  height: 60px;
+  margin-bottom: 6px;
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 4px;
+    right: 4px;
+    height: 14px;
+    background: linear-gradient(var(--collection-edge) 0 4px, var(--journal-panel) 4px 10px, var(--border) 10px);
+    clip-path: polygon(5px 0, calc(100% - 5px) 0, calc(100% - 5px) 4px, 100% 4px, 100% 100%, 0 100%, 0 4px, 5px 4px);
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    top: 7px;
+    right: 4px;
+    width: 3px;
+    height: 3px;
+    background: var(--collection-magic);
+    box-shadow: -44px 16px var(--collection-magic), -20px -5px var(--collection-magic);
+    opacity: .35;
+    transition: opacity .18s, transform .2s steps(2, end);
+  }
+}
+.stat-num { max-width: 100%; font: 700 23px/1.2 var(--journal-mono); letter-spacing: -1px; color: var(--text-primary); overflow-wrap: anywhere; transition: color .18s; }
+.stat-label { max-width: 100%; margin-top: 4px; font-size: 10px; line-height: 1.6; text-align: center; color: var(--journal-dim); overflow-wrap: anywhere; }
+.collection-desk {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  height: 36px;
+  border-top: 1px solid var(--border);
+  pointer-events: none;
+  user-select: none;
+  &::before, &::after { content: ''; width: 20px; height: 3px; background: var(--collection-magic); opacity: .3; box-shadow: 0 5px var(--collection-magic); }
+}
+.collection-prop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  .minecraft-item { transition: transform .24s steps(3, end); }
+}
+.collection-book::before { content: ''; position: absolute; bottom: 0; width: 36px; height: 5px; background: var(--collection-edge); box-shadow: 0 3px color-mix(in srgb, var(--text-primary) 16%, transparent); }
+.profile-collection:hover, .profile-collection:focus-within {
+  .collection-prop .minecraft-item { transform: translateY(-3px); }
+  .collection-book .minecraft-item { animation: collection-book-hover 1.8s steps(6, end) infinite alternate; }
+}
+@keyframes collection-book-hover {
+  from { transform: translateY(-2px); }
+  to { transform: translateY(-6px); }
+}
+.profile-github {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--journal-accent);
+  text-decoration: none;
+  svg { flex-shrink: 0; }
+}
+.profile-summary + .profile-github { margin-top: auto; }
+
+// Stepped motion keeps the links and terminal in the same pixel-art language.
+.journal-notes-link, .profile-github {
+  position: relative;
+  isolation: isolate;
+  transition: transform .12s steps(2, end);
+  &::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: 3px -5px;
+    --pxs: 2px;
+    clip-path: var(--pxc);
+    background: color-mix(in srgb, var(--journal-accent) 7%, var(--journal-panel));
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s;
+  }
+  &::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 3px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, currentColor 0 4px, transparent 4px 6px);
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    pointer-events: none;
+    transition: transform .24s steps(6, end), opacity .18s;
+  }
+  svg { transition: transform .2s steps(2, end); }
+  &:active { transform: translateY(1px); }
+}
+.journal-link-highlight() {
+  &::before { opacity: 1; }
+  &::after { opacity: .65; transform: scaleX(1); }
+  svg { transform: translateX(4px); }
+}
+.journal-notes-link:focus-visible, .profile-github:focus-visible { .journal-link-highlight(); }
+
+@media (hover: hover) and (pointer: fine) {
+  .journal-notes-link:hover, .profile-github:hover { .journal-link-highlight(); }
+  .profile-corner:hover {
+    transform: translateY(-2px);
+    border-color: var(--journal-accent);
+    box-shadow: 5px 5px 0 color-mix(in srgb, var(--journal-accent) 24%, transparent);
+    .corner-art { transform: translateY(-2px); }
+    .corner-sparks { transform: translateY(-2px); opacity: 1; }
+    .corner-terminal-cursor { animation: journal-terminal-blink .8s steps(2, end); }
+    .corner-screen-scan { animation: journal-screen-scan .8s steps(5, end); }
+  }
+}
+@keyframes journal-terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .25; }
+}
+@keyframes journal-screen-scan {
+  0% { transform: translateY(0); opacity: 0; }
+  20%, 80% { opacity: .22; }
+  100% { transform: translateY(20px); opacity: 0; }
+}
+
+@container journal-profile (max-width: 380px) {
+  .profile-summary { grid-template-columns: minmax(0, 1fr) 108px; gap: 14px; margin-bottom: 18px; }
+  .profile-identity { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .profile-avatar-wrap { width: 58px; height: 58px; }
+  .profile-name { font-size: 20px; }
+  .profile-handle { margin-top: 2px; }
+  .profile-bio { margin-top: 12px; }
+  .profile-location { font-size: 10px; gap: 4px; }
+  .profile-corner { padding: 10px; min-height: 162px; }
+  .corner-kicker { font-size: 9px; gap: 4px; }
+  .corner-art { height: 61px; margin: 12px 0; }
+  .corner-title { font-size: 14px; }
+  .corner-caption { font-size: 10px; }
+}
+@container journal-profile (max-width: 300px) {
+  .journal-header h2 { font-size: 12px; gap: 7px; }
+  .journal-header-meta { display: none; }
+}
+@container journal-profile (max-width: 352px) {
+  .collection-heading { font-size: 9px; letter-spacing: .5px; }
+  .collection-desk { gap: 12px; }
+  .stat-num { font-size: 18px; }
+  .collection-plinth::after { right: 3px; box-shadow: -35px 16px var(--collection-magic), -18px -5px var(--collection-magic); }
+}
+@container journal-profile (max-width: 235px) {
+  .profile-summary { grid-template-columns: 1fr; }
+  .profile-corner { min-height: 0; }
+  .corner-art { width: 110px; align-self: center; }
+}
+@container journal-clock (max-width: 340px) {
+  .camp-world { display: none; }
+  .holiday-empty { grid-template-columns: 40px minmax(0, 1fr); column-gap: 10px; row-gap: 0; padding-top: 5px; }
+  .journal-notes-link { grid-column: 2; justify-self: start; padding-inline: 0; }
+}
+@media (max-width: 620px) {
+  .journal-card { padding-inline: 20px; }
+}
