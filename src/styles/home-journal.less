@@ -134,8 +134,7 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 158px;
-  padding: 12px;
+  padding: 8px 12px;
   border: 1px solid var(--journal-edge);
   background: linear-gradient(180deg, var(--journal-panel), var(--bg-card));
   box-shadow: 3px 3px 0 color-mix(in srgb, var(--journal-edge) 38%, transparent);
@@ -144,12 +143,11 @@
 }
 .corner-kicker { display: flex; align-items: center; gap: 6px; margin: 0; font: 10px/1.5 var(--journal-mono); color: var(--journal-dim); }
 .corner-kicker svg { flex-shrink: 0; color: var(--journal-accent); }
-.corner-art { width: 100%; height: 63px; margin: 8px 0 9px; flex-shrink: 0; transition: transform .2s steps(2, end); }
+.corner-art { width: 100%; height: 52px; margin: 5px 0 6px; flex-shrink: 0; transition: transform .2s steps(2, end); }
 .corner-sparks { transition: transform .2s steps(2, end), opacity .2s; }
 .corner-screen-scan { opacity: 0; pointer-events: none; }
-.corner-title { font-size: 15px; line-height: 1.5; letter-spacing: .3px; }
 .corner-caption { margin: 3px 0 0; color: var(--journal-dim); font-size: 11px; line-height: 1.6; }
-.corner-foot { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 9px; font-size: 10px; line-height: 1.4; color: var(--journal-accent); }
+.corner-foot { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 10px; line-height: 1.4; color: var(--journal-accent); }
 .corner-foot i { width: 5px; height: 5px; background: currentColor; flex-shrink: 0; }
 .profile-collection {
   --collection-magic: color-mix(in srgb, #ab7cd9 60%, var(--journal-accent));
@@ -165,7 +163,7 @@
   &::before, &::after {
     content: '';
     position: absolute;
-    top: 28px;
+    top: 10px;
     bottom: 0;
     width: 10px;
     border-inline: 2px solid var(--collection-edge);
@@ -175,32 +173,34 @@
   &::before { left: 0; }
   &::after { right: 0; }
 }
-.collection-heading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 33px;
-  margin: 0 -16px 2px;
-  padding: 4px;
-  border-top: 4px solid var(--collection-edge);
-  border-bottom: 2px solid var(--collection-edge);
-  background: var(--journal-panel);
-  clip-path: var(--pxc);
-  color: var(--journal-dim);
-  font-size: 10px;
-  line-height: 1.6;
-  letter-spacing: 1px;
+/* 薄顶梁覆盖立柱接缝，阶梯端帽与收藏台的像素轮廓呼应。 */
+.collection-cornice {
+  position: relative;
+  z-index: 1;
+  height: 14px;
+  margin: 0 -16px 4px;
+  background: linear-gradient(180deg, var(--collection-edge) 0 3px, var(--journal-panel) 3px 7px, var(--border) 7px 10px, var(--collection-edge) 10px 12px, transparent 12px);
+  clip-path: polygon(6px 0, calc(100% - 6px) 0, calc(100% - 6px) 3px, 100% 3px, 100% 100%, 0 100%, 0 3px, 6px 3px);
   pointer-events: none;
-  user-select: none;
-}
-.collection-rune {
-  flex-shrink: 0;
-  width: 6px;
-  height: 6px;
-  margin-right: 14px;
-  border: 2px solid var(--collection-magic);
-  box-shadow: 11px 0 color-mix(in srgb, var(--collection-magic) 45%, transparent);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 3px 10px 4px;
+    border-inline: 4px solid var(--collection-edge);
+    opacity: .65;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: calc(50% - 3px);
+    width: 6px;
+    height: 6px;
+    background: var(--collection-magic);
+    box-shadow: -10px 1px 0 -1px color-mix(in srgb, var(--collection-magic) 45%, transparent), 10px 1px 0 -1px color-mix(in srgb, var(--collection-magic) 45%, transparent);
+  }
 }
 .profile-stats {
   position: relative;
@@ -369,10 +369,9 @@
   .profile-handle { margin-top: 2px; }
   .profile-bio { margin-top: 12px; }
   .profile-location { font-size: 10px; gap: 4px; }
-  .profile-corner { padding: 10px; min-height: 162px; }
+  .profile-corner { padding: 8px 10px; }
   .corner-kicker { font-size: 9px; gap: 4px; }
-  .corner-art { height: 61px; margin: 12px 0; }
-  .corner-title { font-size: 14px; }
+  .corner-art { height: 48px; margin: 6px 0; }
   .corner-caption { font-size: 10px; }
 }
 @container journal-profile (max-width: 300px) {
@@ -380,14 +379,12 @@
   .journal-header-meta { display: none; }
 }
 @container journal-profile (max-width: 352px) {
-  .collection-heading { font-size: 9px; letter-spacing: .5px; }
   .collection-desk { gap: 12px; }
   .stat-num { font-size: 18px; }
   .collection-plinth::after { right: 3px; box-shadow: -35px 16px var(--collection-magic), -18px -5px var(--collection-magic); }
 }
 @container journal-profile (max-width: 235px) {
   .profile-summary { grid-template-columns: 1fr; }
-  .profile-corner { min-height: 0; }
   .corner-art { width: 110px; align-self: center; }
 }
 @container journal-clock (max-width: 340px) {

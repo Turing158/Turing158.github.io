@@ -103,17 +103,12 @@
               <path fill="var(--journal-edge)" d="M82 42h23v6h-23zM85 48h17v10H85z" />
               <path fill="var(--journal-dim)" d="M0 58h112v3H0z" />
             </svg>
-            <strong class="corner-title">{{ $t('home.journal.project') }}</strong>
             <p class="corner-caption">{{ $t('home.journal.projectNote') }}</p>
             <span class="corner-foot"><i aria-hidden="true"></i>{{ $t('home.journal.projectStatus') }}</span>
           </aside>
         </div>
         <div v-if="profile" class="profile-collection">
-          <div class="collection-heading" aria-hidden="true">
-            <i class="collection-rune"></i>
-            <span>{{ $t('home.journal.collection') }}</span>
-            <i class="collection-rune"></i>
-          </div>
+          <div class="collection-cornice" aria-hidden="true"></div>
           <nav class="profile-stats" :aria-label="$t('home.journal.stats')">
             <a v-for="stat in profileStats" :key="stat.tab" class="profile-stat" :href="`${githubProfileUrl}?tab=${stat.tab}`" :aria-label="`${$t(stat.label)} ${stat.value}`" target="_blank" rel="noopener noreferrer">
               <span class="collection-plinth" aria-hidden="true">

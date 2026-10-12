@@ -137,45 +137,48 @@
           <div v-if="windowLoading" class="rank-loading">
             <CubeLoader :text="$t('common.loading')" />
           </div>
-          <template v-else-if="rankTop.length > 0">
-            <div v-for="(m, i) in rankTop" :key="m.model" class="rank-row">
-              <span class="slot sm"><img :src="ICON[rankIcon(i)]" alt="" draggable="false" /></span>
-              <span class="rank-main">
-                <span class="rank-line1">
-                  <span class="rank-name" :title="m.model">{{ m.model }}</span>
-                  <span class="rank-val">{{ fmtN(m.requests) }}</span>
-                </span>
-                <span class="rank-line2">
-                  <XpBar class="rank-xp" :value="barWidth(m)" />
-                  <span class="rank-tok">
-                    <img :src="ICON.experienceBottle" alt="" draggable="false" />
-                    {{ fmtK(m.tokens) }}
+          <!-- 按统计范围重新入场，同一批模型在不同日期之间切换也会播放动画。 -->
+          <div v-else :key="selectedDate ? `day:${selectedDate}` : `window:${activeEnd}`" class="rank-content">
+            <template v-if="rankTop.length > 0">
+              <div v-for="(m, i) in rankTop" :key="m.model" class="rank-row">
+                <span class="slot sm"><img :src="ICON[rankIcon(i)]" alt="" draggable="false" /></span>
+                <span class="rank-main">
+                  <span class="rank-line1">
+                    <span class="rank-name" :title="m.model">{{ m.model }}</span>
+                    <span class="rank-val">{{ fmtN(m.requests) }}</span>
+                  </span>
+                  <span class="rank-line2">
+                    <XpBar class="rank-xp" :value="barWidth(m)" />
+                    <span class="rank-tok">
+                      <img :src="ICON.experienceBottle" alt="" draggable="false" />
+                      {{ fmtK(m.tokens) }}
+                    </span>
                   </span>
                 </span>
-              </span>
+              </div>
+              <div v-if="rankRestCount > 0" class="rank-rest">
+                {{ $t('home.vibe.rankRest', { n: rankRestCount, m: fmtN(rankRestRequests) }) }}
+              </div>
+            </template>
+            <div v-else-if="selectedDate" class="rank-empty">
+              <img :src="ICON.bookAndQuill" alt="" draggable="false" />
+              <span>{{ $t('home.vibe.emptyDay') }}</span>
             </div>
-            <div v-if="rankRestCount > 0" class="rank-rest">
-              {{ $t('home.vibe.rankRest', { n: rankRestCount, m: fmtN(rankRestRequests) }) }}
-            </div>
-          </template>
-          <div v-else-if="selectedDate" class="rank-empty">
-            <img :src="ICON.bookAndQuill" alt="" draggable="false" />
-            <span>{{ $t('home.vibe.emptyDay') }}</span>
+            <!-- 汇总无数据占位：3 行同构骨架撑住布局 -->
+            <template v-else>
+              <div v-for="i in 3" :key="'sk' + i" class="rank-row rank-skel" :style="{ '--i': i }">
+                <span class="slot sm"></span>
+                <span class="rank-main">
+                  <span class="rank-line1">
+                    <i class="sk sk-name"></i><i class="sk sk-val"></i>
+                  </span>
+                  <span class="rank-line2">
+                    <i class="sk sk-bar"></i><i class="sk sk-tok"></i>
+                  </span>
+                </span>
+              </div>
+            </template>
           </div>
-          <!-- 汇总无数据占位：3 行同构骨架撑住布局 -->
-          <template v-else>
-            <div v-for="i in 3" :key="'sk' + i" class="rank-row rank-skel" :style="{ '--i': i }">
-              <span class="slot sm"></span>
-              <span class="rank-main">
-                <span class="rank-line1">
-                  <i class="sk sk-name"></i><i class="sk sk-val"></i>
-                </span>
-                <span class="rank-line2">
-                  <i class="sk sk-bar"></i><i class="sk sk-tok"></i>
-                </span>
-              </span>
-            </div>
-          </template>
         </div>
       </template>
   </div>
@@ -821,6 +824,14 @@ img {
   background: color-mix(in srgb, var(--accent) 10%, transparent);
   --pxs: 2px; clip-path: var(--pxc);
   min-width: 0;
+  cursor: default;
+  transition: transform .18s steps(2, end), background-color .18s, color .18s;
+
+  &:hover {
+    transform: translateY(-2px);
+    background-color: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+  }
 
   img {
     width: 14px;
@@ -856,6 +867,25 @@ img {
     letter-spacing: 1px;
     opacity: 0.75;
   }
+}
+
+/* 切换只重建排行内容；用裁剪展开经验条，保持像素贴图比例。 */
+.rank-content {
+  animation: rank-content-in .24s ease-out both;
+
+  .rank-xp :deep(.xp-fill) {
+    animation: rank-xp-reveal .32s steps(12, end) both;
+  }
+}
+
+@keyframes rank-content-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes rank-xp-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0); }
 }
 
 /* 选中日期后的压缩按钮：常驻标题行最右，默认显示日期，悬停淡入"查看 28 天汇总" */
