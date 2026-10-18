@@ -1,10 +1,12 @@
 <template>
-  <!-- 文章卡片：整张卡为链接 -->
+  <!-- 文章卡片：整张卡为链接（新标签页 / 当前页由设置面板「搜索点击操作」决定） -->
   <router-link
     v-if="result.type === 'article'"
     :to="`/article/${result.slug}`"
+    :target="openInNewTab ? '_blank' : undefined"
+    :rel="openInNewTab ? 'noopener' : undefined"
     class="search-card search-card--article"
-    @click="props.shouldClose()"
+    @click="closeIfLeaving()"
   >
     <h3 class="card-title" v-html="highlight(result.title, query)" />
     <p class="card-desc" v-html="highlight(result.description, query)" />
@@ -117,12 +119,14 @@
     <span class="card-type-badge px-fade">{{ $t('search.typeRelease') }}</span>
   </div>
 
-  <!-- 工具卡片：点击在当前页面路由跳转到工具详情页 -->
+  <!-- 工具卡片：点击跳转到工具详情页（新标签页 / 当前页由设置面板「搜索点击操作」决定） -->
   <router-link
     v-else-if="result.type === 'tool'"
     :to="{ name: 'tool-detail', params: { id: result.key } }"
+    :target="openInNewTab ? '_blank' : undefined"
+    :rel="openInNewTab ? 'noopener' : undefined"
     class="search-card search-card--tool"
-    @click="props.shouldClose()"
+    @click="closeIfLeaving()"
   >
     <div class="tool-card-header">
       <span class="tool-card-icon">{{ result.icon }}</span>
@@ -137,12 +141,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onBeforeUnmount, watch } from 'vue'
+import { useRouter, type RouteLocationRaw } from 'vue-router'
 import { Button } from 'animal-island-vue'
 import BlogDialog from '@/components/common/BlogDialog.vue'
 import { formatRelativeTime, formatFullTime } from '@/composables/useTime'
 import { highlight } from '@/utils/search-highlighter'
+import { useSettings } from '@/composables/useSettings'
 import type { SearchResult } from '@/types/search'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 
@@ -153,6 +158,26 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+
+// 设置面板「搜索点击操作」：站内跳转走新标签页还是当前页面
+// （卡片内的 <router-link> 用 target="_blank" 让 vue-router 放行给浏览器原生处理；
+//   站外链接如 GitHub / Gitee / 下载始终新标签页，不随该设置改变）
+const { searchClickAction } = useSettings()
+const openInNewTab = computed(() => searchClickAction.value === 'newTab')
+
+/** 站内跳转：按设置选择新标签页或当前页 */
+function navigateTo(location: RouteLocationRaw) {
+  if (openInNewTab.value) {
+    window.open(router.resolve(location).href, '_blank', 'noopener')
+  } else {
+    router.push(location)
+  }
+}
+
+// 新标签页模式下保留搜索结果弹窗（能接着看别的结果），当前页跳转才需要关闭
+function closeIfLeaving() {
+  if (!openInNewTab.value) props.shouldClose()
+}
 
 function open(url: string) {
   window.open(url, '_blank')
@@ -166,14 +191,14 @@ function extractRepoName(url: string): string {
 function goToCommits(url: string) {
   const repo = extractRepoName(url)
   if (repo) {
-    props.shouldClose()
-    router.push({ name: 'commits', params: { repo } })
+    closeIfLeaving()
+    navigateTo({ name: 'commits', params: { repo } })
   }
 }
 
 function goToDetail(repo: string) {
-  props.shouldClose()
-  router.push(`/release/${repo}`)
+  closeIfLeaving()
+  navigateTo(`/release/${repo}`)
 }
 
 // ── 长按平台选择 ──

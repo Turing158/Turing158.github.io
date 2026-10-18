@@ -1,4 +1,5 @@
-import { ref, onUnmounted } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
+import { useAnimations } from './useAnimations'
 
 /**
  * 打字机效果 composable（性能优化版）
@@ -121,7 +122,22 @@ export function useTypewriter(
     showCursor.value = false
   }
 
-  start()
+  // 动画总开关：关闭时直接显示完整文本、收起光标并停掉 rAF 循环；重新开启再从头打字
+  const { animationsEnabled } = useAnimations()
+
+  watch(animationsEnabled, (on) => {
+    if (on) {
+      start()
+    } else {
+      stop()
+    }
+  })
+
+  if (animationsEnabled.value) {
+    start()
+  } else {
+    stop()
+  }
 
   onUnmounted(() => {
     clearTimer()

@@ -415,6 +415,7 @@ import { useLatestRelease } from '@/composables/useLatestRelease'
 import { useGitalk } from '@/composables/useGitalk'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 const REPO = 'StarFall-Minecraft-Launcher'
 const STORAGE_KEY = 'sfmc-notice-dismissed'
@@ -493,7 +494,7 @@ function formatDate(dateStr: string): string {
 }
 
 function scrollToDownload() {
-  downloadSection.value?.scrollIntoView({ behavior: 'smooth' })
+  downloadSection.value?.scrollIntoView({ behavior: scrollBehavior() })
 }
 
 function toggleLang() {

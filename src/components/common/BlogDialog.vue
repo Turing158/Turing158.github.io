@@ -12,6 +12,7 @@
       <div
         v-if="modelValue"
         class="blog-dialog-overlay"
+        :data-backdrop="dialogBackdrop"
         @click.self="handleOverlayClick"
         @keydown.esc="handleEsc"
         tabindex="-1"
@@ -60,6 +61,14 @@
 <script setup lang="ts">
 import { computed, watch, ref, nextTick, onUnmounted } from 'vue'
 import { useDialogStack, lockBodyScroll, unlockBodyScroll } from '@/composables/useDialogStack'
+import { useAnimations } from '@/composables/useAnimations'
+import { useSettings } from '@/composables/useSettings'
+
+// 全局动画开关：关闭时过渡时长记 0，入场/离场不做等待
+const { animationsEnabled } = useAnimations()
+
+// 全局设置：遮罩类型由设置面板统一控制；点击遮罩关闭在调用方未显式传 prop 时取全局值
+const { dialogBackdrop, closeOnClickOverlay: closeOnClickOverlaySetting } = useSettings()
 
 
 interface Props {
@@ -69,6 +78,7 @@ interface Props {
   height?: string | number
   maxWidth?: string | number
   maxHeight?: string | number
+  /** 不传则跟随设置面板的全局值；显式传 false 可强制「点遮罩不关闭」 */
   closeOnClickOverlay?: boolean
   showClose?: boolean
   bodyOverflow?: string
@@ -82,7 +92,7 @@ const props = withDefaults(defineProps<Props>(), {
   height: undefined,
   maxWidth: undefined,
   maxHeight: undefined,
-  closeOnClickOverlay: false,
+  closeOnClickOverlay: undefined,
   showClose: true,
   bodyOverflow: undefined,
   onOpen: undefined,
@@ -154,7 +164,8 @@ function close() {
 }
 
 function handleOverlayClick() {
-  if (props.closeOnClickOverlay) {
+  // 调用方显式传入优先，未传入则用设置面板的全局偏好
+  if (props.closeOnClickOverlay ?? closeOnClickOverlaySetting.value) {
     close()
   }
 }
@@ -205,7 +216,8 @@ function onEnter(el: Element, done: () => void) {
   })
 
   // Wait for the longer animation (dialog 350ms) before calling done
-  setTimeout(done, 400)
+  // 全局动画关闭时过渡为瞬时，不必干等
+  setTimeout(done, animationsEnabled.value ? 400 : 0)
 }
 
 function onAfterEnter(el: Element) {
@@ -258,7 +270,8 @@ function onLeave(el: Element, done: () => void) {
   })
 
   // Wait for the longer animation before calling done
-  setTimeout(done, 280)
+  // 全局动画关闭时过渡为瞬时，不必干等
+  setTimeout(done, animationsEnabled.value ? 280 : 0)
 }
 
 function onAfterLeave(el: Element) {
@@ -321,11 +334,28 @@ defineExpose({ open, close })
   align-items: center;
   justify-content: center;
   padding: 24px;
+  /* 遮罩类型由设置面板控制（data-backdrop，取值见下），默认 blur 为原有观感 */
   background: color-mix(in srgb, var(--text-primary) 35%, transparent);
   backdrop-filter: blur(4px);
   /* 阻止滚轮/触控穿透到背后页面 */
   overscroll-behavior: contain;
   touch-action: none;
+}
+
+/* ── 遮罩类型（设置面板「遮罩类型」）—— 取值需与 SettingsDialog 预览保持一致 ── */
+.blog-dialog-overlay[data-backdrop='dim'] {
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: none;
+}
+
+.blog-dialog-overlay[data-backdrop='light'] {
+  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+  backdrop-filter: blur(2px);
+}
+
+.blog-dialog-overlay[data-backdrop='none'] {
+  background: transparent;
+  backdrop-filter: none;
 }
 
 .blog-dialog {

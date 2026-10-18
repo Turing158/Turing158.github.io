@@ -873,6 +873,10 @@
     "error": "Load failed",
     "switchLang": "中文",
     "collapse": "Collapse",
+    "settings": "Settings",
+    "animation": "Animation",
+    "animationOn": "Animations on, click to turn off",
+    "animationOff": "Animations off, click to turn on",
     "expand": "Open menu",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -880,6 +884,71 @@
     "reloadImage": "Reload image",
     "redstoneDivider": "Redstone dust pixel divider",
     "railDivider": "Minecraft rail pixel divider"
+  },
+  "settings": {
+    "title": "Settings",
+    "groupAppearance": "Appearance",
+    "groupInteraction": "Interaction",
+    "groupApp": "App",
+    "stateOn": "On",
+    "stateOff": "Off",
+    "done": "Done",
+    "reset": "Reset to defaults",
+    "resetConfirm": "Confirm reset?",
+    "resetDone": "Settings restored to defaults",
+    "language": {
+      "label": "Language",
+      "desc": "Interface language, applied immediately",
+      "zh": "中文",
+      "en": "English"
+    },
+    "animation": {
+      "label": "Animation",
+      "desc": "Turn off to make all transitions instant — useful on low-end devices or for static pages"
+    },
+    "backdrop": {
+      "label": "Backdrop",
+      "desc": "Style of the mask behind dialogs",
+      "blur": "Blur",
+      "dim": "Dim",
+      "light": "Light",
+      "none": "None"
+    },
+    "overlayClose": {
+      "label": "Close on backdrop click",
+      "desc": "Clicking outside the dialog closes it; Esc always works"
+    },
+    "toolClick": {
+      "label": "Tool click action",
+      "desc": "When clicking a tool card on the tools page",
+      "dialog": "Open dialog",
+      "dialogDesc": "Open the tool in a dialog on the current page",
+      "newTab": "Open in new tab",
+      "newTabDesc": "Open the tool page in a new tab, keeping the list",
+      "samePage": "Open in this tab",
+      "samePageDesc": "Navigate to the tool page directly"
+    },
+    "searchClick": {
+      "label": "Search click action",
+      "desc": "When clicking an internal search result (external links such as GitHub always open in a new tab)",
+      "newTab": "Open in new tab",
+      "newTabDesc": "Keep the results and view in another tab",
+      "samePage": "Open in this tab",
+      "samePageDesc": "Navigate directly in the current tab"
+    },
+    "pwa": {
+      "label": "Install app",
+      "install": "Install",
+      "installing": "Installing…",
+      "installed": "Installed",
+      "installedDesc": "Running as a standalone app",
+      "descCanInstall": "Add it to your desktop for offline reading and faster launch",
+      "iosHint": "On iOS: Safari → Share → Add to Home Screen",
+      "unavailable": "This browser offers no one-click install",
+      "installSuccess": "Installed — launch it from your desktop",
+      "installDismissed": "Install cancelled, you can try again later",
+      "installFailed": "Cannot install directly in this environment"
+    }
   },
   "contextMenu": {
     "goBack": "Go Back",

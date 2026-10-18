@@ -7,93 +7,112 @@ export interface TipItem {
   message: string
   type: TipType
   count: number
-  duration: number // ms, 0 = never auto-remove
+  /** 自动消失时长（ms），0 = 永不自动消失 */
+  duration: number
+  /** 鼠标移入是否停表，默认 true */
   pauseOnHover: boolean
-  leaving: boolean // 正在播放消失动画
+  /** 正在播放离场动画（此期间不参与同消息合并） */
+  leaving: boolean
+
+  /* —— 以下由 BlogTipContainer 维护的视图状态 —— */
+  /** 已停表（鼠标移入或键盘聚焦中） */
+  paused: boolean
+  /** 已展开（hover / focus） */
+  opened: boolean
+  /** 键盘聚焦中 */
+  focused: boolean
+  /** 展开态实测高度（px），0 = 尚未测量 */
+  openHeight: number
+  /** 卡包层叠深度，0 = 最新（完整浮在最上） */
+  depth: number
+  /** 容器装不下，已折成「卡边」 */
+  peeking: boolean
+  /** 容量仍不够，已整条隐藏 */
+  hidden: boolean
+  /** 自增即重建进度条元素，让 CSS 动画从头播放 —— 「重新计满」的载体 */
+  restartToken: number
 }
 
 export interface TipOptions {
   type?: TipType
-  duration?: number // ms, default 3000, 0 = never auto-remove
-  pauseOnHover?: boolean // default true
+  /** 自动消失时长（ms），默认 5000，传 0 表示不自动消失 */
+  duration?: number
+  /** 鼠标移入是否停表，默认 true */
+  pauseOnHover?: boolean
 }
 
+/** 响应式气泡列表；最新的一条在数组首位（渲染在最上方） */
 export const tips = ref<TipItem[]>([])
 
 let idSeed = 0
-const leaveTimerMap = new Map<number, ReturnType<typeof setTimeout>>()
-const safetyTimerMap = new Map<number, ReturnType<typeof setTimeout>>()
 
-// 离场动画时长，必须与 CSS @keyframes blog-tip-out 一致
-const LEAVE_ANIMATION_MS = 300
+/** 倒计时句柄，刻意不进响应式：定时器不是 UI 状态 */
+const lifeTimers = new Map<number, ReturnType<typeof setTimeout>>()
 
-function clearSafetyTimer(id: number) {
-  const t = safetyTimerMap.get(id)
+/** 离场动画时长，必须与 BlogTipContainer 样式里 blog-tip-out 的时长（--tip-dur-out）一致 */
+export const LEAVE_ANIMATION_MS = 220
+
+function clearLifeTimer(id: number) {
+  const t = lifeTimers.get(id)
   if (t) {
     clearTimeout(t)
-    safetyTimerMap.delete(id)
+    lifeTimers.delete(id)
   }
 }
 
-// 安全移除：无论 animationend 是否触发，都能保证元素最终被清理
-function safeRemove(id: number) {
-  clearSafetyTimer(id)
-  const idx = tips.value.findIndex(t => t.id === id)
-  if (idx !== -1) tips.value.splice(idx, 1)
-}
-
-function scheduleRemove(tip: TipItem) {
-  clearLeaveTimer(tip.id)
-  clearSafetyTimer(tip.id)
-  if (tip.duration === 0) return
-  leaveTimerMap.set(
+/** 开始 / 重新开始倒计时。进度条靠 restartToken 重建元素，因此是「重新计满」而非续接剩余时间 */
+export function startLife(tip: TipItem) {
+  clearLifeTimer(tip.id)
+  tip.paused = false
+  if (tip.duration <= 0) return
+  tip.restartToken++
+  lifeTimers.set(
     tip.id,
-    setTimeout(() => {
-      const t = tips.value.find(x => x.id === tip.id)
-      if (!t) return
-      t.leaving = true
-      // 兜底：动画播放完后若仍未移除，强制清理
-      safetyTimerMap.set(
-        tip.id,
-        setTimeout(() => safeRemove(tip.id), LEAVE_ANIMATION_MS + 50)
-      )
-    }, tip.duration)
+    setTimeout(() => dismiss(tip), tip.duration)
   )
 }
 
-export function clearLeaveTimer(id: number) {
-  const t = leaveTimerMap.get(id)
-  if (t) {
-    clearTimeout(t)
-    leaveTimerMap.delete(id)
-  }
+/** 停表（hover / 键盘聚焦）。只清定时器，进度条由 CSS 动画自己暂停在当前位置 */
+export function pauseLife(tip: TipItem) {
+  clearLifeTimer(tip.id)
+  tip.paused = true
 }
 
-// 由容器在 animationend 后调用，提前清理
-export function finalizeRemove(id: number) {
-  safeRemove(id)
+function removeTip(id: number) {
+  clearLifeTimer(id)
+  const idx = tips.value.findIndex((t) => t.id === id)
+  if (idx !== -1) tips.value.splice(idx, 1)
 }
 
-export function startLeaveTimer(id: number) {
-  const tip = tips.value.find(t => t.id === id)
-  if (tip) scheduleRemove(tip)
+/** 播放离场动画后移除；重复调用安全（leaving 期间直接返回） */
+export function dismiss(tip: TipItem) {
+  // 无论走哪个分支都先清句柄：mouseleave 可能在元素已移除后才补触发并排一个新定时器，
+  // 那个定时器正是在这里（而非 lifeTimers 内部）收尾
+  clearLifeTimer(tip.id)
+  if (tip.leaving || !tips.value.includes(tip)) return
+  tip.leaving = true
+  setTimeout(() => removeTip(tip.id), LEAVE_ANIMATION_MS)
 }
 
 const BlogTip = {
   show(message: string, options?: TipOptions) {
     const type = options?.type ?? 'info'
-    const duration = options?.duration ?? 3000
+    const duration = options?.duration ?? 5000
     const pauseOnHover = options?.pauseOnHover ?? true
 
-    // 正在播放消失动画的 tip 不参与合并，让它自然离场后重新创建
-    const existing = tips.value.find(t => t.message === message && t.type === type && !t.leaving)
+    // 正在播放离场动画的不参与合并，让它自然退场后另起一条
+    const existing = tips.value.find(
+      (t) => t.message === message && t.type === type && !t.leaving
+    )
     if (existing) {
       existing.count++
       existing.duration = duration
-      existing.pauseOnHover = pauseOnHover
-      existing.leaving = false
-      scheduleRemove(existing)
-      return
+      // 刻意不覆盖 pauseOnHover：悬停行为在气泡诞生时确定，中途改会让 paused 与新语义
+      // 失配（pauseOnHover=false 期间鼠标停在上面时 paused 一直是 false）
+      // 只有用户没在看这条时才重启计时；正在看（hover / 聚焦）就保持原节奏，
+      // 否则会在鼠标底下倒计时消失
+      if (!existing.opened && !existing.paused) startLife(existing)
+      return existing
     }
 
     const tip: TipItem = {
@@ -104,22 +123,27 @@ const BlogTip = {
       duration,
       pauseOnHover,
       leaving: false,
+      paused: false,
+      opened: false,
+      focused: false,
+      openHeight: 0,
+      depth: 0,
+      peeking: false,
+      hidden: false,
+      restartToken: 0,
     }
-    tips.value.push(tip)
-    scheduleRemove(tip)
+    tips.value.unshift(tip) // 最新的插到最前（最上方），旧的依次下沉
+    startLife(tip)
+    return tip
   },
 
   remove(id: number) {
-    clearLeaveTimer(id)
-    const idx = tips.value.findIndex(t => t.id === id)
-    if (idx !== -1) tips.value.splice(idx, 1)
+    removeTip(id)
   },
 
   clear() {
-    leaveTimerMap.forEach(t => clearTimeout(t))
-    leaveTimerMap.clear()
-    safetyTimerMap.forEach(t => clearTimeout(t))
-    safetyTimerMap.clear()
+    lifeTimers.forEach((t) => clearTimeout(t))
+    lifeTimers.clear()
     tips.value = []
   },
 
@@ -129,5 +153,4 @@ const BlogTip = {
   },
 }
 
-export { LEAVE_ANIMATION_MS }
 export default BlogTip

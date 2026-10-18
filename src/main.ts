@@ -5,6 +5,9 @@ import App from './App.vue'
 import router from './router'
 import i18n from './i18n'
 import { useTheme } from './composables/useTheme'
+import { useAnimations } from './composables/useAnimations'
+import { useSettings } from './composables/useSettings'
+import { usePwaInstall } from './composables/usePwaInstall'
 import { installAxiosPoolInterceptor } from './utils/axiosPool'
 import BlogTip from './plugins/blog-tip'
 import 'highlight.js/styles/github.css'
@@ -34,6 +37,19 @@ app.use(head)
 // Initialize theme before mounting
 const { initTheme } = useTheme()
 initTheme()
+
+// 动画总开关：与主题一样在挂载前应用（早于任何组件渲染，首帧就不会闪动画）
+const { initAnimations } = useAnimations()
+initAnimations()
+
+// 设置中心（语言 / 动画以外的偏好：遮罩类型、点遮罩关闭、点击行为）
+// 同样在挂载前恢复，保证首个弹窗就按用户偏好渲染
+const { initSettings } = useSettings()
+initSettings()
+
+// PWA 安装：尽早注册 beforeinstallprompt（该事件只派发一次，晚注册会漏）
+const { initPwaInstall } = usePwaInstall()
+initPwaInstall()
 
 // 等待初始路由解析完成再挂载，避免独立页面硬刷新时闪现 MainLayout
 router.isReady().then(() => {

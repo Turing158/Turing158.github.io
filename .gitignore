@@ -15,3 +15,7 @@ CLAUDE.md
 plan/
 /design-proposals
 *.log
+
+# 本地临时产物与备份
+/.tmp-preview
+/backups

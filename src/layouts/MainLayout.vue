@@ -109,14 +109,52 @@
             <SidebarIcon name="dark" :size="18" />
           </button>
         </div>
-        <button class="lang-btn px-fade" @click="toggleLang">
-          <SidebarIcon name="lang" :size="16" />
-          <span>{{ $t('common.switchLang') }}</span>
-        </button>
-        <button class="collapse-btn px-fade" :aria-label="$t('common.collapse')" @click="isCollapsed = true">
-          <SidebarIcon name="chevronLeft" :size="16" class="collapse-icon" />
-          <span class="collapse-text">{{ $t('common.collapse') }}</span>
-        </button>
+        <!-- 四宫格：左上语言切换 / 右上动画开关 / 左下设置 / 右下收起
+             （DOM 顺序即格子顺序，grid 两列自动换行） -->
+        <div class="footer-grid">
+          <button
+            class="grid-btn grid-btn--lang px-fade"
+            :title="$t('common.switchLang')"
+            :aria-label="$t('common.switchLang')"
+            @click="toggleLang"
+          >
+            <SidebarIcon name="lang" :size="16" />
+            <span class="grid-text">{{ $t('common.switchLang') }}</span>
+          </button>
+          <!-- 右上：动画总开关（开 = 图标高亮 + 状态点；关 = 整格暗淡 + 斜杠图标） -->
+          <button
+            class="grid-btn grid-btn--anim px-fade"
+            :class="{ 'is-on': animationsEnabled }"
+            :title="animationsEnabled ? $t('common.animationOn') : $t('common.animationOff')"
+            :aria-label="$t('common.animation')"
+            :aria-pressed="animationsEnabled"
+            @click="toggleAnimations"
+          >
+            <SidebarIcon :name="animationsEnabled ? 'animation' : 'animationOff'" :size="16" />
+            <span class="grid-text">{{ $t('common.animation') }}</span>
+            <span class="grid-led" aria-hidden="true"></span>
+          </button>
+          <!-- 设置：打开设置面板（语言 / 动画 / 遮罩 / 点击行为 / PWA 安装） -->
+          <button
+            class="grid-btn px-fade"
+            :title="$t('common.settings')"
+            :aria-label="$t('common.settings')"
+            aria-haspopup="dialog"
+            @click="openSettings"
+          >
+            <SidebarIcon name="settings" :size="16" />
+            <span class="grid-text">{{ $t('common.settings') }}</span>
+          </button>
+          <button
+            class="grid-btn grid-btn--collapse px-fade"
+            :title="$t('common.collapse')"
+            :aria-label="$t('common.collapse')"
+            @click="isCollapsed = true"
+          >
+            <SidebarIcon name="chevronLeft" :size="16" class="collapse-icon" />
+            <span class="grid-text">{{ $t('common.collapse') }}</span>
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -147,6 +185,7 @@
     </main>
 
     <SearchDialog ref="searchDialogRef" />
+    <SettingsDialog v-model="settingsOpen" />
   </div>
 </template>
 
@@ -155,6 +194,7 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTheme, type ThemeName } from '@/composables/useTheme'
+import { useAnimations } from '@/composables/useAnimations'
 import { useAchievements } from '@/composables/useAchievements'
 import { setLocale } from '@/i18n'
 import ArticleTOCDrawer from '@/components/article/ArticleTOCDrawer.vue'
@@ -162,6 +202,7 @@ import VillageFooter from '@/components/common/VillageFooter.vue'
 import SkyBackground from '@/components/common/SkyBackground.vue'
 import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import SearchDialog from '@/components/search/SearchDialog.vue'
+import SettingsDialog from '@/components/settings/SettingsDialog.vue'
 import { useTypewriter } from '@/composables/useTypewriter'
 import type { TocHeading } from '@/components/article/ArticleTOCDrawer.vue'
 export type { TocHeading }
@@ -179,8 +220,19 @@ const {
   setSystemDarkTheme,
 } = useTheme()
 
+// 动画总开关（四宫格右上角）
+const { animationsEnabled, toggleAnimations } = useAnimations()
+
 const searchDialogRef = ref<InstanceType<typeof SearchDialog> | null>(null)
 const openSearch = () => searchDialogRef.value?.open()
+
+// 设置面板（底部四宫格「设置」）
+const settingsOpen = ref(false)
+const openSettings = () => {
+  settingsOpen.value = true
+  // 移动端：先收起侧边栏，避免弹窗压在抽屉上
+  if (isMobile.value) isCollapsed.value = true
+}
 
 const { isNavUnlocked } = useAchievements()
 
@@ -515,8 +567,15 @@ const toggleLang = () => {
 
 /* 选项区上下装饰条带：苔藓洞顶 + 草皮地面（120px 无缝平铺单元）。
    放在滚动区之外，导航滚动时固定不动；nav 的上下 padding
-   为条带里垂下的浆果 / 耸起的花丛预留间距（26 / 14px）。 */
+   为条带里垂下的浆果 / 耸起的花丛预留间距（上下同为 14px）。 */
 .sidebar-nav-divider {
+  /* 位移量：上条带向下、下条带向上，各自向导航区靠近。
+     只用 transform —— 不参与布局计算（nav / footer 不动），且图形随盒子整体
+     平移，故 SVG 不会被自身的 18px 高度裁切。 */
+  --divider-shift: 8px;
+  /* 提到导航之上：nav 滚动时列表项从条带下缘滑入，会被条带遮住。
+     本元素是 .sidebar 的 flex item，故无需 position 即可让 z-index 生效。 */
+  z-index: 3;
   flex: none;
   height: 18px;
   background-repeat: repeat-x;
@@ -527,16 +586,18 @@ const toggleLang = () => {
 
 .sidebar-nav-divider--top {
   background-image: url('/sidebar/sidebar-moss-top.svg');
+  transform: translateY(var(--divider-shift));
 }
 
 .sidebar-nav-divider--bottom {
   background-image: url('/sidebar/sidebar-grass-bottom.svg');
+  transform: translateY(calc(-1 * var(--divider-shift)));
 }
 
 .sidebar-nav {
   flex: 1;
   min-height: 0;
-  padding: 26px 12px 14px;
+  padding: 14px 12px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -794,13 +855,21 @@ const toggleLang = () => {
   transform: scale(0.92);
 }
 
-.lang-btn,
-.collapse-btn {
+/* 底部四宫格：左上语言 / 右上动画 / 左下设置 / 右下收起 */
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.grid-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 9px 16px;
+  gap: 6px;
+  padding: 9px 6px;
+  min-width: 0;
+  white-space: nowrap;
   --pxs: 3px;
   clip-path: var(--pxc);
   border: 2px solid transparent; border-image: var(--px-frame-on-dark) 6 / calc(2 * var(--pxs)) stretch;
@@ -809,45 +878,96 @@ const toggleLang = () => {
   background: transparent;
   color: var(--text-sidebar);
   cursor: pointer;
-  font-size: 0.85rem;
+  /* 半宽格子（约 100px）：字号收小一档，"Animation" 之类的长词才放得下 */
+  font-size: 0.78rem;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.lang-btn :deep(svg),
-.collapse-btn :deep(svg) {
+.grid-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 收起图标的位移挂在自身：hover 规则里直接写子元素选择器会被 scoped 属性挡住
+   （子组件根元素不带本组件的 data-v） */
+.collapse-icon {
+  flex-shrink: 0;
   transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.lang-btn:hover,
-.collapse-btn:hover {
+.grid-btn :deep(svg) {
+  flex-shrink: 0;
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.grid-btn:hover {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text-sidebar-active);
   transform: translateY(-2px);
 }
 
-.lang-btn:active,
-.collapse-btn:active {
+.grid-btn:active {
   transform: translateY(1px) scale(0.97);
 }
 
-.lang-btn:hover :deep(svg) {
+.grid-btn--lang:hover :deep(svg) {
   transform: scale(1.12) rotate(-8deg);
 }
 
-.collapse-btn:hover :deep(svg) {
+.grid-btn--collapse:hover :deep(svg) {
   transform: translateX(-4px) scale(1.1);
 }
 
-.collapse-icon {
-  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.collapse-btn:hover .collapse-icon {
+.grid-btn--collapse:hover .collapse-icon {
   transform: translateX(-4px) scale(1.1);
 }
 
-.collapse-btn:active .collapse-icon {
+.grid-btn--collapse:active :deep(svg) {
   transform: translateX(2px) scale(0.88);
+}
+
+.grid-btn--collapse:active .collapse-icon {
+  transform: translateX(2px) scale(0.88);
+}
+
+/* 动画总开关：开 = 图标高亮 + 右上角状态点；关 = 整格暗淡 + 斜杠图标 */
+.grid-btn--anim.is-on {
+  color: var(--text-sidebar-active);
+}
+
+.grid-btn--anim:not(.is-on) {
+  opacity: 0.6;
+}
+
+/* 关态：状态点完全熄灭（只留斜杠图标 + 暗淡的整格） */
+.grid-btn--anim:not(.is-on) .grid-led {
+  opacity: 0;
+}
+
+.grid-btn--anim:not(.is-on):hover {
+  opacity: 1;
+}
+
+.grid-btn--anim:hover :deep(svg) {
+  transform: scale(1.12) rotate(-8deg);
+}
+
+/* 状态点：靠 .px-fade 的 position: relative 定位，不占格子宽度 */
+.grid-led {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 3px;
+  height: 3px;
+  background: var(--text-sidebar);
+  opacity: 0.35;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.grid-btn--anim.is-on .grid-led {
+  background: var(--text-sidebar-active);
+  opacity: 1;
 }
 
 .expand-btn {

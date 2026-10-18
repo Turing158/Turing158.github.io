@@ -87,6 +87,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { Button } from 'animal-island-vue'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 export interface TocHeading {
   id: string
@@ -167,7 +168,7 @@ const getH3Children = (h2Index: number): TocHeading[] => {
 const scrollTo = (id: string) => {
   const el = document.getElementById(id)
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
   }
   if (isMobile.value) {
     isOpen.value = false
@@ -175,13 +176,13 @@ const scrollTo = (id: string) => {
 }
 
 const scrollToTop = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  window.scrollTo({ top: 0, behavior: scrollBehavior() })
 }
 
 const scrollToComments = () => {
   const el = document.getElementById('gitalk-container')
   if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    el.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
   }
   if (isMobile.value) {
     isOpen.value = false

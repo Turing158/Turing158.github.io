@@ -179,6 +179,7 @@ import BlogTip from '@/plugins/blog-tip'
 import BlogSelect from '@/components/common/BlogSelect.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
 import { articleTime } from '@/utils/articleDate'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 const { t } = useI18n()
 
@@ -328,7 +329,7 @@ const unregisterContextMenu = registerContextProvider((target) => {
     label: t('contextMenu.scrollToTop'),
     icon: '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>',
     action: () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: scrollBehavior() })
     },
   })
 

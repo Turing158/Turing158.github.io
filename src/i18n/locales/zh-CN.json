@@ -945,6 +945,10 @@
     "error": "加载失败",
     "switchLang": "English",
     "collapse": "收起",
+    "settings": "设置",
+    "animation": "动画",
+    "animationOn": "动画已开启，点击关闭",
+    "animationOff": "动画已关闭，点击开启",
     "expand": "展开菜单",
     "cancel": "取消",
     "confirm": "确认",
@@ -952,6 +956,71 @@
     "reloadImage": "重新加载图片",
     "redstoneDivider": "红石线路像素分割线",
     "railDivider": "Minecraft 铁轨像素分割线"
+  },
+  "settings": {
+    "title": "设置",
+    "groupAppearance": "外观与体验",
+    "groupInteraction": "交互行为",
+    "groupApp": "应用",
+    "stateOn": "开启",
+    "stateOff": "关闭",
+    "done": "完成",
+    "reset": "恢复默认",
+    "resetConfirm": "确认恢复？",
+    "resetDone": "已恢复默认设置",
+    "language": {
+      "label": "语言",
+      "desc": "界面显示语言，切换后立即生效",
+      "zh": "中文",
+      "en": "English"
+    },
+    "animation": {
+      "label": "动画",
+      "desc": "关闭后全站过渡与动效立即完成，适合低性能设备或偏好静态页面"
+    },
+    "backdrop": {
+      "label": "遮罩类型",
+      "desc": "弹窗背后遮罩层的样式",
+      "blur": "模糊",
+      "dim": "暗色",
+      "light": "淡色",
+      "none": "无"
+    },
+    "overlayClose": {
+      "label": "点击遮罩关闭弹窗",
+      "desc": "点击弹窗外部的遮罩区域时关闭；按 Esc 始终可关闭"
+    },
+    "toolClick": {
+      "label": "工具点击操作",
+      "desc": "在工具页点击工具卡片时",
+      "dialog": "打开弹窗",
+      "dialogDesc": "在当前页面以弹窗形式打开工具",
+      "newTab": "跳转到新标签页",
+      "newTabDesc": "在新标签页打开工具详情页，保留当前列表",
+      "samePage": "当前页面跳转",
+      "samePageDesc": "直接在当前标签页打开工具详情页"
+    },
+    "searchClick": {
+      "label": "搜索点击操作",
+      "desc": "点击搜索结果中的站内条目时（GitHub 等站外链接始终在新标签页打开）",
+      "newTab": "跳转到新标签页",
+      "newTabDesc": "保留搜索结果，另开标签页查看",
+      "samePage": "当前页面跳转",
+      "samePageDesc": "直接在当前标签页打开"
+    },
+    "pwa": {
+      "label": "安装到桌面",
+      "install": "安装",
+      "installing": "安装中…",
+      "installed": "已安装",
+      "installedDesc": "已作为独立应用运行",
+      "descCanInstall": "添加到桌面后可离线阅读，启动更快",
+      "iosHint": "iOS 请在 Safari 中点击「分享」→「添加到主屏幕」",
+      "unavailable": "当前浏览器未提供一键安装入口",
+      "installSuccess": "安装成功，可从桌面启动",
+      "installDismissed": "已取消安装，可稍后再试",
+      "installFailed": "当前环境无法直接安装"
+    }
   },
   "contextMenu": {
     "goBack": "返回上一页",

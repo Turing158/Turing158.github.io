@@ -72,6 +72,10 @@
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useVillageFooterStats } from '@/composables/useVillageFooterStats'
 import type { VillageFooterStat } from '@/composables/useVillageFooterStats'
+import { useAnimations } from '@/composables/useAnimations'
+
+// 全局动画开关：关闭时停画下方 canvas（云 / 水波），与组件自身的 paused 开关相互独立
+const { animationsEnabled } = useAnimations()
 
 // 相邻告示牌中心距，与设计稿一致
 const SIGN_GAP = 124
@@ -120,7 +124,8 @@ let tickerUrl: string | null = null
 let tickerFallback: ReturnType<typeof setInterval> | null = null
 
 function beat() {
-  if (paused.value || !pageVisible.value) return
+  // 全局动画关闭：不再重绘，canvas 停在最后一帧（云、水波静止）
+  if (paused.value || !pageVisible.value || !animationsEnabled.value) return
   const now = Date.now()
   // 按实际间隔补偿帧数，个别掉拍时云、水波的速度仍接近实时
   frame += Math.max(1, Math.round((now - lastTick) / 180))

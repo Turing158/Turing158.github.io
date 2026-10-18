@@ -743,3 +743,26 @@ input[type="checkbox"], input[type="radio"] {
   font-family: var(--font-pixel);
   letter-spacing: 0.4px;
 }
+
+/* ── 动画总开关（侧边栏底部四宫格右上角「动画」按钮）──
+   关闭时由 useAnimations 在 <html> 上打 data-animations="off"。
+   这里一刀切压掉全站 CSS 动画与过渡：全站近百处 @keyframes 逐个改不现实，
+   且今后新增的动画会自动纳入本规则，不会漏网。
+   用 0.001ms 而非 animation/transition: none —— 保证 animationend /
+   transitionend 仍会触发，依赖它们收尾的组件（弹窗、抽屉、路由过渡、
+   Vue <transition> 的 out-in）不会卡在中间态。 */
+html[data-animations='off'],
+html[data-animations='off'] *,
+html[data-animations='off'] *::before,
+html[data-animations='off'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  transition-delay: 0s !important;
+}
+
+/* 平滑滚动同样是动画 */
+html[data-animations='off'] {
+  scroll-behavior: auto;
+}

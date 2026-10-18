@@ -106,6 +106,7 @@ import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import BlogTip from '@/plugins/blog-tip'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 import { apiUrl } from '@/utils/apiEndpoint'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 const route = useRoute()
 const router = useRouter()
@@ -282,7 +283,7 @@ const unregisterContextMenu = registerContextProvider((target) => {
     label: t('contextMenu.scrollToTop'),
     icon: '<line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>',
     action: () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: scrollBehavior() })
     },
   })
 

@@ -203,6 +203,7 @@ import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
 import PageTitle from '@/components/common/PageTitle.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { GITHUB_API_HEADERS, githubUrl } from '@/utils/githubApi'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 const router = useRouter()
 const GITHUB_OWNER = 'Turing158'
@@ -285,7 +286,7 @@ function onBodyClick(e: MouseEvent) {
   const card = anchor.closest('.release-card')
   const target = card?.querySelector(`[id="${CSS.escape(id)}"]`) as HTMLElement | null
   if (target) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
   }
 }
 

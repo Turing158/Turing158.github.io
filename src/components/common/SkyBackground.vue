@@ -15,7 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, shallowRef, onMounted, onBeforeUnmount } from 'vue'
+import { ref, shallowRef, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useAnimations } from '@/composables/useAnimations'
 
 /** 云朵素材（public/cloud 下的像素云 SVG），ratio = 高/宽 */
 const CLOUD_TYPES = [
@@ -233,6 +234,17 @@ function stopLoop() {
   }
 }
 
+// 动画总开关：关闭即停掉云的 rAF 循环（云停在原处不动），重新开启无缝续跑
+const { animationsEnabled } = useAnimations()
+
+watch(animationsEnabled, (on) => {
+  if (on) {
+    startLoop()
+  } else {
+    stopLoop()
+  }
+})
+
 let resizeTimer: ReturnType<typeof setTimeout> | null = null
 function onResize() {
   if (resizeTimer) clearTimeout(resizeTimer)
@@ -256,7 +268,8 @@ onMounted(() => {
   }
   preSeed()
   window.addEventListener('resize', onResize)
-  startLoop()
+  // 动画总开关为关时不起循环：云停在初始位置（不显示动画）
+  if (animationsEnabled.value) startLoop()
 })
 
 onBeforeUnmount(() => {

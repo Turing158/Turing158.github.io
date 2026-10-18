@@ -17,6 +17,10 @@ import type { App } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ImageViewer, { type ImageViewerImage } from '@/components/common/ImageViewer.vue'
 import GrassTerrainDivider from '@/components/common/GrassTerrainDivider.vue'
+import { scrollBehavior, useAnimations } from '@/composables/useAnimations'
+
+// 全局动画开关：关闭时停掉分割线上的矿车行驶与锚点平滑滚动
+const { animationsEnabled } = useAnimations()
 
 const props = defineProps<{
   html: string
@@ -398,7 +402,8 @@ const setupRailDivider = (divider: HTMLElement): (() => void) => {
   }
 
   const runMinecart = () => {
-    if (isRunning) return
+    // 全局动画关闭：不起步（行驶途中被关掉的情况由 frame 内的检查收尾）
+    if (isRunning || !animationsEnabled.value) return
 
     cancelRestart()
     isRunning = true
@@ -412,6 +417,13 @@ const setupRailDivider = (divider: HTMLElement): (() => void) => {
     let lastTime = 0
 
     const frame = (time: number) => {
+      // 行驶途中关闭全局动画：就地收尾（矿车隐藏回起点，不再续帧）
+      if (!animationsEnabled.value) {
+        minecart.style.opacity = '0'
+        minecart.style.transform = 'translateX(0)'
+        isRunning = false
+        return
+      }
       if (!lastTime) lastTime = time
       const delta = Math.min(34, time - lastTime)
       lastTime = time
@@ -627,7 +639,7 @@ const handleAnchorClick = (e: Event) => {
   }
   if (target) {
     e.preventDefault()
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    target.scrollIntoView({ behavior: scrollBehavior(), block: 'start' })
   }
 }
 

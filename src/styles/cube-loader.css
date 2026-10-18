@@ -40,6 +40,9 @@
   width: var(--cube-size);
   height: var(--cube-size);
   transform-style: preserve-3d;
+  /* 基础姿态 = 关键帧 0% 的等轴视：动画关闭（iteration-count 被压成 1、播完回落）
+     时立方体仍保持立体，不会塌成一个平面方块 */
+  transform: rotate(45deg) rotateX(-25deg) rotateY(25deg);
   animation: cube-loader-rotate 1s infinite ease;
 }
 

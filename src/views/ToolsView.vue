@@ -119,6 +119,7 @@ import SidebarIcon from '@/components/sidebar/SidebarIcon.vue'
 import ToolDialogActions from '@/components/tools/ToolDialogActions.vue'
 import { usePageSeo } from '@/composables/useSeo'
 import { useAchievements } from '@/composables/useAchievements'
+import { useSettings } from '@/composables/useSettings'
 import { registerContextProvider } from '@/composables/contextMenuRegistry'
 import { toolKeys } from '@/data/tools'
 import { useRoute, useRouter } from 'vue-router'
@@ -247,6 +248,9 @@ const gridRef = ref<HTMLElement | null>(null)
 
 // 成就系统：setup 中取一次，避免每次 openTool 重复调用 composable
 const achievements = useAchievements()
+
+// 设置面板「工具点击操作」：dialog / newTab / samePage
+const { toolClickAction } = useSettings()
 
 let contentReadyRaf = 0
 let contentReadyTimer: ReturnType<typeof setTimeout> | null = null
@@ -526,13 +530,33 @@ function onSeparatorCancel() {
   // noop
 }
 
-// 打开工具
-function openTool(tool: Tool) {
+// 打开工具：行为由设置面板的「工具点击操作」决定
+//   dialog   —— 站内弹窗（原有行为，默认）
+//   newTab   —— 新标签页打开工具详情页
+//   samePage —— 当前页面跳转到工具详情页
+// forceDialog（右键菜单「打开工具」、?tool= 深链）不受设置影响：
+//   前者菜单项字面就是「打开工具」，后者由路由 query 触发、没有用户手势，
+//   window.open 会被弹窗拦截器拦掉，因此一律走弹窗。
+function openTool(tool: Tool, options?: { forceDialog?: boolean }) {
   // 若本次点击源自手柄的拖拽交互（长按 / 拖动），抑制打开
   if (didInteract) {
     didInteract = false
     return
   }
+
+  if (!options?.forceDialog && toolClickAction.value !== 'dialog') {
+    const resolved = resolveToolDetailFor(tool)
+    if (resolved) {
+      // 跳到详情页也算「用到了这个工具」，否则选了非弹窗行为后 tool-master 成就永远无法达成
+      // （handleToolUse 全站仅此一处调用点，ToolDetailView 不记录）
+      achievements.handleToolUse(tool.component)
+      if (toolClickAction.value === 'newTab') window.open(resolved.href, '_blank', 'noopener')
+      else router.push(resolved)
+      return
+    }
+    // 元数据缺失（理论上不会发生）时退回弹窗，避免点击无响应
+  }
+
   activeTool.value = tool
   contentReady.value = false
   dialogOpen.value = true
@@ -560,11 +584,15 @@ function onDialogClose() {
 }
 
 // ── 弹窗右上角快捷操作：「切换」当前标签页前往该工具页，「跳转」新标签页打开 ──
-function resolveToolDetail() {
-  const component = activeTool.value?.component
-  const meta = component ? toolKeys.find((k) => k.component === component) : null
+function resolveToolDetailFor(tool: Tool) {
+  const meta = toolKeys.find((k) => k.component === tool.component)
   if (!meta) return null
   return router.resolve({ name: 'tool-detail', params: { id: meta.key } })
+}
+
+function resolveToolDetail() {
+  const tool = activeTool.value
+  return tool ? resolveToolDetailFor(tool) : null
 }
 
 function onDialogNavSwitch() {
@@ -588,7 +616,9 @@ function maybeOpenFromQuery(component: unknown) {
   if (!meta) return
   const tool = tools.value.find((t) => t.component === component)
   if (tool) {
-    openTool(tool)
+    // 深链语义就是「在工具页打开这个工具的弹窗」，且此处由路由变化触发、无用户手势，
+    // 走 window.open 会被弹窗拦截器拦掉 —— 故强制走弹窗，不受「工具点击操作」设置影响
+    openTool(tool, { forceDialog: true })
     // 清掉 query,避免刷新或返回时重复打开
     router.replace({ name: 'tools' })
   }
@@ -633,7 +663,7 @@ const unregisterContextMenu = registerContextProvider((target) => {
     label: t('contextMenu.openTool'),
     icon: '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>',
     action: () => {
-      openTool(tool)
+      openTool(tool, { forceDialog: true })
     },
   })
 

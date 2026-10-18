@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { formatViewCount } from '@/utils/formatViewCount'
+import { useAnimations } from '@/composables/useAnimations'
 
 /**
  * 数字滚动动画组件
@@ -27,9 +28,12 @@ const props = withDefaults(defineProps<Props>(), {
 const displayText = ref('0')
 let rafId = 0
 
+const { animationsEnabled } = useAnimations()
+
 function animate(from: number, to: number, duration: number) {
   cancelAnimationFrame(rafId)
-  if (duration <= 0 || from === to) {
+  // 动画关闭：直接落到目标值，不做滚动
+  if (!animationsEnabled.value || duration <= 0 || from === to) {
     displayText.value = formatViewCount(to)
     return
   }
@@ -52,6 +56,13 @@ watch(
     animate(from ?? 0, to, props.duration)
   }
 )
+
+// 动画关闭时掐掉进行中的滚动，数字直接定格在目标值
+watch(animationsEnabled, (on) => {
+  if (on) return
+  cancelAnimationFrame(rafId)
+  displayText.value = formatViewCount(props.value)
+})
 
 onMounted(() => {
   animate(0, props.value, props.duration)

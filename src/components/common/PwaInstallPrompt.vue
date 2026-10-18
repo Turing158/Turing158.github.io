@@ -1,63 +1,44 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { useAchievements } from '@/composables/useAchievements'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { usePwaInstall } from '@/composables/usePwaInstall'
 
-const deferredPrompt = ref<Event | null>(null)
+// beforeinstallprompt 事件与「是否已安装」由 usePwaInstall 统一持有
+// （设置面板的「安装到桌面」共用同一份状态，事件只会派发一次，不能各存一份）
+const { isInstalled, canInstall, installApp, setSiteInstallUiAvailable } = usePwaInstall()
+
 const showPrompt = ref(false)
-const isInstalled = ref(false)
 
-// 检查是否已安装
-function checkInstalled() {
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    isInstalled.value = true
-    return true
-  }
-  // iOS 检查
-  if ((window.navigator as any).standalone === true) {
-    isInstalled.value = true
-    return true
-  }
-  return false
+// 横幅存在期间，才让 usePwaInstall 拦下浏览器自带的安装提示；
+// 独立落地页不渲染本组件，浏览器提示因此保持原样
+onMounted(() => setSiteInstallUiAvailable(true))
+onUnmounted(() => setSiteInstallUiAvailable(false))
+
+// 拿到安装机会后延迟 3 秒再弹横幅，避免首次访问就打扰
+// immediate: 若事件在组件挂载前就已派发（main.ts 里更早注册监听），挂载时补一次
+watch(
+  canInstall,
+  (available) => {
+    if (!available) return
+    setTimeout(() => {
+      if (canInstall.value) showPrompt.value = true
+    }, 3000)
+  },
+  { immediate: true },
+)
+
+// 已安装（含从设置面板完成安装）时收起横幅
+watch(isInstalled, (installed) => {
+  if (installed) showPrompt.value = false
+})
+
+async function handleInstall() {
+  const outcome = await installApp()
+  if (outcome === 'accepted') showPrompt.value = false
 }
 
-// 处理安装提示
-function handleBeforeInstallPrompt(e: Event) {
-  e.preventDefault()
-  deferredPrompt.value = e
-  // 延迟显示提示，避免首次访问就弹窗
-  setTimeout(() => {
-    if (!isInstalled.value) {
-      showPrompt.value = true
-    }
-  }, 3000)
-}
-
-// 点击安装
-async function installApp() {
-  if (!deferredPrompt.value) return
-  ;(deferredPrompt.value as any).prompt()
-  const { outcome } = await (deferredPrompt.value as any).userChoice
-  if (outcome === 'accepted') {
-    showPrompt.value = false
-  }
-  deferredPrompt.value = null
-}
-
-// 关闭提示
 function dismissPrompt() {
   showPrompt.value = false
 }
-
-onMounted(() => {
-  if (checkInstalled()) return
-  window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-  window.addEventListener('appinstalled', () => {
-    isInstalled.value = true
-    showPrompt.value = false
-    // 成就系统：PWA 安装完成
-    useAchievements().unlock('install-pwa')
-  })
-})
 </script>
 
 <template>
@@ -79,7 +60,7 @@ onMounted(() => {
         <button class="pwa-prompt__btn pwa-prompt__btn--cancel" @click="dismissPrompt">
           稍后再说
         </button>
-        <button class="pwa-prompt__btn pwa-prompt__btn--install" @click="installApp">
+        <button class="pwa-prompt__btn pwa-prompt__btn--install" @click="handleInstall">
           立即安装
         </button>
       </div>

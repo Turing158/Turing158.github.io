@@ -301,6 +301,7 @@ import { useLatestRelease } from '@/composables/useLatestRelease'
 import { useGitalk } from '@/composables/useGitalk'
 import ExternalLinkIcon from '@/components/common/ExternalLinkIcon.vue'
 import CubeLoader from '@/components/common/CubeLoader.vue'
+import { scrollBehavior } from '@/composables/useAnimations'
 
 const REPO = 'SFMC'
 const GITALK_SLUG = 'sfmc-java-edition-Message-Board'
@@ -368,7 +369,7 @@ function formatDate(dateStr: string): string {
 }
 
 function scrollToDownload() {
-  downloadSection.value?.scrollIntoView({ behavior: 'smooth' })
+  downloadSection.value?.scrollIntoView({ behavior: scrollBehavior() })
 }
 
 function toggleLang() {
