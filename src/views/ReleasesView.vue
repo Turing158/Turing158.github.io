@@ -140,6 +140,7 @@ function getStandalonePage(repo: string): string | null {
     'StarFall-SpringBoot': '/starfall-forum',
     'CodeCraft': 'https://codecraft.cc.cd/',
     'MemeMomo': 'https://mememomo.cc.cd/',
+    'dsh-desktop': 'https://github.com/Turing158/dsh-desktop',
   }
   return map[repo] ?? null
 }

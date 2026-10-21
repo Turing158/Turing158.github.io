@@ -682,14 +682,21 @@ onUnmounted(clearResetTimer)
 }
 
 .settings-legend {
+  /* 浮动使 legend 进入 fieldset 的内边距区域，避免标题悬在卡片顶边或分隔线上。 */
+  float: left;
+  width: 100%;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 0;
-  margin-bottom: 2px;
+  margin: 0 0 6px;
   font-size: 0.92rem;
   font-weight: 600;
   color: var(--text-primary);
+}
+
+.settings-fieldset > .settings-row__desc {
+  clear: both;
 }
 
 /* ── 单选列表（工具 / 搜索点击操作）──
@@ -706,6 +713,7 @@ onUnmounted(clearResetTimer)
 }
 
 .choice {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -714,16 +722,20 @@ onUnmounted(clearResetTimer)
   cursor: pointer;
   background: transparent;
   --pxs: 2px;
+  /* 圆心孔的填色：必须始终等于行底，否则选中/悬停时会露出一块硬色斑 */
+  --mark-hole: var(--bg-secondary);
   clip-path: var(--pxc);
-  transition: background-color 0.2s ease;
+  transition: background-color 0.18s ease;
 
   &:hover {
     /* 区块卡底色就是 --bg-secondary，hover 必须用 --bg-card 才看得出反馈 */
     background: var(--bg-card);
+    --mark-hole: var(--bg-card);
   }
 
   &.is-active {
-    background: color-mix(in srgb, var(--accent) 16%, var(--bg-card));
+    background: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
+    --mark-hole: color-mix(in srgb, var(--accent) 12%, var(--bg-card));
   }
 
   &:has(input:focus-visible) {
@@ -733,37 +745,66 @@ onUnmounted(clearResetTimer)
   }
 }
 
-/* 自绘单选标记：外圈像素圆 + 内点 */
+/* 自绘单选标记：16px 同心像素圆，由 20 格圆方程采样结果等比缩放（见 variables.css）。
+   三层同心：本体画环、::before 盖内孔、::after 画中心点。
+   clip-path 挖不出真空，内孔只能靠「与行底同色」的 ::before 盖出来，
+   所以 --mark-hole 必须随 .choice 的三种底色同步变化（见上）。
+   选中环用 --accent-hover 而非 --accent：后者在浅色主题下与行底仅 2.9~3.1:1，
+   达不到 WCAG 1.4.11 要求的 3:1，深一档后为 3.9~5.2:1。 */
 .choice__mark {
   position: relative;
-  width: 18px;
-  height: 18px;
-  margin-top: 1px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
-  background: var(--bg-secondary);
-  --pxs: 2px;
-  clip-path: var(--pxc-circle);
-  box-shadow: inset 0 0 0 1px var(--border-strong);
-  transition: background-color 0.2s ease;
+  background: var(--text-secondary);
+  clip-path: var(--pxc-radio);
+  transition: background-color 0.18s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--mark-hole);
+    clip-path: var(--pxc-radio-in);
+    transition: background-color 0.18s ease;
+  }
 
   &::after {
     content: '';
     position: absolute;
-    inset: 5px;
-    background: var(--bg-card);
-    --pxs: 2px;
-    clip-path: var(--pxc);
+    inset: 0;
+    background: var(--accent-hover);
+    clip-path: var(--pxc-radio-dot);
     opacity: 0;
-    transition: opacity 0.18s ease;
+    transition: opacity 0.16s ease;
   }
 }
 
-.choice.is-active .choice__mark {
+/* 悬停时环转强调色，作为「可点」的即时反馈。
+   这里【不能】用 --text-primary：它在浅色主题下对比度高达 12:1（近黑），
+   会比选中环 --accent-hover（约 4.5:1）更"重"，悬停反而比选中更抢眼，
+   视觉层级倒置。用 --accent 则形成「灰环 → 绿色环 → 绿色环+圆点」的递进。 */
+.choice:hover .choice__mark {
   background: var(--accent);
+}
+
+.choice.is-active .choice__mark {
+  background: var(--accent-hover);
 
   &::after {
     opacity: 1;
   }
+}
+
+/* 选中行左侧竖条：颜色之外的第二重提示（色弱用户也能分辨选中项） */
+.choice.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  background: var(--accent-hover);
 }
 
 /* 标签定宽成列，说明紧随其后占余下宽度：所有选项的说明左边缘对齐，读起来是一列 */
@@ -877,7 +918,7 @@ onUnmounted(clearResetTimer)
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  /* 窄屏装不下一行：说明换到第二行，缩进到与标签左对齐（标记宽 18 + 间距 10） */
+  /* 窄屏装不下一行：说明换到第二行，缩进到与标签左对齐（标记宽 16 + 间距 10） */
   .choice {
     flex-wrap: wrap;
     align-items: flex-start;
@@ -885,7 +926,7 @@ onUnmounted(clearResetTimer)
 
   .choice__desc {
     flex: 1 1 100%;
-    padding-left: 28px;
+    padding-left: 26px;
   }
 
   .settings-footer {

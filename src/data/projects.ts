@@ -14,6 +14,12 @@ export interface Category {
 
 export const developingProjects: Project[] = [
   {
+    name: 'dsh-desktop',
+    description: '把 DeepSeek Harness 装进桌面，让对话、终端、文件编辑与更改审阅在同一个窗口里完成。基于 Rust + Tauri 2 + WebView2 的 Windows 桌面增强客户端。',
+    tech: ['Rust', 'Tauri 2', 'Windows'],
+    url: 'https://github.com/Turing158/dsh-desktop',
+  },
+  {
     name: 'CodeCraft',
     description: '贴在屏幕顶端的小面板，随时看见 AI 编程助手在干什么。基于 Rust + Tauri 2，为 Windows 打造。',
     tech: ['Rust', 'Tauri 2', 'Windows'],

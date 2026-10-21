@@ -12,6 +12,7 @@ export const RELEASE_REPOS = [
   'StarFall-SpringBoot',
   'MemeMomo',
   'CodeCraft',
+  'dsh-desktop',
 ] as const
 
 export type ReleaseRepo = (typeof RELEASE_REPOS)[number]
