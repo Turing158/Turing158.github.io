@@ -53,6 +53,40 @@ const UNIQUE_META: Array<[string, RegExp]> = [
   ['application/ld+json', /<script type="application\/ld\+json">/g],
 ]
 
+/** 静态托管只能执行编译后的 JS，图标等资源也必须已复制到发布根目录。 */
+export function verifyPageAssets(html: string, page: string, distDir: string): string[] {
+  const failures: string[] = []
+  const scripts = [...html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)]
+    .filter((match) => /\btype=["']module["']/i.test(match[0]))
+
+  if (scripts.length === 0) failures.push(`${page} 缺少编译后的模块入口`)
+  for (const [, src] of scripts) {
+    if (!src.startsWith('/assets/') || !/\.m?js(?:[?#]|$)/i.test(src)) {
+      failures.push(`${page} 的模块入口必须是 /assets/ 下的 JS，不能发布源码：${src}`)
+      continue
+    }
+    const file = src.split(/[?#]/)[0].slice(1)
+    if (!existsSync(join(distDir, file))) failures.push(`${page} 的模块入口文件不存在：${src}`)
+  }
+
+  for (const [tag, href] of html.matchAll(/<link\b[^>]*\bhref=["']([^"']+)["'][^>]*>/gi)) {
+    if (!/\brel=["'](?:icon|apple-touch-icon|stylesheet|modulepreload)["']/i.test(tag)) continue
+    if (!href.startsWith('/')) continue
+    const file = href.split(/[?#]/)[0].slice(1)
+    if (!existsSync(join(distDir, file))) failures.push(`${page} 引用的资源文件不存在：${href}`)
+  }
+
+  return failures
+}
+
+function collectSitePages(dir: string, prefix = ''): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const relative = join(prefix, entry.name)
+    if (entry.isDirectory()) return collectSitePages(join(dir, entry.name), relative)
+    return entry.name === 'index.html' || entry.name === '404.html' ? [relative] : []
+  })
+}
+
 export function verifyBuildOutput(distDir: string): VerifyResult {
   const failures: string[] = []
   const notes: string[] = []
@@ -153,15 +187,14 @@ export function verifyBuildOutput(distDir: string): VerifyResult {
     notes.push(`sitemap ${locs.length} 条 URL`)
   }
 
-  // ── 6. 资源必须是绝对路径（相对路径会随深层 URL 解析成 /article/x/assets/...） ──
-  for (const rel of ['index.html', 'articles/index.html']) {
-    if (!existsSync(join(distDir, rel))) continue
+  // ── 6. 每个页面都必须引用已落盘的编译资源，不能把源码目录当成发布目录 ──
+  for (const rel of collectSitePages(distDir)) {
     const html = raw(rel)
     const relative = [...html.matchAll(/(?:src|href)="(\.\/[^"]*)"/g)].map((m) => m[1])
     if (relative.length) {
       failures.push(`${rel} 含相对资源路径（会随深层 URL 解析错误）：${relative.slice(0, 3).join(', ')}`)
     }
-    if (!/src="\/assets\//.test(html)) failures.push(`${rel} 的入口脚本不是绝对路径 /assets/`)
+    failures.push(...verifyPageAssets(html, rel, distDir))
   }
 
   return { failures, notes }
