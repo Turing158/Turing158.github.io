@@ -1,4 +1,4 @@
-import { defineConfig, type ProxyOptions } from 'vite'
+import { defineConfig, loadEnv, type ProxyOptions, type UserConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -8,11 +8,8 @@ import { prerenderPlugin } from './src/plugins/prerender-plugin'
 // ── 后端域名池 ──
 // 多个域名各自部署了同一个合并版 Worker（源码 D:\EducationalData\cf\merged），
 // 但分属不同 Cloudflare 账号（免费额度按账号计：10 万次/天）。
-// 前端在额度耗尽时自动向后切换，因此本地代理也需要为池内每个域名各留一条映射。
-// 这里显式读取 .env（Vite 配置阶段 import.meta.env 尚不可用），改 .env 即可，本文件自动跟随。
-const BACKEND_BASE = (
-  process.env.VITE_BACKEND_BASE || 'https://api.turing158.dpdns.org'
-).replace(/\/+$/, '')
+// 当前默认关闭轮转，只为 api2 单 API 建立本地代理；域名池配置保留以便后续恢复。
+// Vite 配置阶段用 loadEnv 按 mode 读取 .env，保持本地代理与前端端点一致。
 
 const BUILTIN_BACKUP_BASES = [
   'https://api.turing158.de5.net',
@@ -21,11 +18,14 @@ const BUILTIN_BACKUP_BASES = [
   'https://api.add-friendlink.de5.net',
 ]
 
-const BACKEND_POOL: string[] = (() => {
-  const raw = process.env.VITE_BACKEND_POOL
+function createBackendPool(env: Record<string, string | undefined>): string[] {
+  const base = (env.VITE_BACKEND_BASE || 'https://api2.turing158.dpdns.org').replace(/\/+$/, '')
+  if (env.VITE_BACKEND_POOL_ENABLED !== 'true') return [base]
+
+  const raw = env.VITE_BACKEND_POOL
   const list = raw
     ? raw.split(',').map((s) => s.trim()).filter(Boolean)
-    : [BACKEND_BASE, ...BUILTIN_BACKUP_BASES]
+    : [base, ...BUILTIN_BACKUP_BASES]
   const seen = new Set<string>()
   const out: string[] = []
   for (const item of list) {
@@ -34,8 +34,8 @@ const BACKEND_POOL: string[] = (() => {
     seen.add(normalized)
     out.push(normalized)
   }
-  return out.length > 0 ? out : [BACKEND_BASE]
-})()
+  return out.length > 0 ? out : [base]
+}
 
 // ── 本地接口代理 ──
 // 后端 Worker 的 CORS 白名单由 NORMAL_OPERATE_ALLOW_ORIGIN 控制，只放行线上域名与
@@ -49,33 +49,33 @@ const BACKEND_POOL: string[] = (() => {
 //    的前缀串 —— 若索引 0 排在前面，`/api/turing158-1/...` 会被它抢先吃掉，
 //    错转发到索引 0 的域名。降序后长前缀先匹配，歧义消除。
 //    命名规则必须与 src/utils/backendPool.ts 的 proxyPrefixFor() 保持一致。
-const API_PROXY: Record<string, string> = Object.fromEntries(
-  BACKEND_POOL.map((base, index) => [
-    index === 0 ? '/api/turing158' : `/api/turing158-${index}`,
-    base,
-  ]).sort((a, b) => b[0].length - a[0].length)
-)
-
 // 转发时把 Origin 伪装成线上站点域名，避免后端按白名单判定为非法来源
 const SITE_ORIGIN = 'https://blog.turing158.cc.cd'
 
-const apiProxy: Record<string, ProxyOptions> = Object.fromEntries(
-  Object.entries(API_PROXY).map(([prefix, target]) => [
-    prefix,
-    {
-      target,
-      changeOrigin: true,
-      secure: true,
-      headers: { Origin: SITE_ORIGIN },
-      // 去掉代理前缀，转发到后端真实路径。
-      // 必须要求 `/` 或结尾边界：否则 `/api/turing158-1/...` 会被 `/api/turing158`
-      // 的规则吃掉前缀、错转发到索引 0 的域名（两个前缀互为前缀串）。
-      rewrite: (path: string) => path.replace(new RegExp(`^${prefix}(?=/|$)`), ''),
-    } satisfies ProxyOptions,
-  ])
-)
+function createApiProxy(pool: string[]): Record<string, ProxyOptions> {
+  const API_PROXY: Record<string, string> = Object.fromEntries(
+    pool.map((base, index) => [
+      index === 0 ? '/api/turing158' : `/api/turing158-${index}`,
+      base,
+    ]).sort((a, b) => b[0].length - a[0].length)
+  )
 
-export default defineConfig({
+  return Object.fromEntries(
+    Object.entries(API_PROXY).map(([prefix, target]) => [
+      prefix,
+      {
+        target,
+        changeOrigin: true,
+        secure: true,
+        headers: { Origin: SITE_ORIGIN },
+        // 去掉代理前缀，并要求 `/` 或结尾边界，避免不同索引的前缀互相误匹配。
+        rewrite: (path: string) => path.replace(new RegExp(`^${prefix}(?=/|$)`), ''),
+      } satisfies ProxyOptions,
+    ])
+  )
+}
+
+const createViteConfig = (BACKEND_POOL: string[], apiProxy: Record<string, ProxyOptions>): UserConfig => ({
   plugins: [
     vue(),
     articlesPlugin(),
@@ -256,4 +256,10 @@ export default defineConfig({
     // npm run preview 时同样启用，方便本地校验构建产物
     proxy: apiProxy,
   },
+})
+
+export default defineConfig(({ mode }) => {
+  const env = { ...loadEnv(mode, process.cwd(), 'VITE_'), ...process.env }
+  const pool = createBackendPool(env)
+  return createViteConfig(pool, createApiProxy(pool))
 })

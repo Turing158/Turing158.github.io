@@ -17,7 +17,7 @@
  *
  * 用法（⚠️ owner 由 Worker 注入，路径里**不能**再写 owner / login）：
  *   githubUrl('repos/SFMC/releases?per_page=1')
- *     → https://api.turing158.dpdns.org/github/api/repos/SFMC/releases?per_page=1
+ *     → https://api2.turing158.dpdns.org/github/api/repos/SFMC/releases?per_page=1
  *     → Worker 转发到 api.github.com/repos/Turing158/SFMC/releases?per_page=1
  *   githubFetch('users/events?per_page=10')
  *     → Worker 转发到 api.github.com/users/Turing158/events?per_page=10
@@ -37,7 +37,7 @@
 
 import { config } from '@/config'
 import { buildPoolUrl, getActiveIndex, runWithPool, splitPoolUrl } from '@/utils/backendPool'
-import { isLocalEnv } from '@/utils/apiEndpoint'
+import { apiFetch, apiUrl, isLocalEnv } from '@/utils/apiEndpoint'
 
 /** 默认请求头；与 Worker 侧 buildGithubHeaders 的语义对齐 */
 export const GITHUB_API_HEADERS = {
@@ -45,7 +45,7 @@ export const GITHUB_API_HEADERS = {
 } as const
 
 /**
- * 由「不含域名的资源路径」拼出当前 active 域名下的可请求地址。
+ * 为域名池模式拼出当前 active 域名下的资源路径。
  *
  * @param path 以 `/repos/...` 或 `/users/...` 开头的资源路径，**不要包含 owner / login**。
  *             前导斜杠可有可无；query string 直接跟在后面。
@@ -69,6 +69,9 @@ function activeGithubPath(path: string): string {
  *             前导斜杠可有可无；query string 直接跟在后面。
  */
 export function githubUrl(path: string): string {
+  if (!config.backendPoolEnabled) {
+    return apiUrl(`${config.github.apiBase}/${path.replace(/^\/+/, '')}`)
+  }
   return buildPoolUrl(getActiveIndex(), activeGithubPath(path), isLocalEnv ? 'proxy' : 'remote')
 }
 
@@ -87,7 +90,7 @@ export function githubOptions(init?: {
 }
 
 /**
- * 带兜底的 GitHub 请求。降级顺序：
+ * GitHub 请求默认使用单 API；显式开启域名池后，降级顺序为：
  *   ① 池内轮转 —— 当前 active 域名的同源代理（本地）/ 绝对地址（线上）
  *   ② 池内下一个域名（额度耗尽 / 被墙 / 宕机时自动切换）
  *   ③ 最后才回退直连 api.github.com（按 Worker 规则补回 owner）
@@ -101,6 +104,11 @@ export function githubOptions(init?: {
  */
 export async function githubFetch(path: string, init?: RequestInit): Promise<Response> {
   const headers = { ...GITHUB_API_HEADERS, ...((init?.headers as Record<string, string>) ?? {}) }
+  // 单 API 模式仅请求配置的 GitHub 代理，不轮转域名或回退匿名 GitHub API。
+  if (!config.backendPoolEnabled) {
+    const url = `${config.github.apiBase}/${path.replace(/^\/+/, '')}`
+    return apiFetch(url, { ...init, headers })
+  }
   const resourcePath = activeGithubPath(path)
 
   try {

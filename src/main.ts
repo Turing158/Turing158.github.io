@@ -8,6 +8,7 @@ import { useTheme } from './composables/useTheme'
 import { useAnimations } from './composables/useAnimations'
 import { useSettings } from './composables/useSettings'
 import { usePwaInstall } from './composables/usePwaInstall'
+import { config } from './config'
 import { installAxiosPoolInterceptor } from './utils/axiosPool'
 import BlogTip from './plugins/blog-tip'
 import 'highlight.js/styles/github.css'
@@ -25,8 +26,8 @@ const app = createApp(App)
 const pinia = createPinia()
 const head = createHead()
 
-// 后端域名池：让 5 处 axios 调用点也具备「额度耗尽自动换域名」的能力（挂全局拦截器）
-installAxiosPoolInterceptor()
+// 单 API 模式下不安装域名轮转拦截器；实现保留，显式开启域名池时再启用。
+if (config.backendPoolEnabled) installAxiosPoolInterceptor()
 
 app.use(pinia)
 app.use(router)

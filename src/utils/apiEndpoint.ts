@@ -1,18 +1,19 @@
 /**
- * 外部 API 端点解析（域名池 + 本地代理 / 线上直连）
+ * 外部 API 端点解析（默认单 API + 本地代理 / 线上直连）
  *
  * 背景一（CORS）：后端 Worker 的 CORS 白名单由 NORMAL_OPERATE_ALLOW_ORIGIN 控制，
  * 只放行线上站点域名与 localhost:3000。本地用 127.0.0.1、局域网 IP 或其它端口
  * 打开时会被浏览器拦截，因此本地把远端绝对地址改写成 Vite 代理的同源路径
  * （映射见 vite.config.ts 的 API_PROXY）；线上（GitHub Pages 纯静态托管）直连绝对地址。
  *
- * 背景二（额度轮换）：多个域名分属不同 Cloudflare 账号，各有 10 万次/天免费额度。
+ * 可选的额度轮换（当前默认关闭）：多个域名分属不同 Cloudflare 账号，各有 10 万次/天免费额度。
  * 任一域名耗尽（Error 1027）时自动切到下一个 —— 判定与状态机全在
  * src/utils/backendPool.ts；本模块只负责「按 active 域名拼地址」并接上轮转重试。
  *
  * CORS 本身放行的第三方接口（如 https://date.nager.at）不在此列，保持直连。
  */
 
+import { config } from '@/config'
 import {
   buildPoolUrl,
   runWithPool,
@@ -48,15 +49,21 @@ export function apiUrl(url: string): string {
 }
 
 /**
- * 带兜底的 fetch。
+ * 默认使用单 API 的 fetch，本地代理不存在时回退同一 API 的远端地址。
  *
- * 池内地址（后端 Worker）：接上「额度耗尽自动换域名」的轮转 —— 某个域名网络层
+ * 显式开启域名池后，池内地址（后端 Worker）接上轮转 —— 某个域名网络层
  * 失败时改用池内下一个域名重试同一个请求。同时保留既有的「本地代理不可用
  * （404/405/501，例如用普通静态服务器打开构建产物）则回退远端直连」行为。
  *
  * 非池内地址（date.nager.at、corsproxy.io 等）：行为与改造前完全一致。
  */
 export async function apiFetch(url: string, init?: RequestInit): Promise<Response> {
+  // 单 API 模式：不读取域名池状态，也不在请求失败后切换备用域名。
+  if (!config.backendPoolEnabled) {
+    if (!isLocalEnv) return fetch(url, init)
+    return fetchViaLocalProxy(apiUrl(url), url, init)
+  }
+
   const split = splitPoolUrl(url)
 
   if (!split) {
@@ -108,7 +115,7 @@ async function fetchNonPoolWithFallback(
  *
  * ⚠️ 与改造前的关键差别 —— 只有当代理【返回了 404/405/501】（说明当前服务器压根没配代理，
  * 例如直接用普通静态服务器打开构建产物）才回退直连；若代理是【网络层失败】（抛异常），
- * 则原样抛出，交给 runWithPool 去轮转域名。
+ * 则原样抛出；仅在启用域名池时由 runWithPool 接管轮转。
  *
  * 改造前无论何种失败都回退直连，等于把请求打向同一个（可能已额度耗尽的）域名，
  * 使域名池形同虚设。
@@ -124,7 +131,7 @@ async function fetchViaLocalProxy(
   try {
     res = await fetch(proxied, init)
   } catch (err) {
-    // 代理不可达 → 不盲目直连，让上层换域名重试
+    // 代理不可达时原样抛出；单 API 模式不会再次请求。
     throw err
   }
 

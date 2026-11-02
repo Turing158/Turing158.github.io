@@ -24,16 +24,19 @@
 // 可用环境变量 VITE_BACKEND_BASE 覆盖；换域名时需同步 .env，vite.config.ts 与
 // src/utils/apiEndpoint.ts 会自动跟随该变量，无需再改代码。
 const BACKEND_BASE = (
-  import.meta.env.VITE_BACKEND_BASE || 'https://api.turing158.dpdns.org'
+  import.meta.env.VITE_BACKEND_BASE || 'https://api2.turing158.dpdns.org'
 ).replace(/\/+$/, '')
 
 // --- 后端域名池 ---
+// 暂时停用域名轮转，默认只请求 BACKEND_BASE；实现文件保留，后续可显式开启。
+const BACKEND_POOL_ENABLED = import.meta.env.VITE_BACKEND_POOL_ENABLED === 'true'
+
 // 下列域名各自部署了同一个合并版 Worker，但分属不同 Cloudflare 账号
 // （免费额度按【账号】计：10 万次/天，00:00 UTC 重置）。
-// 任一域名额度耗尽（Error 1027）、被墙或宕机时，由 src/utils/backendPool.ts
+// 开启轮转后，任一域名额度耗尽（Error 1027）、被墙或宕机时，由 src/utils/backendPool.ts
 // 自动切到下一个域名继续服务 —— 数组顺序即优先级。
 //
-// 可用环境变量 VITE_BACKEND_POOL 覆盖（逗号分隔）；未配置时 = BACKEND_BASE + 下列备用域名。
+// 开启后可用 VITE_BACKEND_POOL 覆盖（逗号分隔）；未配置时 = BACKEND_BASE + 下列备用域名。
 // ⚠️ 池内每个域名都必须部署了同一个合并版 Worker，否则切过去会大面积 404。
 const BUILTIN_BACKUP_BASES = [
   'https://api.turing158.de5.net',
@@ -43,6 +46,7 @@ const BUILTIN_BACKUP_BASES = [
 ]
 
 const BACKEND_POOL: readonly string[] = (() => {
+  if (!BACKEND_POOL_ENABLED) return [BACKEND_BASE]
   const raw = import.meta.env.VITE_BACKEND_POOL
   const list = raw
     ? raw.split(',').map((s) => s.trim()).filter(Boolean)
@@ -149,11 +153,12 @@ export const config = {
   site: {
     url: SITE_URL,
   },
-  /** 统一后端基址：合并后的单个 Worker（见文件头注释的路径分工）；= 域名池首项 */
+  /** 统一后端基址：默认使用 api2 单 API（见文件头注释的路径分工） */
   backendBase: BACKEND_BASE,
+  /** 是否启用域名轮转；默认关闭，保留实现以便后续恢复 */
+  backendPoolEnabled: BACKEND_POOL_ENABLED,
   /**
-   * 后端域名池：顺序即优先级，额度耗尽时由 backendPool 自动向后切换。
-   * 池首项始终等于 pageTitle 所用的 backendBase（见上方 BACKEND_POOL 构造）。
+   * 关闭轮转时只包含 backendBase；开启后按顺序切换备用域名。
    */
   backendPool: BACKEND_POOL,
   github: {
