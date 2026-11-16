@@ -111,7 +111,7 @@ const TITLE_TEMPLATE = '{current_page} | Blog - {blog_title}'
 
 // --- 开发中项目仓库列表（用于获取最近提交） ---
 const DEVELOPING_REPOS = [
-  'StarFall-Minecraft-Launcher',
+  'SFMCL-Transformed',
   'Turing158.github.io',
 ]
 

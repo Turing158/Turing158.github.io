@@ -121,7 +121,9 @@ usePageSeo(
 const { loading, error, releases, fetchReleases } = useReleases()
 
 const displayedReleases = computed(() =>
-  releases.value.filter(r => r.tag_name)
+  releases.value
+    .filter(r => r.tag_name)
+    .sort((a, b) => (Date.parse(b.published_at) || 0) - (Date.parse(a.published_at) || 0))
 )
 
 function open(url: string) {

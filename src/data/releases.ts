@@ -6,6 +6,7 @@
  * 运行时由 `src/composables/useReleases.ts` 使用。
  */
 export const RELEASE_REPOS = [
+  'SFMCL-Transformed',
   'StarFall-Minecraft-Launcher',
   'SFMC',
   'StarFall-Vue',

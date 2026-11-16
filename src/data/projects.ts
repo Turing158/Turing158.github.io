@@ -38,10 +38,10 @@ export const developingProjects: Project[] = [
     url: 'https://github.com/Turing158/LeisureHub',
   },
   {
-    name: 'StarFall-Minecraft-Launcher',
-    description: 'SFMC Minecraft 启动器，支持多版本管理、模组集成等功能。',
-    tech: ['C#', 'Minecraft', 'Launcher'],
-    url: 'https://github.com/Turing158/StarFall-Minecraft-Launcher',
+    name: 'SFMCL-Transformed',
+    description: 'StarFall Minecraft 启动器的 Rust / Tauri 重写版本，支持多版本管理、模组与整合包安装，采用 Minecraft 像素风界面。',
+    tech: ['Rust', 'Tauri 2', 'React'],
+    url: 'https://github.com/Turing158/SFMCL-Transformed',
   },
   {
     name: 'Turing158.github.io',
@@ -63,6 +63,12 @@ export const categories: Category[] = [
     icon: '✅',
     label: 'projects.categoryCompleted',
     projects: [
+      {
+        name: 'StarFall-Minecraft-Launcher',
+        description: 'SFMC Minecraft 启动器，支持多版本管理、模组集成等功能。',
+        tech: ['C#', 'Minecraft', 'Launcher'],
+        url: 'https://github.com/Turing158/StarFall-Minecraft-Launcher',
+      },
       {
         name: 'CoolCoding',
         description: '通过提示词、模型与 Agent 一次性生成的小玩具集合。',
