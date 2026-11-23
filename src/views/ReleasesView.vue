@@ -136,6 +136,7 @@ function goToDetail(repo: string) {
 
 function getStandalonePage(repo: string): string | null {
   const map: Record<string, string> = {
+    'SFMCL-Transformed': 'https://sfmcl.cc.cd/',
     'StarFall-Minecraft-Launcher': '/sfmc',
     'SFMC': '/sfmc-jar',
     'StarFall-Vue': '/starfall-forum',
